@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CCZ Mossoró - Centro de Controle de Zoonoses</title>
+    <style>
+        /* PALETA DE CORES FORNECIDA */
+        :root {
+            --primary-dark: #001449;
+            --primary-med: #012677;
+            --accent-blue: #005BC5;
+            --light-blue: #00B4FC;
+            --cyan: #17F9FF;
+            --white: #ffffff;
+            --gray-light: #f4f4f4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--white);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* NAVBAR PROFISSIONAL */
+        nav {
+            background-color: var(--accent-blue);
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+      /* Ajuste também o texto da Logo para acompanhar o aumento */
+.logo-text h1 {
+    font-size: 1.8rem; 
+}
+
+
+        .logo-text p {
+            font-size: 0.8rem;
+            border-top: 1px solid white;
+            margin-top: 5px;
+        }
+
+        nav ul {
+    display: flex;
+    list-style: none;
+    gap: 40px; /* Aumentei o espaço entre os nomes (era 25px) */
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: 600; /* Deixei um pouco mais grosso para destacar */
+    font-size: 1.2rem; /* Aumentei o tamanho (era aprox. 1.0rem) */
+    transition: 0.3s;
+}
+
+
+        nav ul li a:hover {
+            color: var(--cyan);
+        }
+
+        .contact-btns {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-contact {
+            padding: 8px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .btn-email { border: 1px solid white; color: white; }
+        .btn-whatsapp { background-color: white; color: var(--accent-blue); }
+
+      /* HERO SECTION - AJUSTE DE ENQUADRAMENTO */
+.hero {
+    /* Mudamos para 'center center' para centralizar os animais e 500px para não cortar tanto */
+    background: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)), url('home2.avif') center center / cover; 
+    height: 500px; 
+    display: flex;
+    justify-content: flex-end; 
+    align-items: center;
+    padding: 0 5%; /* Diminuí um pouco o recuo para o container não ficar espremido */
+    color: white;
+}
+
+.hero-container {
+    background: rgba(255, 255, 255, 0.95); 
+    padding: 30px;
+    border-radius: 4px;
+    max-width: 380px; 
+    text-align: left; /* Alinhado à esquerda dentro do bloco para melhor leitura */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    border-right: 8px solid var(--accent-blue);
+    margin-right: 20px;
+}
+
+.hero-container h2 {
+    color: var(--primary-dark);
+    font-size: 1.6rem;
+    line-height: 1.2;
+    margin-bottom: 10px;
+}
+
+.hero-container p {
+    color: #444;
+    font-size: 0.95rem;
+}
+        /* SEÇÃO DE SERVIÇOS (CARDS) */
+        .container { width: 90%; max-width: 1200px; margin: 40px auto; }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+            color: var(--primary-dark);
+            font-size: 2rem;
+        }
+
+        .grid-services {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--gray-light);
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            transition: 0.3s;
+            border-bottom: 4px solid var(--accent-blue);
+        }
+
+        .card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .card i { font-size: 2.5rem; color: var(--accent-blue); margin-bottom: 15px; display: block; }
+
+        /* FORMULÁRIO DE DENÚNCIA */
+        .complaint-form {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            max-width: 800px;
+            margin: auto;
+        }
+
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: var(--primary-dark); }
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .btn-submit {
+            background-color: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+        }
+
+        /* FOOTER / ONDE ESTAMOS */
+        footer {
+            background-color: var(--primary-dark);
+            color: white;
+            padding: 40px 5% 20px;
+            margin-top: 50px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        .info-box h4 { margin-bottom: 15px; border-bottom: 1px solid var(--light-blue); display: inline-block; }
+
+        .bottom-bar {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.9rem;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            background: #e1e1e1;
+            font-size: 0.8rem;
+            margin-top: 10px;
+        }
+
+        /* NAVEGAÇÃO */
+        .page { display: none; }
+        .page.active { display: block; }
+    </style>
+</head>
+<body>
+<nav>
+        <div class="logo-area">
+            <img src="logo.svg" alt="Logo CCZ Mossoró" style="height: 85px; width: auto;">
+        </div>
+        <ul>
+            <li><a href="#" onclick="showPage('home')">Home</a></li>
+            <li><a href="#" onclick="showPage('servicos')">Serviços</a></li>
+            <li><a href="#" onclick="showPage('denuncias')">Denúncias</a></li>
+        </ul>
+        <div class="contact-btns">
+            <a href="mailto:ccz@mossoro.rn.gov.br" class="btn-contact btn-email">E-mail</a>
+            <a href="https://wa.me/558433151234" class="btn-contact btn-whatsapp">WhatsApp</a>
+        </div>
+    </nav>
+
+   <main id="home" class="page active">
+        <section class="hero">
+            <div class="hero-container">
+                <h2>Vigilância em Saúde e Controle de Vetores</h2>
+                <p>Trabalhando pela saúde coletiva e proteção animal em Mossoró.</p>
+            </div>
+        </section>
+
+       <div class="container">
+    <h3 class="section-title">Acesso Rápido</h3>
+    <div class="grid-services">
+    <div class="card" onclick="showPage('servicos')">
+        <span class="material-symbols-outlined" style="font-size: 40px; color: var(--accent-blue); margin-bottom: 15px;">vaccines</span>
+        <h3>Vacinação</h3>
+        <p>Confira o calendário de vacinação antirrábica.</p>
+    </div>
+
+    <div class="card" onclick="showPage('servicos')">
+       <span class="material-symbols-outlined" style="font-size: 40px; color: var(--accent-blue); margin-bottom: 15px;">bug_report</span>
+        <h3>Controle de Vetores</h3>
+        <p>Ações contra Dengue, Zika e Chikungunya.</p>
+    </div>
+
+    <div class="card" onclick="showPage('denuncias')">
+        <span class="material-symbols-outlined" style="font-size: 40px; color: var(--accent-blue); margin-bottom: 15px;">report</span>
+        <h3>Denúncias</h3>
+        <p>Registre focos de mosquito ou maus-tratos.</p>
+    </div>
+
+    <div class="card" onclick="showPage('servicos')">
+        <span class="material-symbols-outlined" style="font-size: 40px; color: var(--accent-blue); margin-bottom: 15px;">pets</span>
+        <h3>Castração</h3>
+        <p>Informações sobre o programa de esterilização.</p>
+    </div>
+</div>
+</div>
+    </main>
+
+   <main id="servicos" class="page">
+    <div class="container">
+        <h3 class="section-title">Nossos Serviços</h3>
+        <div class="grid-services">
+            
+            <div class="card">
+               <span class="material-symbols-outlined" style="font-size: 40px; color: var(--accent-blue); margin-bottom: 15px;">menu_book</span>
+                <h3>Educação em Saúde</h3>
+                <p>Conteúdos educativos, materiais para download e solicitação de palestras.</p>
+            </div>
+
+            <div class="card">
+                <span class="material-symbols-outlined" style="font-size: 40px; color: var(--accent-blue); margin-bottom: 15px;">biotech</span>
+                <h3>Leishmaniose (Calazar)</h3>
+                <p>Informações sobre transmissão, sintomas em animais e diagnóstico laboratorial</p>
+            </div>
+
+            <div class="card">
+              <span class="material-symbols-outlined" style="font-size: 40px; color: var(--accent-blue); margin-bottom: 15px;">emergency_home</span>
+                <h3>Acidentes com Animais</h3>
+                <p>Orientações sobre mordeduras e acidentes com animais peçonhentos.</p>
+            </div>
+
+            <div class="card">
+               <span class="material-symbols-outlined" style="font-size: 40px; color: var(--accent-blue); margin-bottom: 15px;">vaccines</span>
+                <h3>Vacinação</h3>
+                <p>Informações sobre campanhas de vacinação antirrábica e calendário vacinal.</p>
+            </div>
+
+            <div class="card">
+                <span class="material-symbols-outlined" style="font-size: 40px; color: var(--accent-blue); margin-bottom: 15px;">pets</span>
+                <h3>Castração</h3>
+                <p>Agendamento e procedimentos de esterilização para cães e gatos.</p>
+            </div>
+
+            <div class="card">
+                <span class="material-symbols-outlined" style="font-size: 40px; color: var(--accent-blue); margin-bottom: 15px;">health_and_safety</span>
+                <h3>Prevenção de Zoonoses</h3>
+                <p>Informações sobre Raiva, Dengue, Zika, Chikungunya e Chagas.</p>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+    <main id="denuncias" class="page">
+    <div class="container">
+        <h3 class="section-title">Formulário de Denúncia de Focos e Pragas</h3>
+        
+        <div class="complaint-form" style="background: #fff; padding: 40px; border-radius: 12px; border-top: 6px solid var(--accent-blue);">
+            <form onsubmit="event.preventDefault(); alert('Protocolo Gerado com Sucesso: #2026' + Math.floor(Math.random()*9999));">
+                
+                <fieldset style="border: none; margin-bottom: 30px;">
+                    <legend style="font-weight: bold; color: var(--primary-dark); font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                        <span style="background: var(--accent-blue); color: white; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 0.8rem;">1</span>
+                        Informações sobre a Ocorrência
+                    </legend>
+                    <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label>Tipo de Praga/Foco</label>
+                            <select required style="background: #fdffdf; border: 1px solid var(--accent-blue);">
+                                <option value="">Selecione o tipo...</option>
+                                <option>Mosquito da Dengue</option>
+                                <option>Escorpião</option>
+                                <option>Ratos/Roedores</option>
+                                <option>Morcegos</option>
+                                <option>Animais Sinantrópicos</option>
+                                <option>Outro</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Data da Ocorrência</label>
+                            <input type="date" value="2026-04-29">
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset style="border: none; margin-bottom: 30px; background: #f8f9ff; padding: 20px; border-radius: 8px;">
+                    <legend style="font-weight: bold; color: var(--primary-dark); font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                        <span style="background: var(--accent-blue); color: white; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 0.8rem;">2</span>
+                        Localização do Foco
+                    </legend>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px;">
+                        <div class="form-group">
+                            <label>Endereço Completo</label>
+                            <input type="text" placeholder="Ex: Rua das Flores, 123" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Bairro / Ponto de Referência</label>
+                            <input type="text" placeholder="Ex: Alto de São Manoel, próximo ao mercado">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button type="button" style="width: 100%; padding: 10px; background: white; border: 1px dashed var(--accent-blue); color: var(--accent-blue); border-radius: 5px; cursor: pointer; font-weight: bold;">
+                            📍 Ativar Geolocalização Atual (GPS)
+                        </button>
+                    </div>
+                </fieldset>
+
+                <fieldset style="border: none; margin-bottom: 30px;">
+                    <legend style="font-weight: bold; color: var(--primary-dark); font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                        <span style="background: var(--accent-blue); color: white; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 0.8rem;">3</span>
+                        Descrição e Anexos
+                    </legend>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label>Relato Detalhado</label>
+                            <textarea rows="4" placeholder="Descreva a situação observada..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Fotos ou Vídeos</label>
+                            <div style="border: 2px dashed #ddd; height: 110px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 8px; color: #888; font-size: 0.9rem;">
+                                <input type="file" id="file" style="display: none;">
+                                <label for="file" style="cursor: pointer; text-align: center;">
+                                    <strong>Clique para anexar</strong><br>ou arraste arquivos aqui
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <div style="border-top: 1px solid #eee; padding-top: 25px; margin-top: 10px;">
+                    <p style="font-size: 0.85rem; color: #666; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;">Contato para Retorno (Opcional)</p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                        <input type="text" placeholder="Seu Nome">
+                        <input type="email" placeholder="E-mail">
+                        <input type="tel" placeholder="WhatsApp">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit" style="margin-top: 30px; box-shadow: 0 4px 15px rgba(0, 20, 73, 0.2);">
+                    ENVIAR DENÚNCIA AGORA
+                </button>
+            </form>
+        </div>
+        <div style="margin-top: 40px; text-align: center; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+            <h4 style="color: var(--primary-dark); margin-bottom: 15px;">Acompanhar Denúncia Existente</h4>
+            <div style="display: flex; justify-content: center; gap: 10px;">
+                <input type="text" placeholder="Digite seu número de protocolo" style="max-width: 300px;">
+                <button class="btn-contact btn-whatsapp" style="border: 1px solid var(--accent-blue);">Consultar</button>
+            </div>
+            <p style="margin-top: 15px; font-size: 0.9rem; color: #666;">
+                Status possíveis: <span class="status-badge">Em análise</span> <span class="status-badge">Visita Realizada</span>
+            </p>
+        </div>
+    </div>
+</main>
+
+    <footer>
+        <div class="footer-content">
+           <div class="info-box">
+    <h4>Onde Estamos</h4>
+    <p style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+        <span class="material-symbols-outlined" style="font-size: 20px; color: var(--light-blue);">location_on</span>
+        R. Dr. Moisés da Costa Lopes, 48 - Nova Betânia, Mossoró - RN, 59607-490
+    </p>
+    <p style="display: flex; align-items: center; gap: 8px;">
+        <span class="material-symbols-outlined" style="font-size: 20px; color: var(--light-blue);">call</span>
+        (84) 3315-1234
+    </p>
+</div>
+            <div class="info-box">
+                <h4>Funcionamento</h4>
+                <p>Segunda à Sexta</p>
+                <p>07:30 às 16:00</p>
+            </div>
+            <div class="info-box">
+                <h4>Redes Sociais</h4>
+                <p>Siga o CCZ para alertas em tempo real:</p>
+                <p>Instagram | Facebook | Twitter</p>
+            </div>
+        </div>
+        <div class="bottom-bar">
+            <p>2026 © Governo de Mossoró - Vigilância em Saúde</p>
+            <p><small>Acessibilidade | Privacidade</small></p>
+        </div>
+    </footer>
+
+    <script>
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+    </script>
+</body>
+</html>
