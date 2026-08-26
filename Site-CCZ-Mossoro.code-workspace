@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"name": "SiteInstitucionalCCZ-BackEnd",
+			"path": "../SiteInstitucionalCCZ-BackEnd"
+		}
+	],
+	"settings": {}
+}
