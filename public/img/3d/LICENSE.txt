@@ -1,0 +1,9 @@
+Os ícones 3D desta pasta são do projeto Microsoft Fluent Emoji.
+Fonte: https://github.com/microsoft/fluentui-emoji
+Licença: MIT (uso livre, inclusive comercial e governamental).
+
+Copyright (c) Microsoft Corporation.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files, to deal in the software
+without restriction, including the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies, subject to the MIT License terms.
