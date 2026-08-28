@@ -1,7 +1,7 @@
 import { adminPasswordConfigured } from "@/lib/auth";
 import { LoginForm } from "./login-form";
 
-export const metadata = { title: "Entrar · CCZ Mossoró" };
+export const metadata = { title: "Entrar | CCZ Mossoró" };
 
 export default function LoginPage() {
   return (

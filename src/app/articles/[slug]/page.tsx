@@ -64,7 +64,6 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
         <header className="max-w-3xl border-b border-line/70 pb-10">
           <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-brand-600">
-            <span className="h-px w-8 bg-brand-600" />
             {meta.eyebrow}
           </span>
           <h1 className="mt-4 text-4xl font-bold md:text-5xl">{meta.title}</h1>

@@ -104,7 +104,6 @@ export default async function ServicoPage({ params }: { params: Promise<{ slug: 
           <div className="blob -left-24 -top-24 size-80 bg-brand-400/25" aria-hidden="true" />
           <Reveal className="relative max-w-[60ch]">
             <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-brand-600">
-              <span className="h-px w-8 bg-brand-600" />
               {servico.eyebrow}
             </span>
             <h1 className="mt-4 text-4xl font-bold md:text-5xl">{servico.title}</h1>

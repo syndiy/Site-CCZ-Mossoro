@@ -345,7 +345,7 @@ export function ReportForm() {
                     alt="Pré-visualização da foto"
                     className="max-h-48 rounded-lg object-contain shadow-sm"
                   />
-                  <span className="font-medium text-brand-800">{imagem?.name} · clique para trocar</span>
+                  <span className="font-medium text-brand-800">{imagem?.name} (clique para trocar)</span>
                 </>
               ) : (
                 <>

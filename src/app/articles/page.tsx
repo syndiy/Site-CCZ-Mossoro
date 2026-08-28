@@ -26,7 +26,6 @@ export default function ArtigosPage() {
       <Container>
         <header className="max-w-2xl">
           <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-brand-600">
-            <span className="h-px w-8 bg-brand-600" />
             Educação em saúde
           </span>
           <h1 className="mt-4 text-4xl font-bold md:text-5xl">Artigos</h1>

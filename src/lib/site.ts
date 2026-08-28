@@ -2,7 +2,7 @@ export const site = {
   name: "CCZ Mossoró",
   legalName: "Centro de Controle de Zoonoses de Mossoró",
   parentOrg: "Prefeitura Municipal de Mossoró",
-  department: "Secretaria Municipal de Saúde · Vigilância em Saúde",
+  department: "Secretaria Municipal de Saúde. Vigilância em Saúde",
 
   url: "https://ccz.mossoro.rn.gov.br",
 
