@@ -28,7 +28,12 @@ export async function PUT(req: NextRequest, { params }: Context) {
     return NextResponse.json({ error: "O título é obrigatório." }, { status: 400 });
   }
 
-  writeEntry(collection, slug, data, String(body ?? ""));
+  const current = readEntry(collection, slug);
+  const nextData = { ...current?.data, ...data };
+  if (collection === "articles" && Object.prototype.hasOwnProperty.call(data, "featured")) {
+    nextData.home = Boolean(data.featured);
+  }
+  writeEntry(collection, slug, nextData, String(body ?? ""));
   await commitChange(`conteudo: atualiza ${collection}/${slug}`, [
     `content/${collection}/${slug}.md`,
   ]);
