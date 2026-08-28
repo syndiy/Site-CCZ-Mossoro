@@ -6,13 +6,28 @@ import {
   Marker,
   NavigationControl,
   AttributionControl,
+  type StyleSpecification,
 } from "maplibre-gl";
 import { useEffect, useRef } from "react";
 
 export type LatLng = { lat: number; lng: number };
 
-// Tiles vetoriais do OpenFreeMap: sem chave de API, sem limite de uso.
-const ESTILO = "https://tiles.openfreemap.org/styles/positron";
+// Camada raster evita o estilo vetorial remoto que falhava ao entregar tiles.
+// A atribuicao e mantida no controle nativo do MapLibre.
+const ESTILO: StyleSpecification = {
+  version: 8,
+  sources: {
+    openstreetmap: {
+      type: "raster",
+      tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
+      tileSize: 256,
+      maxzoom: 19,
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors',
+    },
+  },
+  layers: [{ id: "openstreetmap", type: "raster", source: "openstreetmap" }],
+};
 
 const PIN_HTML = `<div class="ccz-pin">
   <span class="ccz-pin-pulse"></span>
