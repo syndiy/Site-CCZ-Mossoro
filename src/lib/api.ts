@@ -83,7 +83,15 @@ export async function criarDenuncia(payload: DenunciaPayload): Promise<Denuncia>
     form.append("imagem", payload.imagem);
   }
 
-  const res = await fetch(endpoint("/denuncia"), { method: "POST", body: form });
+  let res: Response;
+  try {
+    res = await fetchWithTimeout(endpoint("/denuncia"), { method: "POST", body: form }, 15000);
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") {
+      throw new Error("O envio demorou mais que o esperado. Verifique a internet e tente novamente.");
+    }
+    throw new Error("Não foi possível conectar ao serviço. Verifique a internet e tente novamente.");
+  }
   if (!res.ok) {
     throw new Error(`Não foi possível enviar a denúncia (HTTP ${res.status}).`);
   }
@@ -96,10 +104,19 @@ export async function buscarDenuncia(id: string): Promise<DenunciaDetalhe | null
     return { id: Number(id), tipoDeDenuncia: "MAUS_TRATOS", statusDenuncia: "EM_ANALISE" };
   }
 
-  const res = await fetch(endpoint(`/denuncia/${encodeURIComponent(id)}`));
+  let res: Response;
+  try {
+    res = await fetchWithTimeout(endpoint(`/denuncia/${encodeURIComponent(id)}`), {}, 10000);
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") {
+      throw new Error("A consulta demorou mais que o esperado. Tente novamente.");
+    }
+    throw new Error("Não foi possível conectar ao serviço. Verifique a internet e tente novamente.");
+  }
   if (res.status === 404) return null;
   if (!res.ok) {
     throw new Error(`Não foi possível consultar a denúncia (HTTP ${res.status}).`);
   }
   return (await res.json()) as DenunciaDetalhe;
 }
+import { fetchWithTimeout } from "./fetch-with-timeout";

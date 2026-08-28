@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { tiposDenuncia, statusDenuncia } from "@/lib/content";
 import {
   criarDenuncia,
@@ -17,6 +17,7 @@ import {
   type Coords,
 } from "@/lib/geocode";
 import { comprimirImagem } from "@/lib/image";
+import { validateReportImage } from "@/lib/report-validation";
 import { site } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -70,6 +71,28 @@ export function ReportForm() {
   const [enviando, setEnviando] = useState(false);
   const [erroEnvio, setErroEnvio] = useState("");
   const [resultado, setResultado] = useState<Denuncia | null>(null);
+  const [buscandoCep, setBuscandoCep] = useState(false);
+  const [buscandoEndereco, setBuscandoEndereco] = useState(false);
+  const [online, setOnline] = useState(true);
+  const cepRequest = useRef(0);
+  const ultimoCepConsultado = useRef("");
+
+  useEffect(() => {
+    const atualizarOnline = () => setOnline(navigator.onLine);
+    atualizarOnline();
+    window.addEventListener("online", atualizarOnline);
+    window.addEventListener("offline", atualizarOnline);
+    return () => {
+      window.removeEventListener("online", atualizarOnline);
+      window.removeEventListener("offline", atualizarOnline);
+    };
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (preview) URL.revokeObjectURL(preview);
+    };
+  }, [preview]);
 
   function preencher(dados: Partial<Record<string, string>>) {
     if (dados.cep) setCep(dados.cep);
@@ -82,31 +105,50 @@ export function ReportForm() {
 
   async function onCepBlur() {
     const digitos = cep.replace(/\D/g, "");
-    if (digitos.length !== 8) return;
-    setAviso("Buscando o endereço pelo CEP…");
-    const encontrado = await buscarPorCep(digitos);
-    if (!encontrado) {
-      setAviso("CEP não encontrado. Preencha o endereço ou toque no mapa.");
-      return;
+    if (digitos.length !== 8 || digitos === ultimoCepConsultado.current) return;
+    ultimoCepConsultado.current = digitos;
+    const requestId = ++cepRequest.current;
+    setBuscandoCep(true);
+    setAviso("Buscando o endereço pelo CEP...");
+    try {
+      const encontrado = await buscarPorCep(digitos);
+      if (requestId !== cepRequest.current) return;
+      if (!encontrado) {
+        setAviso("CEP não encontrado. Preencha o endereço ou toque no mapa.");
+        return;
+      }
+      preencher(encontrado);
+      setAviso("Endereço preenchido pelo CEP. Toque no mapa para marcar o ponto exato.");
+      const consulta = [encontrado.logradouro, encontrado.bairro, encontrado.localidade, encontrado.uf]
+        .filter(Boolean)
+        .join(", ");
+      setBuscandoEndereco(true);
+      const coords = await coordenadasDoEndereco(consulta);
+      if (requestId !== cepRequest.current) return;
+      if (coords) setPonto(coords);
+    } finally {
+      if (requestId === cepRequest.current) {
+        setBuscandoCep(false);
+        setBuscandoEndereco(false);
+      }
     }
-    preencher(encontrado);
-    setAviso("Endereço preenchido pelo CEP. Toque no mapa para marcar o ponto exato.");
-    const consulta = [encontrado.logradouro, encontrado.bairro, encontrado.localidade, encontrado.uf]
-      .filter(Boolean)
-      .join(", ");
-    const coords = await coordenadasDoEndereco(consulta);
-    if (coords) setPonto(coords);
   }
 
   async function marcarNoMapa(p: Coords) {
+    cepRequest.current += 1;
     setPonto(p);
-    setAviso("Buscando o endereço do ponto marcado…");
-    const encontrado = await enderecoDasCoordenadas(p);
-    if (encontrado) {
-      preencher(encontrado);
-      setAviso("Ponto marcado. Confira o endereço e ajuste o número, se precisar.");
-    } else {
-      setAviso("Ponto marcado no mapa. Preencha o endereço manualmente.");
+    setBuscandoEndereco(true);
+    setAviso("Buscando o endereço do ponto marcado...");
+    try {
+      const encontrado = await enderecoDasCoordenadas(p);
+      if (encontrado) {
+        preencher(encontrado);
+        setAviso("Ponto marcado. Confira o endereço e ajuste o número, se precisar.");
+      } else {
+        setAviso("Ponto marcado no mapa. Preencha o endereço manualmente.");
+      }
+    } finally {
+      setBuscandoEndereco(false);
     }
   }
 
@@ -128,14 +170,37 @@ export function ReportForm() {
       setPreview("");
       return;
     }
-    const comprimida = await comprimirImagem(file);
-    setImagem(comprimida);
-    setPreview(URL.createObjectURL(comprimida));
+    const validationError = validateReportImage(file);
+    if (validationError) {
+      setImagem(null);
+      setPreview("");
+      setErrors((current) => ({ ...current, imagem: validationError }));
+      return;
+    }
+
+    try {
+      const comprimida = await comprimirImagem(file);
+      setImagem(comprimida);
+      setPreview(URL.createObjectURL(comprimida));
+      setErrors((current) => ({ ...current, imagem: undefined }));
+    } catch {
+      setImagem(null);
+      setPreview("");
+      setErrors((current) => ({
+        ...current,
+        imagem: "Não foi possível processar a imagem. Escolha outro arquivo.",
+      }));
+    }
   }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setErroEnvio("");
+
+    if (!online) {
+      setErroEnvio("Você está offline. Conecte-se à internet para enviar a denúncia.");
+      return;
+    }
 
     const next: Errors = {};
     if (!tipo) next.tipo = "Selecione o tipo de denúncia.";
@@ -239,14 +304,18 @@ export function ReportForm() {
               className="h-72 w-full"
             />
             <div className="mt-3 flex flex-wrap items-center gap-3">
-              <Button type="button" variant="outline" onClick={usarMinhaLocalizacao}>
+              <Button type="button" variant="outline" onClick={usarMinhaLocalizacao} disabled={buscandoEndereco}>
                 <Icon name="gps" size={18} /> Usar minha localização
               </Button>
               <span className="text-sm text-muted-foreground">
                 Toque no mapa para marcar o local exato. Arraste o pino para ajustar.
               </span>
             </div>
-            {aviso ? <p className="mt-2 text-sm text-muted-foreground">{aviso}</p> : null}
+            {aviso ? (
+              <p className="mt-2 text-sm text-muted-foreground" role="status" aria-live="polite">
+                {aviso}
+              </p>
+            ) : null}
 
             <div className="mt-5 grid gap-5 sm:grid-cols-6">
               <div className="flex flex-col gap-2 sm:col-span-2">
@@ -258,6 +327,7 @@ export function ReportForm() {
                   onChange={(e) => setCep(formatarCep(e.target.value))}
                   onBlur={onCepBlur}
                   placeholder="59600-000"
+                  aria-busy={buscandoCep || buscandoEndereco}
                 />
               </div>
 
@@ -364,7 +434,7 @@ export function ReportForm() {
             <Input
               id="imagem"
               type="file"
-              accept="image/*"
+              accept="image/jpeg,image/png,image/webp"
               className="sr-only"
               aria-invalid={!!errors.imagem}
               onChange={(e) => onImagem(e.target.files?.[0] ?? null)}
@@ -391,8 +461,14 @@ export function ReportForm() {
             </div>
           </section>
 
+          {!online ? (
+            <p className="text-sm text-warning-700" role="status" aria-live="polite">
+              Você está offline. O envio será liberado quando a conexão voltar.
+            </p>
+          ) : null}
+
           {erroEnvio ? (
-            <Alert variant="destructive">
+            <Alert variant="destructive" role="alert">
               <AlertDescription>{erroEnvio}</AlertDescription>
             </Alert>
           ) : null}
@@ -414,12 +490,16 @@ export function ProtocolLookup() {
 
   async function consultar(e: React.FormEvent) {
     e.preventDefault();
-    if (!id.trim()) return;
+    const protocolo = id.replace(/\D/g, "");
+    if (!protocolo || protocolo.length > 12) {
+      setNaoEncontrado(true);
+      return;
+    }
     setCarregando(true);
     setResultado(null);
     setNaoEncontrado(false);
     try {
-      const res = await buscarDenuncia(id.trim());
+      const res = await buscarDenuncia(protocolo);
       if (res) setResultado(res);
       else setNaoEncontrado(true);
     } catch {
@@ -445,8 +525,9 @@ export function ProtocolLookup() {
             id="id"
             inputMode="numeric"
             value={id}
-            onChange={(e) => setId(e.target.value)}
+            onChange={(e) => setId(e.target.value.replace(/\D/g, "").slice(0, 12))}
             placeholder="Ex.: 1234"
+            maxLength={12}
             className="max-w-56"
           />
           <Button type="submit" variant="outline" disabled={carregando}>
