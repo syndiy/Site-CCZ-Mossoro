@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useSyncExternalStore } from "react";
+import { Minus } from "lucide-react";
 import { Container } from "@/components/layout/container";
 import { subscribeToStorage, readStorage, writeStorage } from "@/lib/browser-store";
 
@@ -48,7 +49,7 @@ export function AccessibilityBar() {
           className={botao}
           aria-label="Diminuir tamanho da fonte"
         >
-          A−
+          <span aria-hidden="true">A</span><Minus size={13} aria-hidden="true" />
         </button>
         <button
           type="button"
