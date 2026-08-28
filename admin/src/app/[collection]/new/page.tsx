@@ -15,10 +15,14 @@ export default async function NewEntryPage({
   const config = collections[collection];
 
   return (
-    <div className="page">
+    <main className="page page-editor">
       <BackLink />
-      <h1>{config.createLabel}</h1>
+      <header className="page-header">
+        <p className="kicker">Novo conteúdo</p>
+        <h1>{config.createLabel}</h1>
+        <p className="muted">Preencha os dados abaixo e salve como rascunho antes de publicar.</p>
+      </header>
       <EntryForm config={config} initialValues={defaultValues(config)} />
-    </div>
+    </main>
   );
 }

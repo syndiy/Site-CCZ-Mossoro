@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { ExternalLink, FileText, Newspaper } from "lucide-react";
 import type { Collection } from "@/lib/content";
 import { collectionInfo, sortEntries, entryId, type WorkspaceEntry } from "./content-workspace-data";
 import { ContentRow } from "./content-row";
@@ -23,16 +22,13 @@ export function ContentBoard({
 }) {
   const homeEntries = sortEntries(entries.filter((entry) => entry.home));
   const libraryEntries = sortEntries(entries.filter((entry) => !entry.home));
-  const Icon = collection === "news" ? Newspaper : FileText;
-
   return (
     <section className="content-board">
       <header className="board-header">
         <div className="board-title">
-          <span className={`collection-mark ${collection}`}><Icon size={19} /></span>
           <div><h2>{collectionInfo[collection].label}</h2><span>{entries.length} arquivos</span></div>
         </div>
-        <Link className="icon-link" href={`/${collection}`} aria-label={`Abrir todos os ${collectionInfo[collection].label.toLocaleLowerCase()}`} title="Abrir listagem"><ExternalLink size={17} /></Link>
+        <Link className="text-link" href={`/${collection}`}>Abrir lista</Link>
       </header>
 
       <div className="board-lanes">

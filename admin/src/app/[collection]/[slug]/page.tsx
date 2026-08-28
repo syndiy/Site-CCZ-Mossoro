@@ -20,9 +20,13 @@ export default async function EditEntryPage({
   const config = collections[collection];
 
   return (
-    <div className="page">
+    <main className="page page-editor">
       <BackLink />
-      <h1>Editar {config.singular.toLowerCase()}</h1>
+      <header className="page-header">
+        <p className="kicker">Edição de conteúdo</p>
+        <h1>Editar {config.singular.toLowerCase()}</h1>
+        <p className="muted">Atualize as informações e salve como rascunho ou publique no site.</p>
+      </header>
       <EntryForm
         config={config}
         slug={slug}
@@ -30,6 +34,6 @@ export default async function EditEntryPage({
         initialBody={entry.body}
         initialDraft={Boolean(entry.data.draft)}
       />
-    </div>
+    </main>
   );
 }

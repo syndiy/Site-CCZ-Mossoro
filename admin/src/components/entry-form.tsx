@@ -84,8 +84,8 @@ export function EntryForm({
   }
 
   return (
-    <div>
-      <div className="card">
+    <div className="entry-form">
+      <div className="editor-status">
         <div className="status-row">
           <span className={draft ? "badge draft" : "badge live"}>
             {draft ? "Rascunho" : "Publicado no site"}
@@ -98,7 +98,13 @@ export function EntryForm({
         </div>
       </div>
 
-      <div className="card">
+      <div className="card metadata-card">
+        <div className="section-heading">
+          <div>
+            <h2>Informações principais</h2>
+            <p className="muted">Esses dados aparecem na listagem e nos resultados de busca.</p>
+          </div>
+        </div>
         {config.fields.map((field) => (
           <FieldControl
             key={field.name}
@@ -109,8 +115,13 @@ export function EntryForm({
         ))}
       </div>
 
-      <div className="card">
-        <span className="field-label">Conteúdo</span>
+      <div className="card body-card">
+        <div className="section-heading">
+          <div>
+            <h2>Texto da publicação</h2>
+            <p className="muted">Use títulos de seção, listas e links para organizar a leitura.</p>
+          </div>
+        </div>
         <ContentEditor value={initialBody} onChange={setBody} />
       </div>
 

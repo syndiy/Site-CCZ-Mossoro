@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { Check, Plus, Save, Search, Upload } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { Collection } from "@/lib/content";
 import { ContentBoard } from "./content-board";
@@ -125,10 +124,9 @@ export function ContentWorkspace({ initialEntries }: { initialEntries: Workspace
     <div className="workspace">
       <section className="workspace-summary">
         <div className="summary-intro">
-          <span className="summary-icon"><Upload size={20} /></span>
           <div>
-            <strong>Distribuicao da pagina inicial</strong>
-            <span>Conteudos publicados aparecem conforme a ordem abaixo.</span>
+            <strong>Organização da página inicial</strong>
+            <span>Arraste os conteúdos publicados para definir o destaque.</span>
           </div>
         </div>
         <div className="summary-stats">
@@ -137,8 +135,7 @@ export function ContentWorkspace({ initialEntries }: { initialEntries: Workspace
           <span><b>{homeCount}</b> na home</span>
         </div>
         <button className="btn save-btn" type="button" disabled={!dirty || busy} onClick={saveOrder}>
-          {busy ? <span className="spinner" /> : <Save size={17} />}
-          {busy ? "Salvando" : "Salvar organizacao"}
+          {busy ? "Salvando..." : "Salvar organização"}
         </button>
       </section>
 
@@ -160,13 +157,12 @@ export function ContentWorkspace({ initialEntries }: { initialEntries: Workspace
             ))}
           </div>
           <label className="search-field">
-            <Search size={17} />
             <span className="sr-only">Buscar conteudo</span>
-            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar por titulo" />
+            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar por título" />
           </label>
           <div className="new-links">
-            <Link className="btn secondary compact-btn" href="/news/new"><Plus size={16} /> Noticia</Link>
-            <Link className="btn secondary compact-btn" href="/articles/new"><Plus size={16} /> Artigo</Link>
+            <Link className="btn secondary compact-btn" href="/news/new">Nova notícia</Link>
+            <Link className="btn secondary compact-btn" href="/articles/new">Novo artigo</Link>
           </div>
         </div>
 
@@ -187,7 +183,7 @@ export function ContentWorkspace({ initialEntries }: { initialEntries: Workspace
       </section>
 
       {error ? <p className="error workspace-feedback">{error}</p> : null}
-      {message ? <p className="success workspace-feedback"><Check size={16} /> {message}</p> : null}
+      {message ? <p className="success workspace-feedback">{message}</p> : null}
     </div>
   );
 }

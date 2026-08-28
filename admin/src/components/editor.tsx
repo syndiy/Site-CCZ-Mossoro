@@ -7,19 +7,6 @@ import StarterKit from "@tiptap/starter-kit";
 import TiptapImage from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import { Markdown } from "tiptap-markdown";
-import {
-  Bold,
-  Code,
-  Heading2,
-  Image as ImageIcon,
-  Italic,
-  Link as LinkIcon,
-  List,
-  ListOrdered,
-  Quote,
-  Redo2,
-  Undo2,
-} from "lucide-react";
 import { uploadImage } from "@/lib/upload";
 
 type Props = {
@@ -66,10 +53,10 @@ export function ContentEditor({ value, onChange }: Props) {
       </div>
       <Toolbar editor={editor} onPickImage={() => fileInput.current?.click()} />
       <BubbleMenu editor={editor} className="editor-bubble">
-        <ActionButton label="Negrito" active={editor.isActive("bold")} onClick={() => editor.chain().focus().toggleBold().run()}><Bold size={16} /></ActionButton>
-        <ActionButton label="Italico" active={editor.isActive("italic")} onClick={() => editor.chain().focus().toggleItalic().run()}><Italic size={16} /></ActionButton>
-        <ActionButton label="Link" active={editor.isActive("link")} onClick={() => setLink(editor)}><LinkIcon size={16} /></ActionButton>
-        <ActionButton label="Citacao" active={editor.isActive("blockquote")} onClick={() => editor.chain().focus().toggleBlockquote().run()}><Quote size={16} /></ActionButton>
+        <ActionButton label="Negrito" active={editor.isActive("bold")} onClick={() => editor.chain().focus().toggleBold().run()}>Negrito</ActionButton>
+        <ActionButton label="Itálico" active={editor.isActive("italic")} onClick={() => editor.chain().focus().toggleItalic().run()}>Itálico</ActionButton>
+        <ActionButton label="Link" active={editor.isActive("link")} onClick={() => setLink(editor)}>Link</ActionButton>
+        <ActionButton label="Citação" active={editor.isActive("blockquote")} onClick={() => editor.chain().focus().toggleBlockquote().run()}>Citação</ActionButton>
       </BubbleMenu>
       <input
         ref={fileInput}
@@ -92,20 +79,20 @@ export function ContentEditor({ value, onChange }: Props) {
 function Toolbar({ editor, onPickImage }: { editor: Editor; onPickImage: () => void }) {
   const chain = () => editor.chain().focus();
   return (
-    <div className="editor-toolbar" aria-label="Ferramentas de formatacao">
-      <ActionButton label="Desfazer" onClick={() => chain().undo().run()} disabled={!editor.can().undo()}><Undo2 size={17} /></ActionButton>
-      <ActionButton label="Refazer" onClick={() => chain().redo().run()} disabled={!editor.can().redo()}><Redo2 size={17} /></ActionButton>
+    <div className="editor-toolbar" aria-label="Ferramentas de formatação">
+      <ActionButton label="Desfazer" onClick={() => chain().undo().run()} disabled={!editor.can().undo()}>Desfazer</ActionButton>
+      <ActionButton label="Refazer" onClick={() => chain().redo().run()} disabled={!editor.can().redo()}>Refazer</ActionButton>
       <span className="toolbar-divider" />
-      <ActionButton label="Negrito" active={editor.isActive("bold")} onClick={() => chain().toggleBold().run()}><Bold size={17} /></ActionButton>
-      <ActionButton label="Italico" active={editor.isActive("italic")} onClick={() => chain().toggleItalic().run()}><Italic size={17} /></ActionButton>
-      <ActionButton label="Titulo de secao" active={editor.isActive("heading", { level: 2 })} onClick={() => chain().toggleHeading({ level: 2 }).run()}><Heading2 size={17} /></ActionButton>
+      <ActionButton label="Negrito" active={editor.isActive("bold")} onClick={() => chain().toggleBold().run()}>Negrito</ActionButton>
+      <ActionButton label="Itálico" active={editor.isActive("italic")} onClick={() => chain().toggleItalic().run()}>Itálico</ActionButton>
+      <ActionButton label="Título de seção" active={editor.isActive("heading", { level: 2 })} onClick={() => chain().toggleHeading({ level: 2 }).run()}>Título</ActionButton>
       <span className="toolbar-divider" />
-      <ActionButton label="Lista" active={editor.isActive("bulletList")} onClick={() => chain().toggleBulletList().run()}><List size={17} /></ActionButton>
-      <ActionButton label="Lista numerada" active={editor.isActive("orderedList")} onClick={() => chain().toggleOrderedList().run()}><ListOrdered size={17} /></ActionButton>
-      <ActionButton label="Citacao" active={editor.isActive("blockquote")} onClick={() => chain().toggleBlockquote().run()}><Quote size={17} /></ActionButton>
-      <ActionButton label="Codigo" active={editor.isActive("code")} onClick={() => chain().toggleCode().run()}><Code size={17} /></ActionButton>
-      <ActionButton label="Link" active={editor.isActive("link")} onClick={() => setLink(editor)}><LinkIcon size={17} /></ActionButton>
-      <ActionButton label="Imagem" onClick={onPickImage}><ImageIcon size={17} /></ActionButton>
+      <ActionButton label="Lista" active={editor.isActive("bulletList")} onClick={() => chain().toggleBulletList().run()}>Lista</ActionButton>
+      <ActionButton label="Lista numerada" active={editor.isActive("orderedList")} onClick={() => chain().toggleOrderedList().run()}>Numerada</ActionButton>
+      <ActionButton label="Citação" active={editor.isActive("blockquote")} onClick={() => chain().toggleBlockquote().run()}>Citação</ActionButton>
+      <ActionButton label="Código" active={editor.isActive("code")} onClick={() => chain().toggleCode().run()}>Código</ActionButton>
+      <ActionButton label="Link" active={editor.isActive("link")} onClick={() => setLink(editor)}>Link</ActionButton>
+      <ActionButton label="Imagem" onClick={onPickImage}>Imagem</ActionButton>
     </div>
   );
 }
@@ -123,7 +110,7 @@ function ActionButton({
   onClick: () => void;
   children: React.ReactNode;
 }) {
-  return <button type="button" className={active ? "active" : ""} onClick={onClick} disabled={disabled} aria-label={label} title={label}>{children}</button>;
+  return <button type="button" className={active ? "active" : ""} onClick={onClick} disabled={disabled} aria-label={label} aria-pressed={active}>{children}</button>;
 }
 
 function setLink(editor: Editor) {

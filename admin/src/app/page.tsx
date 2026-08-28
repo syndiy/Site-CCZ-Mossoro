@@ -25,15 +25,15 @@ export default function DashboardPage() {
   );
 
   return (
-    <div className="page">
+    <main className="page">
       <header className="page-header">
-        <p className="kicker">Painel editorial</p>
-        <h1>Organizar conteudo</h1>
+        <p className="kicker">Editor de conteúdo</p>
+        <h1>Organização da página inicial</h1>
         <p className="muted">
-          Escolha o que aparece na pagina inicial e defina a ordem arrastando os conteudos.
+          Escolha o que aparece na página inicial e defina a ordem dos conteúdos publicados.
         </p>
       </header>
       <ContentWorkspace initialEntries={entries} />
-    </div>
+    </main>
   );
 }

@@ -12,9 +12,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="pt-BR">
       <body>
-        <div className="topbar">
-          <Link href="/">CCZ Mossoró | Editor de conteúdo</Link>
-        </div>
+        <header className="topbar">
+          <div className="topbar-inner">
+            <Link href="/" className="brand-link">
+              <strong>CCZ Mossoró</strong>
+              <span>Editor de conteúdo</span>
+            </Link>
+            <Link href="/" className="site-link">Painel</Link>
+          </div>
+        </header>
         {children}
       </body>
     </html>
