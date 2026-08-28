@@ -34,6 +34,13 @@ const dateAndTags: Field[] = [
   { name: "tags", label: "Tags", type: "tags", hint: "Separe por vírgula. Ex.: dengue, prevenção" },
 ];
 
+const homeField: Field = {
+  name: "home",
+  label: "Mostrar na pagina inicial",
+  type: "toggle",
+  hint: "A posicao e definida no quadro Organizar conteudo.",
+};
+
 export const collections: Record<Collection, CollectionConfig> = {
   articles: {
     name: "articles",
@@ -76,6 +83,7 @@ export const collections: Record<Collection, CollectionConfig> = {
       },
       ...coverFields,
       ...dateAndTags,
+      homeField,
     ],
   },
 };
@@ -83,7 +91,9 @@ export const collections: Record<Collection, CollectionConfig> = {
 export const defaultValues = (config: CollectionConfig): Record<string, string | boolean> => {
   const values: Record<string, string | boolean> = {};
   for (const field of config.fields) {
-    if (field.type === "toggle") values[field.name] = false;
+    if (field.type === "toggle") {
+      values[field.name] = field.name === "home";
+    }
     else if (field.type === "date") values[field.name] = new Date().toISOString().slice(0, 10);
     else if (field.name === "eyebrow") values[field.name] = "Educação em saúde";
     else values[field.name] = "";
@@ -97,7 +107,8 @@ export const toFormValues = (
 ): Record<string, string | boolean> => {
   const values = defaultValues(config);
   for (const field of config.fields) {
-    const raw = data[field.name];
+    const raw =
+      (field.name === "featured" && data.featured === undefined ? data.home : data[field.name]);
     if (raw === undefined || raw === null) continue;
     if (field.type === "toggle") values[field.name] = Boolean(raw);
     else if (field.type === "tags") values[field.name] = Array.isArray(raw) ? raw.join(", ") : String(raw);

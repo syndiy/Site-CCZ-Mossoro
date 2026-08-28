@@ -15,6 +15,8 @@ type BaseMeta = {
   publishedAt: string;
   tags: string[];
   draft: boolean;
+  home: boolean;
+  homeOrder: number | null;
 };
 
 export type ArticleMeta = BaseMeta & {
@@ -72,6 +74,8 @@ function baseMeta(slug: string, data: Record<string, unknown>): BaseMeta {
     publishedAt: String(data.publishedAt ?? ""),
     tags: toStringArray(data.tags),
     draft: Boolean(data.draft),
+    home: data.home === undefined ? Boolean(data.featured) : Boolean(data.home),
+    homeOrder: Number.isFinite(Number(data.homeOrder)) ? Number(data.homeOrder) : null,
   };
 }
 
@@ -80,6 +84,7 @@ function parseArticle(slug: string, raw: string): Doc<ArticleMeta> {
   return {
     meta: {
       ...baseMeta(slug, data),
+      home: data.home === undefined ? Boolean(data.featured) : Boolean(data.home),
       description: String(data.description ?? ""),
       eyebrow: String(data.eyebrow ?? "Educação em saúde"),
       featured: Boolean(data.featured),
@@ -94,6 +99,7 @@ function parseNews(slug: string, raw: string): Doc<NewsMeta> {
   return {
     meta: {
       ...baseMeta(slug, data),
+      home: data.home === undefined ? true : Boolean(data.home),
       excerpt: String(data.excerpt ?? ""),
     },
     body: content,
@@ -115,8 +121,10 @@ export function getAllArticles(): ArticleMeta[] {
 
 export function getFeaturedArticles(limit = 3): ArticleMeta[] {
   const published = getAllArticles();
-  const featured = published.filter((article) => article.featured);
-  return (featured.length > 0 ? featured : published).slice(0, limit);
+  const featured = published.filter((article) => article.home);
+  return featured
+    .sort((a, b) => (a.homeOrder ?? 9999) - (b.homeOrder ?? 9999) || byDateDesc(a, b))
+    .slice(0, limit);
 }
 
 export function getArticleSlugs(): string[] {
@@ -136,7 +144,10 @@ export function getAllNews(): NewsMeta[] {
 }
 
 export function getLatestNews(limit = 3): NewsMeta[] {
-  return getAllNews().slice(0, limit);
+  const homeNews = getAllNews().filter((news) => news.home);
+  return homeNews
+    .sort((a, b) => (a.homeOrder ?? 9999) - (b.homeOrder ?? 9999) || byDateDesc(a, b))
+    .slice(0, limit);
 }
 
 export function getNewsSlugs(): string[] {

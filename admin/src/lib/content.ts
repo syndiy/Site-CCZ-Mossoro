@@ -60,6 +60,12 @@ export function writeEntry(
   fs.writeFileSync(entryPath(collection, slug), matter.stringify(`${body.trim()}\n`, data), "utf8");
 }
 
+export function updateEntryFields(collection: Collection, slug: string, fields: EntryData): void {
+  const entry = readEntry(collection, slug);
+  if (!entry) throw new Error("Content not found.");
+  writeEntry(collection, slug, { ...entry.data, ...fields }, entry.body);
+}
+
 export function deleteEntry(collection: Collection, slug: string): void {
   const file = entryPath(collection, slug);
   if (fs.existsSync(file)) fs.unlinkSync(file);
