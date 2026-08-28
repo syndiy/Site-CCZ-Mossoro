@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isCollection, listEntries, entryExists, writeEntry } from "@/lib/content";
+import { deleteEntry, isCollection, listEntries, entryExists, writeEntry } from "@/lib/content";
 import { commitChange } from "@/lib/git";
 import { slugify } from "@/lib/slug";
 
@@ -35,8 +35,19 @@ export async function POST(
     return NextResponse.json({ error: "Já existe um conteúdo com esse título." }, { status: 409 });
   }
 
-  writeEntry(collection, slug, data, String(body ?? ""));
-  await commitChange(`conteudo: cria ${collection}/${slug}`, [`content/${collection}/${slug}.md`]);
+  const nextData = { ...data };
+  if (collection === "articles") {
+    const home = Boolean(nextData.featured ?? nextData.home);
+    nextData.home = home;
+    nextData.featured = home;
+  }
+  writeEntry(collection, slug, nextData, String(body ?? ""));
+  try {
+    await commitChange(`conteudo: cria ${collection}/${slug}`, [`content/${collection}/${slug}.md`]);
+  } catch {
+    deleteEntry(collection, slug);
+    return NextResponse.json({ error: "Não foi possível registrar a criação." }, { status: 500 });
+  }
 
   return NextResponse.json({ slug }, { status: 201 });
 }

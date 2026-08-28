@@ -61,6 +61,8 @@ export function EntryForm({
       setDraft(nextDraft);
       router.push("/");
       router.refresh();
+    } catch {
+      setError("Não foi possível conectar ao editor. Tente novamente.");
     } finally {
       setBusy(false);
     }
@@ -73,13 +75,20 @@ export function EntryForm({
     if (!confirmed) return;
 
     setBusy(true);
-    const res = await fetch(`/api/content/${config.name}/${slug}`, { method: "DELETE" });
-    if (res.ok) {
-      router.push("/");
-      router.refresh();
-    } else {
+    setError("");
+    try {
+      const res = await fetch(`/api/content/${config.name}/${slug}`, { method: "DELETE" });
+      if (res.ok) {
+        router.push("/");
+        router.refresh();
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setError(data.error ?? "Não foi possível remover.");
+      }
+    } catch {
+      setError("Não foi possível conectar ao editor. Tente novamente.");
+    } finally {
       setBusy(false);
-      setError("Não foi possível remover.");
     }
   }
 
