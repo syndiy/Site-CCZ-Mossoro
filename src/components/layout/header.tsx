@@ -20,6 +20,24 @@ export function Header() {
     return () => window.removeEventListener("scroll", aoRolar);
   }, []);
 
+  useEffect(() => {
+    if (!open) return;
+    const fecharComEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    const overflowAnterior = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", fecharComEscape);
+    return () => {
+      document.body.style.overflow = overflowAnterior;
+      document.removeEventListener("keydown", fecharComEscape);
+    };
+  }, [open]);
+
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
@@ -51,6 +69,7 @@ export function Header() {
           className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-white/40 text-white lg:hidden"
           aria-expanded={open}
           aria-controls="main-menu"
+          aria-label={open ? "Fechar menu" : "Abrir menu"}
           onClick={() => setOpen((v) => !v)}
         >
           <Icon name={open ? "close" : "menu"} title={open ? "Fechar menu" : "Abrir menu"} />

@@ -18,7 +18,12 @@ export function CookieBanner() {
   if (aceito) return null;
 
   return (
-    <div data-aviso-cookies className="fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-brand-900 text-white shadow-pop">
+    <div
+      data-aviso-cookies
+      role="region"
+      aria-label="Aviso de privacidade"
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-brand-900 text-white shadow-pop"
+    >
       <Container className="flex flex-col items-start gap-3 py-4 sm:flex-row sm:items-center">
         <p className="text-sm text-white/90">
           Usamos cookies essenciais para o funcionamento do site e para melhorar a sua experiência.
