@@ -18,7 +18,13 @@ export function Hero({ eyebrow, title, subtitle, image, imageAlt, slides, childr
   const comSlides = Boolean(slides && slides.length > 0);
 
   return (
-    <section className="relative flex min-h-[560px] items-center overflow-hidden bg-brand-900 md:min-h-[640px]">
+    <section
+      className={
+        comSlides
+          ? "relative flex min-h-[720px] items-center overflow-hidden bg-brand-900 sm:min-h-[680px] md:min-h-[640px]"
+          : "relative flex min-h-[560px] items-center overflow-hidden bg-brand-900 md:min-h-[640px]"
+      }
+    >
       {comSlides ? (
         <HeroNewsBackground slides={slides!} fallback={image} fallbackAlt={imageAlt} />
       ) : (
@@ -35,7 +41,7 @@ export function Hero({ eyebrow, title, subtitle, image, imageAlt, slides, childr
         </>
       )}
 
-      <Container className={comSlides ? "relative pb-32 pt-16" : "relative py-16"}>
+      <Container className={comSlides ? "relative pb-64 pt-14 sm:pb-56 sm:pt-16 md:pb-32" : "relative py-16"}>
         <div className="max-w-2xl">
           {eyebrow ? (
             <span className="inline-flex items-center gap-3 text-sm font-semibold uppercase tracking-widest text-brand-300">

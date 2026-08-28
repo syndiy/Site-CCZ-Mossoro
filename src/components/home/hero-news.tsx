@@ -92,9 +92,9 @@ export function HeroNewsBackground({ slides, fallback, fallbackAlt }: Props) {
       />
 
       {noticia ? (
-        <div className="absolute inset-x-0 bottom-0 z-10 pb-14">
+        <div className="absolute inset-x-0 bottom-0 z-10 pb-6 sm:pb-10 md:pb-14">
           <div className="mx-auto w-full max-w-[1200px] px-5 sm:px-8">
-            <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+            <div className="grid min-w-0 gap-3 sm:gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
               {/* aria-live avisa leitores de tela a cada troca. */}
               <div aria-live="polite" aria-atomic="true" className="min-w-0">
                 <span className="text-xs font-semibold uppercase tracking-widest text-brand-300">
@@ -105,10 +105,10 @@ export function HeroNewsBackground({ slides, fallback, fallbackAlt }: Props) {
                   className="group mt-2 block max-w-3xl text-white underline-offset-4 hover:underline"
                 >
                   <span className="block text-xs text-white/75">Publicado em {noticia.publishedLabel}</span>
-                  <span className="mt-1 block text-lg font-bold leading-tight sm:text-2xl">
+                  <span className="mt-1 block line-clamp-3 text-lg font-bold leading-tight sm:line-clamp-2 sm:text-2xl">
                     {noticia.title}
                   </span>
-                  {noticia.excerpt ? <span className="mt-2 block line-clamp-2 text-sm leading-relaxed text-white/80">{noticia.excerpt}</span> : null}
+                  {noticia.excerpt ? <span className="mt-2 block line-clamp-3 text-sm leading-relaxed text-white/80 sm:line-clamp-2">{noticia.excerpt}</span> : null}
                   <span className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-white">
                     Ler notícia
                     <Icon name="arrow" size={16} className="transition-transform group-hover:translate-x-1" />
@@ -116,7 +116,7 @@ export function HeroNewsBackground({ slides, fallback, fallbackAlt }: Props) {
                 </Link>
               </div>
 
-              <div className="flex items-center gap-1 lg:pb-1">
+              <div className="flex max-w-full flex-wrap items-center gap-1 lg:pb-1">
                 {slides.map((slide, i) => (
                   <button
                     key={slide.slug}
