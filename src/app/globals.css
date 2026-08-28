@@ -94,21 +94,6 @@
   }
 }
 
-@keyframes page-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-.animate-page-in {
-  animation: page-in 480ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
 .icon-tint-blue {
   filter: grayscale(1) sepia(1) saturate(5) hue-rotate(178deg) brightness(0.95);
 }
@@ -156,9 +141,53 @@ html.contraste :is(button, a[class*="bg-"], a[class*="border"]) :is(span, svg, s
   color: #fff !important;
 }
 
-html.contraste :is([aria-checked="true"], [aria-current="page"]) {
+html.contraste :is([aria-checked="true"], [aria-pressed="true"], [aria-current="page"]) {
   border-color: #ffe600 !important;
   color: #ffe600 !important;
+}
+
+/* Ícones fora de botões ficavam na cor da marca sobre o preto. */
+html.contraste svg {
+  color: #fff !important;
+}
+
+html.contraste [class*="fill-"] {
+  fill: #fff !important;
+}
+
+/* O pino do mapa mantém as cores próprias para continuar legível. */
+html.contraste .ccz-pin svg path {
+  fill: #1465be !important;
+}
+
+html.contraste .ccz-pin svg circle {
+  fill: #fff !important;
+}
+
+/* O anel de foco usava a cor da marca, invisível sobre o preto. */
+html.contraste :is(a, button, input, textarea, select, summary, [tabindex]):focus-visible {
+  outline: 3px solid #ffe600 !important;
+  outline-offset: 2px !important;
+  box-shadow: none !important;
+}
+
+html.contraste ::placeholder {
+  color: #d0d0d0 !important;
+  opacity: 1;
+}
+
+html.contraste .maplibregl-ctrl-attrib {
+  background: #000 !important;
+  color: #fff !important;
+}
+
+html.contraste .maplibregl-ctrl-attrib a {
+  color: #ffe600 !important;
+}
+
+/* Base do mapa invertida no alto contraste; o pino é DOM e não é afetado. */
+html.contraste .maplibregl-canvas {
+  filter: invert(1) hue-rotate(180deg);
 }
 
 html.contraste [class*="border"] {
@@ -169,20 +198,17 @@ html.contraste .blob {
   display: none !important;
 }
 
-.leaflet-container {
+.maplibregl-map {
   z-index: 0;
   font: inherit;
   background: var(--color-surface);
+}
+
+.maplibregl-canvas-container.maplibregl-interactive {
   cursor: crosshair;
 }
 
-.leaflet-pane,
-.leaflet-top,
-.leaflet-bottom {
-  z-index: 0 !important;
-}
-
-.leaflet-control-zoom {
+.maplibregl-ctrl-group {
   border: none !important;
   margin: 12px !important;
   box-shadow: 0 4px 12px rgba(0, 20, 73, 0.15) !important;
@@ -190,18 +216,18 @@ html.contraste .blob {
   overflow: hidden;
 }
 
-.leaflet-control-zoom a {
+.maplibregl-ctrl-group button {
   width: 34px !important;
   height: 34px !important;
-  line-height: 34px !important;
   color: var(--color-brand-800) !important;
-  border: none !important;
-  font-size: 18px !important;
 }
 
-.leaflet-control-zoom a:hover {
+.maplibregl-ctrl-group button:hover {
   background: var(--color-info-50) !important;
-  color: var(--color-brand-600) !important;
+}
+
+.maplibregl-ctrl-attrib {
+  font-size: 11px;
 }
 
 .ccz-pin {
@@ -315,12 +341,6 @@ html.contraste .blob {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .animate-page-in {
-    animation: none;
-  }
-}
-
 .animate-float {
   animation: float 7s ease-in-out infinite;
 }
@@ -413,7 +433,8 @@ html.contraste .blob {
   --accent-foreground: #023e84;
   --destructive: #b3261e;
   --border: #d7dbe0;
-  --input: #d7dbe0;
+  /* Borda de campo é componente de interface: WCAG 1.4.11 exige 3:1. */
+  --input: #8b929d;
   --ring: #1465be;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
@@ -463,4 +484,28 @@ html.contraste .blob {
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+}
+/* No celular o botão do VLibras cobria o texto do hero. Fica acima do
+   botão "voltar ao topo", que por sua vez sobe quando o aviso de cookies aparece. */
+@media (max-width: 1023px) {
+  div[vw-access-button],
+  div[vw-access-button].active {
+    position: fixed !important;
+    top: auto !important;
+    bottom: 11rem !important;
+    right: 0.75rem !important;
+    transform: scale(0.8);
+    transform-origin: bottom right;
+  }
+}
+
+/* O botão "voltar ao topo" ficava escondido atrás do aviso de cookies. */
+body:has([data-aviso-cookies]) {
+  --voltar-ao-topo-bottom: 11rem;
+}
+
+@media (min-width: 640px) {
+  body:has([data-aviso-cookies]) {
+    --voltar-ao-topo-bottom: 6.5rem;
+  }
 }
