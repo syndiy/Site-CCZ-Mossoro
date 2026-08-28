@@ -451,13 +451,13 @@ def main() -> None:
     build_pdf(
         ROOT / "Relato-Experiencia-GAT4-Frontend.md",
         "Relato-Experiencia-GAT4-Frontend.pdf",
-        "Relato de experiência · GAT 4",
+        "Relato de experiência GAT 4",
         "Interface, acessibilidade e autonomia editorial",
         "Desenvolvimento do front-end do portal institucional do CCZ de Mossoró-RN no âmbito do PET-Saúde Digital",
         [
             ("Autores", "Fábio Gurgel Filho e Vinícius Gabriel L. de Oliveira"),
             ("Tutoria", "Louise H. de F. Ribeiro e Fábio F. da C. Fontes"),
-            ("Programa", "PET-Saúde/I&SD · Conecta Mossoró"),
+            ("Programa", "PET-Saúde/I&SD. Conecta Mossoró"),
             ("Grupo", "Grupo de Aprendizagem Tutorial 4"),
         ],
         "Relato da construção da camada de apresentação do portal: exportação estática, integração com a API de denúncias, acessibilidade digital e um editor próprio que devolve a autonomia editorial ao órgão.",
