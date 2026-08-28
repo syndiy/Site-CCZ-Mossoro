@@ -108,7 +108,7 @@ export const toFormValues = (
   const values = defaultValues(config);
   for (const field of config.fields) {
     const raw =
-      (field.name === "featured" && data.featured === undefined ? data.home : data[field.name]);
+      field.name === "featured" && data.home !== undefined ? data.home : data[field.name];
     if (raw === undefined || raw === null) continue;
     if (field.type === "toggle") values[field.name] = Boolean(raw);
     else if (field.type === "tags") values[field.name] = Array.isArray(raw) ? raw.join(", ") : String(raw);
