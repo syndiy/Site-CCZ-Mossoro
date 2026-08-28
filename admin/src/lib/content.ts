@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { randomUUID } from "node:crypto";
 import matter from "gray-matter";
 
 const REPO_ROOT = path.join(process.cwd(), "..");
@@ -76,6 +77,15 @@ export function saveImage(filename: string, buffer: Buffer): string {
   const safeName = filename.replace(/[^a-zA-Z0-9._-]/g, "-");
   fs.writeFileSync(path.join(IMAGE_ROOT, safeName), buffer);
   return `/img/${safeName}`;
+}
+
+export function uniqueImageName(extension: string): string {
+  return `${randomUUID()}${extension}`;
+}
+
+export function removeImage(publicPath: string): void {
+  const file = path.join(IMAGE_ROOT, path.basename(publicPath));
+  if (fs.existsSync(file)) fs.unlinkSync(file);
 }
 
 export function readImage(filename: string): Buffer | null {
