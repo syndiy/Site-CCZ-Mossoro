@@ -93,7 +93,7 @@ export function HeroNewsBackground({ slides, fallback, fallbackAlt }: Props) {
 
       {noticia ? (
         <div className="absolute inset-x-0 bottom-0 z-10 pb-8 sm:pb-10 md:pb-14">
-          <div className="mx-auto w-full max-w-[1200px] px-5 sm:px-8">
+          <div className="mx-auto w-full max-w-[1200px] border-t border-white/20 px-5 pt-4 sm:px-8 sm:pt-5">
             <div className="grid min-w-0 gap-4 sm:gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
               {/* aria-live avisa leitores de tela a cada troca. */}
               <div aria-live="polite" aria-atomic="true" className="min-w-0">
