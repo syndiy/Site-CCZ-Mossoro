@@ -1,8 +1,8 @@
 ---
 title: "Castração gratuita: CCZ abre novas vagas para cães e gatos"
 excerpt: "O programa de castração do Centro de Controle de Zoonoses recebe novos cadastros. Saiba quem pode participar e como preparar o animal para a cirurgia."
-cover: "/img/3d/gato.png"
-coverAlt: "Ilustração de um gato"
+cover: "/img/home.avif"
+coverAlt: "Cão e gato atendidos nas campanhas do CCZ Mossoró"
 publishedAt: "2026-08-20"
 tags:
   - castração

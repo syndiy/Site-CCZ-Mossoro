@@ -1,8 +1,8 @@
 ---
 title: "Mutirão contra a dengue percorre bairros de Mossoró"
 excerpt: "Equipes de vigilância visitam residências para eliminar criadouros do mosquito Aedes aegypti. Veja como receber os agentes e o que fazer na sua casa."
-cover: "/img/3d/mosquito.png"
-coverAlt: "Ilustração de um mosquito"
+cover: "/img/ilustracoes/dengue-criadouros.png"
+coverAlt: "Caixa d'água tampada ao lado de pneus e garrafas acumulando água parada"
 publishedAt: "2026-08-12"
 tags:
   - dengue

@@ -1,8 +1,8 @@
 ---
 title: "CCZ realiza mutirão de vacinação antirrábica em Mossoró"
 excerpt: "Ação leva vacinação gratuita de cães e gatos a diferentes bairros da cidade. Confira os pontos e horários de atendimento."
-cover: "/img/3d/cao.png"
-coverAlt: "Ilustração de um cão"
+cover: "/img/home2.avif"
+coverAlt: "Um cão e um gato juntos, atendidos pelo CCZ"
 publishedAt: "2026-07-28"
 tags:
   - vacinação

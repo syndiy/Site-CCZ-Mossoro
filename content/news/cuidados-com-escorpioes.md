@@ -25,7 +25,7 @@ O escorpião se alimenta principalmente de baratas. Manter o ambiente limpo e se
 
 Lave o local da picada com água e sabão e procure imediatamente a unidade de saúde de referência. Não faça torniquete, não corte e não aplique substâncias sobre o ferimento.
 
-Se possível e sem risco, leve o animal em um recipiente fechado para identificação — isso ajuda a equipe médica a definir a conduta.
+Se possível e sem risco, leve o animal em um recipiente fechado para identificação, porque isso ajuda a equipe médica a definir a conduta.
 
 ## Encontrou um escorpião?
 
