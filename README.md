@@ -50,7 +50,11 @@ npm install
 npm run dev      # site em http://localhost:3000
 npm run build    # gera o site estático em ./out
 npm run lint
+npm test         # testes unitários do front e do contrato do editor
 ```
+
+Para configurar o front local, copie `.env.example` para `.env.local`. Use
+`NEXT_PUBLIC_SIMULATE=1` apenas para demonstrar o formulário sem uma API real.
 
 Editor de conteúdo (app separado, precisa de servidor Node):
 
@@ -59,6 +63,12 @@ cd admin
 npm install
 npm run dev      # editor em http://localhost:4001
 ```
+
+O admin é um editor demonstrativo local: ele grava Markdown e imagens no repositório e cria
+commits para manter o histórico. Ele ainda não publica sozinho nem substitui a integração com o
+backend; depois de revisar uma alteração, rode `npm run build` no front para gerar o site estático.
+Defina `ADMIN_PASSWORD` e `ADMIN_SESSION_SECRET` no `admin/.env.local` usando
+[`admin/.env.example`](admin/.env.example).
 
 Tudo junto com o backend e o banco:
 
