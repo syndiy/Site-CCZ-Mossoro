@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { Container } from "@/components/layout/container";
 import { ButtonLink } from "@/components/layout/button-link";
 import { Reveal } from "@/components/shared/reveal";
@@ -14,8 +13,8 @@ const dicas = [
 export function DengueSection() {
   return (
     <section className="py-12 lg:py-24">
-      <Container className="grid items-center gap-10 lg:grid-cols-2">
-        <Reveal>
+      <Container>
+        <Reveal className="mx-auto max-w-3xl">
           <span className="text-xs font-semibold uppercase tracking-wider text-brand-600">
             Vigilância em saúde
           </span>
@@ -42,16 +41,6 @@ export function DengueSection() {
               Denunciar um foco
             </ButtonLink>
           </div>
-        </Reveal>
-
-        <Reveal delay={120} className="hidden justify-self-center lg:block">
-          <Image
-            src="/img/3d/mosquito.png"
-            alt="Mosquito da dengue"
-            width={320}
-            height={320}
-            className="icon-tint-blue h-auto w-64 animate-float drop-shadow-2xl"
-          />
         </Reveal>
       </Container>
     </section>
