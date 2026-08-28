@@ -5,7 +5,6 @@ import { BubbleMenu } from "@tiptap/react/menus";
 import { useEditor, EditorContent, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import TiptapImage from "@tiptap/extension-image";
-import Link from "@tiptap/extension-link";
 import { Markdown } from "tiptap-markdown";
 import { uploadImage } from "@/lib/upload";
 
@@ -23,7 +22,6 @@ export function ContentEditor({ value, onChange }: Props) {
     extensions: [
       StarterKit,
       TiptapImage,
-      Link.configure({ openOnClick: false }),
       Markdown.configure({ html: false, transformCopiedText: true }),
     ],
     content: value,
