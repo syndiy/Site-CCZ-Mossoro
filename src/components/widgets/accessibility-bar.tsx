@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useSyncExternalStore } from "react";
-import { Minus } from "lucide-react";
 import { Container } from "@/components/layout/container";
 import { subscribeToStorage, readStorage, writeStorage } from "@/lib/browser-store";
 
@@ -48,14 +47,16 @@ export function AccessibilityBar() {
           onClick={() => ajustarFonte(-1)}
           className={botao}
           aria-label="Diminuir tamanho da fonte"
+          aria-controls="content"
         >
-          <span aria-hidden="true">A</span><Minus size={13} aria-hidden="true" />
+          A-
         </button>
         <button
           type="button"
           onClick={() => ajustarFonte(1)}
           className={`${botao} text-sm`}
           aria-label="Aumentar tamanho da fonte"
+          aria-controls="content"
         >
           A+
         </button>
