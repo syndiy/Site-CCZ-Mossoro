@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { Hero } from "@/components/home/hero";
-import { HeroNews } from "@/components/home/hero-news";
 import { ServiceGrid } from "@/components/cards/service-card";
 import { Container } from "@/components/layout/container";
 import { ButtonLink } from "@/components/layout/button-link";
@@ -12,18 +11,29 @@ import { DengueSection } from "@/components/home/dengue-section";
 import { FeaturedArticles } from "@/components/home/featured-articles";
 import { PawPattern, Paw } from "@/components/shared/illustrations";
 import { quickAccess } from "@/lib/content";
+import { getLatestNews, formatDate } from "@/lib/cms";
 import { site, whatsappUrl } from "@/lib/site";
 
 export default function HomePage() {
+  const heroSlides = getLatestNews().map((noticia) => ({
+    slug: noticia.slug,
+    title: noticia.title,
+    excerpt: noticia.excerpt,
+    publishedAt: noticia.publishedAt,
+    publishedLabel: formatDate(noticia.publishedAt),
+    cover: noticia.cover,
+    coverAlt: noticia.coverAlt,
+  }));
+
   return (
     <>
       <Hero
-        eyebrow="Vigilância em Saúde · Mossoró"
+        eyebrow="Vigilância em Saúde em Mossoró"
         title="Saúde pública e proteção animal para todos"
         subtitle="Vacinação, castração, controle de vetores e denúncias. Todos os serviços do Centro de Controle de Zoonoses em um só lugar."
         image="/img/home2.avif"
         imageAlt="Um cão e um gato juntos, representando o cuidado do CCZ com os animais de Mossoró"
-        aside={<HeroNews />}
+        slides={heroSlides}
       >
         <ButtonLink href="/reports/" size="lg">
           Fazer uma denúncia
@@ -84,8 +94,8 @@ export default function HomePage() {
             <Image
               src="/img/mascote-cao-gato.png"
               alt="Mascotes do CCZ: um cão e um gato"
-              width={460}
-              height={460}
+              width={781}
+              height={659}
               className="animate-float h-auto w-80 drop-shadow-2xl lg:w-[26rem]"
             />
           </Reveal>
