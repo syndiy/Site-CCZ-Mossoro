@@ -5,7 +5,7 @@ export const baseMetadata: Metadata = {
   metadataBase: new URL(site.url),
   applicationName: site.name,
   title: {
-    default: `${site.legalName} | ${site.address.city}-${site.address.state}`,
+    default: `${site.legalName} | ${site.address.city}, ${site.address.state}`,
     template: `%s | ${site.name}`,
   },
   description: site.description,
@@ -32,7 +32,7 @@ export const baseMetadata: Metadata = {
     locale: "pt_BR",
     siteName: site.legalName,
     url: site.url,
-    title: `${site.legalName} | ${site.address.city}-${site.address.state}`,
+    title: `${site.legalName} | ${site.address.city}, ${site.address.state}`,
     description: site.description,
     images: [
       {
@@ -85,7 +85,9 @@ export function organizationJsonLd() {
       opens: site.hours.opens,
       closes: site.hours.closes,
     },
-    sameAs: [site.social.instagram, site.social.facebook],
+    sameAs: [site.social.instagram, site.social.facebook].filter(
+      (url) => !/\/(instagram|facebook)\.com\/$/.test(url),
+    ),
   };
 }
 
@@ -110,5 +112,43 @@ export function breadcrumbJsonLd(items: { name: string; path: string }[]) {
       name: it.name,
       item: `${site.url}${it.path}`,
     })),
+  };
+}
+
+export function contentArticleJsonLd({
+  type,
+  title,
+  description,
+  path,
+  cover,
+  publishedAt,
+  tags,
+}: {
+  type: "Article" | "NewsArticle";
+  title: string;
+  description: string;
+  path: string;
+  cover: string | null;
+  publishedAt: string;
+  tags: string[];
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": type,
+    headline: title,
+    description,
+    url: `${site.url}${path}`,
+    mainEntityOfPage: { "@type": "WebPage", "@id": `${site.url}${path}` },
+    image: cover ? `${site.url}${cover}` : `${site.url}/img/home2.avif`,
+    datePublished: publishedAt || undefined,
+    dateModified: publishedAt || undefined,
+    author: { "@type": "Organization", name: site.parentOrg },
+    publisher: {
+      "@type": "GovernmentOrganization",
+      name: site.legalName,
+      logo: { "@type": "ImageObject", url: `${site.url}/logo.svg` },
+    },
+    keywords: tags.length > 0 ? tags.join(", ") : undefined,
+    inLanguage: "pt-BR",
   };
 }

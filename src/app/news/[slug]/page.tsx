@@ -6,7 +6,7 @@ import { Container } from "@/components/layout/container";
 import { ButtonLink } from "@/components/layout/button-link";
 import { JsonLd } from "@/components/shared/json-ld";
 import { Markdown } from "@/components/shared/markdown";
-import { breadcrumbJsonLd } from "@/lib/seo";
+import { breadcrumbJsonLd, contentArticleJsonLd } from "@/lib/seo";
 import { getNews, getNewsSlugs, formatDate } from "@/lib/cms";
 
 export const dynamicParams = false;
@@ -27,6 +27,16 @@ export async function generateMetadata({
     title: doc.meta.title,
     description: doc.meta.excerpt,
     alternates: { canonical: `/news/${doc.meta.slug}/` },
+    openGraph: {
+      type: "article",
+      title: doc.meta.title,
+      description: doc.meta.excerpt,
+      url: `/news/${doc.meta.slug}/`,
+      publishedTime: doc.meta.publishedAt || undefined,
+      tags: doc.meta.tags,
+      images: doc.meta.cover ? [doc.meta.cover] : undefined,
+    },
+    twitter: { card: "summary_large_image", title: doc.meta.title, description: doc.meta.excerpt },
   };
 }
 
@@ -39,6 +49,17 @@ export default async function NewsPage({ params }: { params: Promise<{ slug: str
 
   return (
     <article className="py-12 lg:py-20">
+      <JsonLd
+        data={contentArticleJsonLd({
+          type: "NewsArticle",
+          title: meta.title,
+          description: meta.excerpt,
+          path: `/news/${meta.slug}/`,
+          cover: meta.cover,
+          publishedAt: meta.publishedAt,
+          tags: meta.tags,
+        })}
+      />
       <JsonLd
         data={breadcrumbJsonLd([
           { name: "Início", path: "/" },

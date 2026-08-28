@@ -6,21 +6,32 @@ import { getAllArticles, getAllNews } from "@/lib/cms";
 export const dynamic = "force-static";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const routes = [
-    "/",
-    "/services/",
-    "/articles/",
-    "/news/",
-    "/reports/",
-    "/about/",
-    "/contact/",
-    ...servicoPaginas.map((s) => `/services/${s.slug}/`),
-    ...getAllArticles().map((a) => `/articles/${a.slug}/`),
-    ...getAllNews().map((n) => `/news/${n.slug}/`),
+  const routes: { path: string; lastModified?: string }[] = [
+    ...[
+      "/",
+      "/services/",
+      "/articles/",
+      "/news/",
+      "/reports/",
+      "/about/",
+      "/contact/",
+      "/privacy/",
+      "/accessibility/",
+    ].map((path) => ({ path })),
+    ...servicoPaginas.map((service) => ({ path: `/services/${service.slug}/` })),
+    ...getAllArticles().map((article) => ({
+      path: `/articles/${article.slug}/`,
+      lastModified: article.publishedAt || undefined,
+    })),
+    ...getAllNews().map((news) => ({
+      path: `/news/${news.slug}/`,
+      lastModified: news.publishedAt || undefined,
+    })),
   ];
 
-  return routes.map((path) => ({
+  return routes.map(({ path, lastModified }) => ({
     url: `${site.url}${path}`,
+    lastModified,
     changeFrequency: "monthly",
     priority: path === "/" ? 1 : 0.8,
   }));

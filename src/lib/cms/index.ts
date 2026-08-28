@@ -133,7 +133,9 @@ export function getArticleSlugs(): string[] {
 
 export function getArticle(slug: string): Doc<ArticleMeta> | null {
   const found = readCollection("articles").find((item) => item.slug === slug);
-  return found ? parseArticle(found.slug, found.raw) : null;
+  if (!found) return null;
+  const doc = parseArticle(found.slug, found.raw);
+  return doc.meta.draft ? null : doc;
 }
 
 export function getAllNews(): NewsMeta[] {
@@ -156,7 +158,9 @@ export function getNewsSlugs(): string[] {
 
 export function getNews(slug: string): Doc<NewsMeta> | null {
   const found = readCollection("news").find((item) => item.slug === slug);
-  return found ? parseNews(found.slug, found.raw) : null;
+  if (!found) return null;
+  const doc = parseNews(found.slug, found.raw);
+  return doc.meta.draft ? null : doc;
 }
 
 export function formatDate(iso: string): string {

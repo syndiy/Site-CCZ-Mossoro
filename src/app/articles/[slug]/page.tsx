@@ -7,7 +7,7 @@ import { JsonLd } from "@/components/shared/json-ld";
 import { Icon } from "@/components/shared/icon";
 import { Markdown } from "@/components/shared/markdown";
 import { Card, CardContent } from "@/components/ui/card";
-import { breadcrumbJsonLd } from "@/lib/seo";
+import { breadcrumbJsonLd, contentArticleJsonLd } from "@/lib/seo";
 import { getArticle, getArticleSlugs, formatDate } from "@/lib/cms";
 import { site } from "@/lib/site";
 
@@ -29,6 +29,16 @@ export async function generateMetadata({
     title: doc.meta.title,
     description: doc.meta.description,
     alternates: { canonical: `/articles/${doc.meta.slug}/` },
+    openGraph: {
+      type: "article",
+      title: doc.meta.title,
+      description: doc.meta.description,
+      url: `/articles/${doc.meta.slug}/`,
+      publishedTime: doc.meta.publishedAt || undefined,
+      tags: doc.meta.tags,
+      images: doc.meta.cover ? [doc.meta.cover] : undefined,
+    },
+    twitter: { card: "summary_large_image", title: doc.meta.title, description: doc.meta.description },
   };
 }
 
@@ -41,6 +51,17 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
   return (
     <article className="py-12 lg:py-20">
+      <JsonLd
+        data={contentArticleJsonLd({
+          type: "Article",
+          title: meta.title,
+          description: meta.description,
+          path: `/articles/${meta.slug}/`,
+          cover: meta.cover,
+          publishedAt: meta.publishedAt,
+          tags: meta.tags,
+        })}
+      />
       <JsonLd
         data={breadcrumbJsonLd([
           { name: "Início", path: "/" },
