@@ -89,7 +89,12 @@ export function removeImage(publicPath: string): void {
 }
 
 export function readImage(filename: string): Buffer | null {
-  const file = path.join(IMAGE_ROOT, path.basename(filename));
+  const relative = filename.replace(/^\/?img\//, "");
+  if (!relative || relative.split("/").some((part) => !part || part === "." || part === "..")) {
+    return null;
+  }
+  const file = path.resolve(IMAGE_ROOT, relative);
+  if (!file.startsWith(`${IMAGE_ROOT}${path.sep}`)) return null;
   return fs.existsSync(file) ? fs.readFileSync(file) : null;
 }
 

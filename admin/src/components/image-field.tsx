@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { uploadImage } from "@/lib/upload";
+import { editorImageUrl } from "@/lib/image-url";
 
 type Props = {
   value: string;
@@ -13,6 +14,14 @@ export function ImageField({ value, onChange }: Props) {
   const [error, setError] = useState("");
 
   async function handleFile(file: File) {
+    if (!new Set(["image/jpeg", "image/png", "image/webp"]).has(file.type)) {
+      setError("Use uma imagem JPG, PNG ou WebP.");
+      return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      setError("A imagem deve ter no maximo 8 MB.");
+      return;
+    }
     setBusy(true);
     setError("");
     try {
@@ -31,7 +40,7 @@ export function ImageField({ value, onChange }: Props) {
           {value ? "Trocar imagem" : "Escolher imagem"}
           <input
             type="file"
-            accept="image/*"
+            accept="image/jpeg,image/png,image/webp"
             hidden
             disabled={busy}
             onChange={(event) => {
@@ -49,7 +58,7 @@ export function ImageField({ value, onChange }: Props) {
         {busy ? <span className="muted">Enviando...</span> : null}
       </div>
       {error ? <p className="error">{error}</p> : null}
-      {value ? <img src={value} alt="" className="image-preview" /> : null}
+      {value ? <img src={editorImageUrl(value)} alt="" className="image-preview" /> : null}
     </div>
   );
 }

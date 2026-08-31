@@ -59,7 +59,7 @@ export function ContentEditor({ value, onChange }: Props) {
       <input
         ref={fileInput}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png,image/webp"
         hidden
         onChange={(event) => {
           const file = event.target.files?.[0];

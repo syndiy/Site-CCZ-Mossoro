@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ContentEditor } from "./editor";
+import { ContentPreview } from "./content-preview";
 import { ImageField } from "./image-field";
 import { toPayload, type CollectionConfig, type Field } from "@/lib/collections";
 
@@ -29,10 +30,26 @@ export function EntryForm({
   const [draft, setDraft] = useState(initialDraft);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   const isEditing = Boolean(slug);
+  const initialSnapshot = useMemo(
+    () => JSON.stringify({ values: initialValues, body: initialBody, draft: initialDraft }),
+    [initialBody, initialDraft, initialValues],
+  );
+  const dirty = JSON.stringify({ values, body, draft }) !== initialSnapshot;
   const setField = (name: string, value: string | boolean) =>
     setValues((current) => ({ ...current, [name]: value }));
+
+  useEffect(() => {
+    if (!dirty) return;
+    const warnBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warnBeforeUnload);
+    return () => window.removeEventListener("beforeunload", warnBeforeUnload);
+  }, [dirty]);
 
   async function save(nextDraft: boolean) {
     if (!String(values.title ?? "").trim()) {
@@ -99,6 +116,7 @@ export function EntryForm({
           <span className={draft ? "badge draft" : "badge live"}>
             {draft ? "Rascunho" : "Publicado no site"}
           </span>
+          {dirty ? <span className="unsaved-status" role="status">Alteracoes nao salvas</span> : null}
           <span className="muted">
             {draft
               ? "Só você vê. O conteúdo não aparece no site."
@@ -131,7 +149,39 @@ export function EntryForm({
             <p className="muted">Use títulos de seção, listas e links para organizar a leitura.</p>
           </div>
         </div>
-        <ContentEditor value={initialBody} onChange={setBody} />
+        <div className="editor-view-switch" role="tablist" aria-label="Modo de visualizacao">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={!previewOpen}
+            className={!previewOpen ? "active" : ""}
+            onClick={() => setPreviewOpen(false)}
+          >
+            Editar
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={previewOpen}
+            className={previewOpen ? "active" : ""}
+            onClick={() => setPreviewOpen(true)}
+          >
+            Previa
+          </button>
+        </div>
+        {previewOpen ? (
+          <ContentPreview
+            title={String(values.title ?? "")}
+            eyebrow={String(values.eyebrow ?? "")}
+            summary={String(values.description ?? values.excerpt ?? "")}
+            cover={String(values.cover ?? "")}
+            coverAlt={String(values.coverAlt ?? "")}
+            publishedAt={String(values.publishedAt ?? "")}
+            body={body}
+          />
+        ) : (
+          <ContentEditor value={body} onChange={setBody} />
+        )}
       </div>
 
       {error ? <p className="error">{error}</p> : null}
