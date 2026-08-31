@@ -83,6 +83,32 @@ export function ContentWorkspace({ initialEntries }: { initialEntries: Workspace
     moveEntry(entryId(entry), !entry.home);
   }
 
+  function nudgeEntry(id: string, direction: -1 | 1) {
+    setEntries((current) => {
+      const source = current.find((entry) => entryId(entry) === id);
+      if (!source) return current;
+
+      const lane = sortEntries(
+        current.filter(
+          (entry) => entry.collection === source.collection && entry.home === source.home,
+        ),
+      );
+      const index = lane.findIndex((entry) => entryId(entry) === id);
+      const nextIndex = index + direction;
+      if (nextIndex < 0 || nextIndex >= lane.length) return current;
+
+      [lane[index], lane[nextIndex]] = [lane[nextIndex], lane[index]];
+      const orderedIds = new Map(lane.map((entry, position) => [entryId(entry), position + 1]));
+      setDirty(true);
+      setMessage("");
+      return current.map((entry) =>
+        orderedIds.has(entryId(entry))
+          ? { ...entry, homeOrder: orderedIds.get(entryId(entry))! }
+          : entry,
+      );
+    });
+  }
+
   async function saveOrder() {
     setBusy(true);
     setError("");
@@ -177,6 +203,7 @@ export function ContentWorkspace({ initialEntries }: { initialEntries: Workspace
               onDragEnd={() => setDraggedId(null)}
               onDrop={moveEntry}
               onToggle={toggleHome}
+              onNudge={nudgeEntry}
             />
           ))}
         </div>

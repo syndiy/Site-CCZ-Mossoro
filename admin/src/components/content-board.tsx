@@ -11,6 +11,7 @@ export function ContentBoard({
   onDragEnd,
   onDrop,
   onToggle,
+  onNudge,
 }: {
   collection: Collection;
   entries: WorkspaceEntry[];
@@ -19,6 +20,7 @@ export function ContentBoard({
   onDragEnd: () => void;
   onDrop: (id: string, home: boolean, beforeId?: string) => void;
   onToggle: (entry: WorkspaceEntry) => void;
+  onNudge: (id: string, direction: -1 | 1) => void;
 }) {
   const homeEntries = sortEntries(entries.filter((entry) => entry.home));
   const libraryEntries = sortEntries(entries.filter((entry) => !entry.home));
@@ -42,6 +44,7 @@ export function ContentBoard({
           onDragEnd={onDragEnd}
           onDrop={onDrop}
           onToggle={onToggle}
+          onNudge={onNudge}
         />
         <DropLane
           title="Fora da pagina inicial"
@@ -53,6 +56,7 @@ export function ContentBoard({
           onDragEnd={onDragEnd}
           onDrop={onDrop}
           onToggle={onToggle}
+          onNudge={onNudge}
         />
       </div>
     </section>
@@ -69,6 +73,7 @@ function DropLane({
   onDragEnd,
   onDrop,
   onToggle,
+  onNudge,
 }: {
   title: string;
   caption: string;
@@ -79,6 +84,7 @@ function DropLane({
   onDragEnd: () => void;
   onDrop: (id: string, home: boolean, beforeId?: string) => void;
   onToggle: (entry: WorkspaceEntry) => void;
+  onNudge: (id: string, direction: -1 | 1) => void;
 }) {
   return (
     <div
@@ -102,6 +108,8 @@ function DropLane({
             onDragEnd={onDragEnd}
             onDrop={onDrop}
             onToggle={onToggle}
+            onNudge={onNudge}
+            total={entries.length}
           />
         ))}
         {entries.length === 0 ? <div className="empty-lane">Solte um conteudo aqui</div> : null}
