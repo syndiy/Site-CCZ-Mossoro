@@ -157,10 +157,23 @@ export function ReportForm() {
       setAviso("Geolocalização não disponível neste navegador.");
       return;
     }
+    setBuscandoEndereco(true);
     setAviso("Obtendo a sua localização…");
     navigator.geolocation.getCurrentPosition(
       (pos) => marcarNoMapa({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-      () => setAviso("Não foi possível obter a localização. Toque no mapa ou digite o CEP."),
+      (error) => {
+        setBuscandoEndereco(false);
+        if (error.code === error.TIMEOUT) {
+          setAviso("A localização demorou demais. Toque no mapa ou digite o CEP.");
+          return;
+        }
+        if (error.code === error.PERMISSION_DENIED) {
+          setAviso("A permissão de localização foi negada. Toque no mapa ou digite o CEP.");
+          return;
+        }
+        setAviso("Não foi possível obter a localização. Toque no mapa ou digite o CEP.");
+      },
+      { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 },
     );
   }
 
@@ -225,6 +238,8 @@ export function ReportForm() {
         localidade: localidade.trim(),
         uf: uf.trim().toUpperCase(),
         imagem,
+        latitude: ponto?.lat,
+        longitude: ponto?.lng,
       });
       setResultado(res);
     } catch (err) {

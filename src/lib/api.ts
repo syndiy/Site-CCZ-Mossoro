@@ -23,6 +23,8 @@ export type DenunciaPayload = {
   localidade: string;
   uf: string;
   imagem: File | null;
+  latitude?: number;
+  longitude?: number;
 };
 
 export type Denuncia = {
@@ -79,6 +81,10 @@ export async function criarDenuncia(payload: DenunciaPayload): Promise<Denuncia>
   form.append("bairro", payload.bairro);
   form.append("localidade", payload.localidade);
   form.append("uf", payload.uf);
+  if (Number.isFinite(payload.latitude) && Number.isFinite(payload.longitude)) {
+    form.append("latitude", String(payload.latitude));
+    form.append("longitude", String(payload.longitude));
+  }
   if (payload.imagem) {
     form.append("imagem", payload.imagem);
   }

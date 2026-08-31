@@ -23,7 +23,7 @@ export default function PrivacyPage() {
           <h2 className="mb-3 mt-6 text-2xl font-bold">Quais dados coletamos</h2>
           <p className="mb-3 text-ink-soft">
             Ao registrar uma denúncia, coletamos apenas os dados que você informar: descrição e
-            localização da ocorrência e, se você quiser, nome, e-mail e telefone para retorno.
+            localização da ocorrência e, se você quiser, nome e telefone para retorno.
             Informar o contato é opcional.
           </p>
 
