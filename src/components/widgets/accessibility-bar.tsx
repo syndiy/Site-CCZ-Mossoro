@@ -5,6 +5,7 @@ import { Container } from "@/components/layout/container";
 import { subscribeToStorage, readStorage, writeStorage } from "@/lib/browser-store";
 
 const TAMANHOS = [100, 112, 125];
+const ROTULOS_TAMANHO = ["Padrão", "Ampliado", "Máximo"];
 const CHAVE_CONTRASTE = "ccz-contraste";
 const CHAVE_FONTE = "ccz-fonte";
 
@@ -33,7 +34,7 @@ export function AccessibilityBar() {
     writeStorage(CHAVE_FONTE, String(Math.min(TAMANHOS.length - 1, Math.max(0, tamanho + delta))));
 
   const botao =
-    "rounded px-2 py-1 font-medium transition-colors hover:bg-white/15 focus-visible:bg-white/15";
+    "rounded px-2 py-1 font-medium transition-colors hover:bg-white/15 focus-visible:bg-white/15 disabled:cursor-not-allowed disabled:opacity-55";
 
   return (
     <div className="bg-brand-900 text-xs text-white/90">
@@ -48,6 +49,8 @@ export function AccessibilityBar() {
           className={botao}
           aria-label="Diminuir tamanho da fonte"
           aria-controls="content"
+          disabled={tamanho === 0}
+          title="Diminuir tamanho da fonte"
         >
           A-
         </button>
@@ -57,6 +60,8 @@ export function AccessibilityBar() {
           className={`${botao} text-sm`}
           aria-label="Aumentar tamanho da fonte"
           aria-controls="content"
+          disabled={tamanho === TAMANHOS.length - 1}
+          title="Aumentar tamanho da fonte"
         >
           A+
         </button>
@@ -68,6 +73,9 @@ export function AccessibilityBar() {
         >
           Alto contraste
         </button>
+        <span className="sr-only" role="status" aria-live="polite">
+          Tamanho do texto: {ROTULOS_TAMANHO[tamanho] ?? ROTULOS_TAMANHO[0]}
+        </span>
       </Container>
     </div>
   );
