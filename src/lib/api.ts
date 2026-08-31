@@ -57,18 +57,7 @@ const API_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/+$/, "");
 
 const endpoint = (path: string) => `${API_BASE}${path}`;
 
-export async function criarDenuncia(payload: DenunciaPayload): Promise<Denuncia> {
-  if (SIMULATE) {
-    await new Promise((r) => setTimeout(r, 700));
-    return {
-      id: Math.floor(1000 + Math.random() * 9000),
-      tipoDeDenuncia: payload.tipoDeDenuncia,
-      statusDenuncia: "EM_ANALISE",
-      nomeDenunciante: payload.nomeDenunciante,
-      numeroTelefone: payload.numeroTelefone,
-    };
-  }
-
+export function toDenunciaFormData(payload: DenunciaPayload): FormData {
   const form = new FormData();
   form.append("tipoDeDenuncia", payload.tipoDeDenuncia);
   form.append("statusDenuncia", "EM_ANALISE");
@@ -88,10 +77,24 @@ export async function criarDenuncia(payload: DenunciaPayload): Promise<Denuncia>
   if (payload.imagem) {
     form.append("imagem", payload.imagem);
   }
+  return form;
+}
+
+export async function criarDenuncia(payload: DenunciaPayload): Promise<Denuncia> {
+  if (SIMULATE) {
+    await new Promise((r) => setTimeout(r, 700));
+    return {
+      id: Math.floor(1000 + Math.random() * 9000),
+      tipoDeDenuncia: payload.tipoDeDenuncia,
+      statusDenuncia: "EM_ANALISE",
+      nomeDenunciante: payload.nomeDenunciante,
+      numeroTelefone: payload.numeroTelefone,
+    };
+  }
 
   let res: Response;
   try {
-    res = await fetchWithTimeout(endpoint("/denuncia"), { method: "POST", body: form }, 15000);
+    res = await fetchWithTimeout(endpoint("/denuncia"), { method: "POST", body: toDenunciaFormData(payload) }, 15000);
   } catch (error) {
     if (error instanceof DOMException && error.name === "AbortError") {
       throw new Error("O envio demorou mais que o esperado. Verifique a internet e tente novamente.");

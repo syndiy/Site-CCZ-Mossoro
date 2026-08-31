@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getAllNews, getNews } from "@/lib/cms";
+import { getAllArticles, getAllNews, getNews } from "@/lib/cms";
 
 describe("CMS publico", () => {
   it("nao expoe noticias marcadas como rascunho", () => {
@@ -15,5 +15,19 @@ describe("CMS publico", () => {
     expect(ordered.map((item) => item.slug)).toEqual(
       expect.arrayContaining(news.map((item) => item.slug)),
     );
+  });
+
+  it("mantem metadados necessarios para busca e compartilhamento", () => {
+    const documents = [...getAllArticles(), ...getAllNews()];
+
+    expect(documents.length).toBeGreaterThan(0);
+    for (const document of documents) {
+      expect(document.slug).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
+      expect(document.title.trim().length).toBeGreaterThan(0);
+      expect(document.cover).toMatch(/^\/img\/.+\.(avif|jpe?g|png|webp)$/i);
+      expect(document.coverAlt.trim().length).toBeGreaterThan(0);
+      expect(document.publishedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      expect(document.tags.length).toBeGreaterThan(0);
+    }
   });
 });
