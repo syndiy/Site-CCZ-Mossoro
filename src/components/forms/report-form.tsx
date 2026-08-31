@@ -446,7 +446,7 @@ export function ReportForm() {
                 </>
               )}
             </Label>
-            <Input
+            <input
               id="imagem"
               type="file"
               accept="image/jpeg,image/png,image/webp"
