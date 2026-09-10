@@ -230,6 +230,12 @@ h3 { margin: 0; font-size: 0.9rem; line-height: 1.25; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
+/* ---------- triagem de denuncias ---------- */
+
+.aviso-api h2 { margin: 0 0 8px; font-size: 1.05rem; }
+.aviso-api .muted + .muted { margin-top: 10px; }
+.aviso-api code { padding: 1px 5px; border-radius: 4px; background: #eef1f4; font-family: ui-monospace, Consolas, monospace; font-size: 0.85em; }
+
 @media (max-width: 1000px) {
   .workspace-summary { grid-template-columns: 1fr auto; }
   .summary-stats { grid-column: 1 / -1; grid-row: 2; }
