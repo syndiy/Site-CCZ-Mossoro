@@ -1,3 +1,5 @@
+import { fetchWithTimeout } from "./fetch-with-timeout";
+
 export type TipoDenuncia =
   | "MAUS_TRATOS"
   | "BARATAS"
@@ -28,17 +30,22 @@ export type DenunciaPayload = {
 };
 
 export type Denuncia = {
-  id: number;
-  tipoDeDenuncia: TipoDenuncia;
+  id?: number;
+  protocolo?: string;
+  tipoDeDenuncia?: TipoDenuncia;
+  tipoDenuncia?: TipoDenuncia;
   statusDenuncia: StatusDenuncia;
   nomeDenunciante?: string;
   numeroTelefone?: string;
+  dataCriacao?: string;
 };
 
 export type DenunciaDetalhe = {
   id?: number;
   idDenuncia?: number;
-  tipoDeDenuncia: TipoDenuncia;
+  protocolo?: string; // Adicionado para a busca
+  tipoDeDenuncia?: TipoDenuncia;
+  tipoDenuncia?: TipoDenuncia; // O Java retorna sem o "De"
   statusDenuncia: StatusDenuncia;
   nomeDenunciante?: string;
   numeroTelefone?: string;
@@ -53,7 +60,8 @@ export type DenunciaDetalhe = {
 };
 
 const SIMULATE = process.env.NEXT_PUBLIC_SIMULATE === "1";
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/+$/, "");
+//const API_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/+$/, "");
+const API_BASE = "http://localhost:8080";
 
 const endpoint = (path: string) => `${API_BASE}${path}`;
 
@@ -64,12 +72,13 @@ export function toDenunciaFormData(payload: DenunciaPayload): FormData {
   form.append("nomeDenunciante", payload.nomeDenunciante);
   form.append("numeroTelefone", payload.numeroTelefone);
   form.append("cep", payload.cep);
-  form.append("logradouro", payload.logradouro);
+  form.append("rua", payload.logradouro);
   form.append("numero", payload.numero);
   form.append("complemento", payload.complemento);
   form.append("bairro", payload.bairro);
-  form.append("localidade", payload.localidade);
-  form.append("uf", payload.uf);
+  form.append("cidade", payload.localidade);
+  form.append("estado", payload.uf);
+  
   if (Number.isFinite(payload.latitude) && Number.isFinite(payload.longitude)) {
     form.append("latitude", String(payload.latitude));
     form.append("longitude", String(payload.longitude));
@@ -85,6 +94,7 @@ export async function criarDenuncia(payload: DenunciaPayload): Promise<Denuncia>
     await new Promise((r) => setTimeout(r, 700));
     return {
       id: Math.floor(1000 + Math.random() * 9000),
+      protocolo: "2026-SIMULADO",
       tipoDeDenuncia: payload.tipoDeDenuncia,
       statusDenuncia: "EM_ANALISE",
       nomeDenunciante: payload.nomeDenunciante,
@@ -110,12 +120,12 @@ export async function criarDenuncia(payload: DenunciaPayload): Promise<Denuncia>
 export async function buscarDenuncia(id: string): Promise<DenunciaDetalhe | null> {
   if (SIMULATE) {
     await new Promise((r) => setTimeout(r, 500));
-    return { id: Number(id), tipoDeDenuncia: "MAUS_TRATOS", statusDenuncia: "EM_ANALISE" };
+    return { id: Number(id), protocolo: id, tipoDeDenuncia: "MAUS_TRATOS", statusDenuncia: "EM_ANALISE" };
   }
 
   let res: Response;
   try {
-    res = await fetchWithTimeout(endpoint(`/denuncia/${encodeURIComponent(id)}`), {}, 10000);
+    res = await fetchWithTimeout(endpoint(`/denuncia/protocolo/${encodeURIComponent(id)}`), {}, 10000);
   } catch (error) {
     if (error instanceof DOMException && error.name === "AbortError") {
       throw new Error("A consulta demorou mais que o esperado. Tente novamente.");
@@ -128,4 +138,3 @@ export async function buscarDenuncia(id: string): Promise<DenunciaDetalhe | null
   }
   return (await res.json()) as DenunciaDetalhe;
 }
-import { fetchWithTimeout } from "./fetch-with-timeout";

@@ -260,7 +260,7 @@ export function ReportForm() {
           </span>
           <h2 className="text-2xl font-bold">Denúncia registrada!</h2>
           <p className="mt-2 text-muted-foreground">Guarde o número para acompanhar:</p>
-          <p className="my-5 text-4xl font-bold tracking-wide text-success-600">#{resultado.id}</p>
+          <p className="my-5 text-4xl font-bold tracking-wide text-success-600">{resultado.protocolo}</p>
           <p className="mx-auto mb-7 max-w-md text-muted-foreground">
             Nossa equipe vai analisar a ocorrência. Se você informou um telefone, poderá receber um
             retorno.
@@ -505,8 +505,8 @@ export function ProtocolLookup() {
 
   async function consultar(e: React.FormEvent) {
     e.preventDefault();
-    const protocolo = id.replace(/\D/g, "");
-    if (!protocolo || protocolo.length > 12) {
+    const protocolo = id.trim();
+    if (!protocolo) {
       setNaoEncontrado(true);
       return;
     }
@@ -538,11 +538,10 @@ export function ProtocolLookup() {
           </Label>
           <Input
             id="id"
-            inputMode="numeric"
             value={id}
-            onChange={(e) => setId(e.target.value.replace(/\D/g, "").slice(0, 12))}
-            placeholder="Ex.: 1234"
-            maxLength={12}
+            onChange={(e) => setId(e.target.value.toUpperCase())}
+            placeholder="Ex.: 2026-ZYHJ-MQSC"
+            maxLength={25}
             className="max-w-56"
           />
           <Button type="submit" variant="outline" disabled={carregando}>
@@ -552,7 +551,7 @@ export function ProtocolLookup() {
 
         {resultado ? (
           <p className="mt-5 inline-flex flex-wrap items-center justify-center gap-2">
-            Denúncia <strong>#{resultado.id ?? resultado.idDenuncia}</strong>
+            Denúncia <strong>#{resultado.protocolo ?? resultado.idDenuncia}</strong>
             <Badge className={statusDenuncia[resultado.statusDenuncia].className}>
               <Icon name={statusDenuncia[resultado.statusDenuncia].icon} size={14} />
               {statusDenuncia[resultado.statusDenuncia].label}
