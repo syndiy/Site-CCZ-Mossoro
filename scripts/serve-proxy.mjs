@@ -86,12 +86,18 @@ function serveStatic(req, res) {
   const file = candidates.find((f) => existsSync(f) && statSync(f).isFile());
 
   if (!file) {
+    const naoEncontrado = join(OUT, "404.html");
     res.writeHead(404, { "Content-Type": "text/html; charset=utf-8" });
-    createReadStream(join(OUT, "404.html")).pipe(res);
+    // Durante um rebuild o out/ some por alguns segundos: responder texto puro
+    // em vez de estourar o servidor inteiro num ENOENT.
+    if (existsSync(naoEncontrado)) createReadStream(naoEncontrado).pipe(res);
+    else res.end("<h1>404</h1>");
     return;
   }
   res.writeHead(200, { "Content-Type": contentType(file) });
-  createReadStream(file).pipe(res);
+  const stream = createReadStream(file);
+  stream.on("error", () => res.end());
+  stream.pipe(res);
 }
 
 http
