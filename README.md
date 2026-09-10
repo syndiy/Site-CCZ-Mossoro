@@ -31,9 +31,7 @@ flowchart LR
     C -->|navega| S
     C -->|"denúncia e protocolo"| API
     API --> DB
-    SEC -.->|"planejado: substitui a senha local"| E
-
-    style SEC stroke-dasharray: 5 5
+    SEC -->|"login da equipe (JWT)"| E
 ```
 
 Duas coisas importantes nesse desenho:
@@ -116,6 +114,7 @@ chama a API direto.
 | --- | --- |
 | Enviar denúncia (multipart, com foto) | `POST /denuncia` |
 | Consultar protocolo | `GET /denuncia/{id}` |
+| Login da equipe (editor) | `POST /users/login` |
 
 Variáveis de ambiente no build:
 
@@ -126,11 +125,28 @@ Variáveis de ambiente no build:
 
 ## Login da equipe
 
-Hoje o editor usa uma **senha única** na variável `ADMIN_PASSWORD` (veja
-[`admin/.env.example`](admin/.env.example)). É provisório: sem essa variável, ninguém entra.
+O editor autentica no **Spring Security do backend**, com usuário individual por pessoa.
 
-O plano é substituir por **Spring Security**, no mesmo backend das denúncias. Assim a equipe
-passa a ter usuários individuais e o histórico do git mostra quem publicou o quê.
+```
+POST /users/login  { email, password }  ->  { token }   # JWT HS256, 4h
+```
+
+O token vai para um cookie `httpOnly` e é validado localmente a cada navegação
+([`admin/src/lib/jwt.ts`](admin/src/lib/jwt.ts)): assinatura, emissor e validade. O editor não
+guarda senha nenhuma. O cliente do backend fica isolado em
+[`admin/src/lib/backend.ts`](admin/src/lib/backend.ts), espelhando os DTOs do Spring.
+
+| Variável (em `admin/.env.local`) | Para que serve |
+| --- | --- |
+| `CCZ_API_URL` | Endereço da API. Definida, liga o login por usuário. |
+| `CCZ_JWT_SECRET` | Mesmo segredo do `JwtTokenService` no backend. |
+| `CCZ_JWT_ISSUER` | Emissor do token. Padrão: `SiteInstitucionalCcz`. |
+
+Sem `CCZ_API_URL`, o editor cai no modo local antigo: senha única em `ADMIN_PASSWORD`, útil para
+mexer no editor sem subir o backend. Sem nenhuma das duas, ninguém entra.
+
+Quem entra no sistema é decidido pelo backend em duas etapas: um administrador libera o CPF em
+`POST /allowedEmployee` e a pessoa só então consegue ter usuário criado.
 
 ## Acessibilidade e SEO
 
