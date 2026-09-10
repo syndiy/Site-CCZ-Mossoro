@@ -3,20 +3,35 @@
 import { useActionState } from "react";
 import { login, type LoginState } from "./actions";
 
-export function LoginForm() {
+export function LoginForm({ withEmail }: { withEmail: boolean }) {
   const [state, formAction, pending] = useActionState<LoginState, FormData>(login, {});
 
   return (
     <form action={formAction} className="card">
+      {withEmail ? (
+        <div className="field">
+          <label className="field-label" htmlFor="email">
+            E-mail
+          </label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            autoFocus
+            required
+            autoComplete="username"
+          />
+        </div>
+      ) : null}
       <div className="field">
         <label className="field-label" htmlFor="password">
-          Senha do editor
+          {withEmail ? "Senha" : "Senha do editor"}
         </label>
         <input
           id="password"
           name="password"
           type="password"
-          autoFocus
+          autoFocus={!withEmail}
           required
           autoComplete="current-password"
         />
