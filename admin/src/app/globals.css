@@ -232,6 +232,32 @@ h3 { margin: 0; font-size: 0.9rem; line-height: 1.25; }
 
 /* ---------- triagem de denuncias ---------- */
 
+select { min-height: 36px; padding: 6px 10px; border: 1px solid var(--border); border-radius: 7px; background: var(--surface); color: var(--ink); font: inherit; font-size: 0.86rem; }
+select:focus { border-color: var(--focus); }
+select:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.triagem-filtros { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; margin-bottom: 18px; }
+.filtro-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.filtro-chip { display: inline-flex; align-items: center; gap: 7px; min-height: 34px; padding: 5px 12px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); color: var(--ink-soft); font-size: 0.82rem; font-weight: 650; cursor: pointer; }
+.filtro-chip:hover { border-color: #b4ccd5; color: var(--ink); }
+.filtro-chip.ativo { border-color: var(--brand); background: var(--brand-soft); color: var(--brand-dark); }
+.filtro-total { min-width: 21px; padding: 1px 6px; border-radius: 999px; background: #eef2f5; color: var(--ink-soft); font-size: 0.72rem; font-weight: 700; font-variant-numeric: tabular-nums; text-align: center; }
+.filtro-chip.ativo .filtro-total { background: rgba(255, 255, 255, 0.8); color: var(--brand-dark); }
+.filtro-chip.destaque .filtro-total { background: var(--warning-soft); color: var(--warning); }
+.filtro-tipo { display: inline-flex; align-items: center; gap: 8px; color: var(--ink-soft); font-size: 0.82rem; font-weight: 650; }
+
+.triagem-lista { margin: 0; padding: 0; overflow: hidden; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); list-style: none; }
+.denuncia-row { display: flex; flex-direction: column; gap: 5px; padding: 16px 20px; border-top: 1px solid var(--border); }
+.denuncia-row:first-child { border-top: 0; }
+.denuncia-topo { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.denuncia-protocolo { font-size: 0.9rem; font-weight: 750; font-variant-numeric: tabular-nums; text-decoration: none; }
+.denuncia-protocolo:hover { text-decoration: underline; }
+.denuncia-tipo { padding: 2px 9px; border-radius: 5px; background: var(--brand-soft); color: var(--brand-dark); font-size: 0.74rem; font-weight: 700; }
+.denuncia-status { margin-left: auto; }
+.denuncia-pessoa { margin: 3px 0 0; font-size: 0.88rem; }
+.denuncia-endereco { margin: 0; color: var(--ink-soft); font-size: 0.85rem; }
+.triagem-vazio { margin: 0; padding: 36px 20px; border: 1px dashed var(--border); border-radius: 10px; color: var(--ink-soft); font-size: 0.9rem; text-align: center; }
+
 .aviso-api h2 { margin: 0 0 8px; font-size: 1.05rem; }
 .aviso-api .muted + .muted { margin-top: 10px; }
 .aviso-api code { padding: 1px 5px; border-radius: 4px; background: #eef1f4; font-family: ui-monospace, Consolas, monospace; font-size: 0.85em; }
@@ -261,6 +287,9 @@ h3 { margin: 0; font-size: 0.9rem; line-height: 1.25; }
   .filter-tab { flex: 1; }
   .search-field { min-width: 100%; margin-left: 0; }
   .new-links .btn { flex: 1; }
+  .denuncia-status { width: 100%; margin-left: 0; }
+  .denuncia-status select { width: 100%; }
+  .triagem-filtros { align-items: stretch; flex-direction: column; }
   .board-grid { grid-template-columns: 1fr; }
   .board-lanes { grid-template-columns: 1fr; }
   .content-row { grid-template-columns: 27px 20px 32px minmax(0, 1fr); }
