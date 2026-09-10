@@ -137,4 +137,25 @@ export async function buscarDenuncia(id: string): Promise<DenunciaDetalhe | null
     throw new Error(`Não foi possível consultar a denúncia (HTTP ${res.status}).`);
   }
   return (await res.json()) as DenunciaDetalhe;
+
+//login e armazenamento do token
+export async function loginUsuario(email: string, password: string): Promise<string> {
+  const res = await fetch(endpoint("/users/login"), {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, password }),
+  });
+
+  if (!res.ok) {
+    throw new Error("E-mail ou senha incorretos.");
+  }
+
+  const data = await res.json();
+  
+  return data.token;
+}
+
+
 }
