@@ -93,7 +93,12 @@ src/
 content/
   articles/     artigos de educação em saúde
   news/         campanhas, mutirões e avisos
-admin/          editor de conteúdo (app Next.js separado)
+admin/          editor de conteúdo e triagem (app Next.js separado)
+  src/app/      /            conteúdo do site
+                /denuncias/  denúncias recebidas e andamento dos protocolos
+                /login/      login da equipe
+  src/lib/      backend.ts   🔌 cliente do Spring (auth, usuários, denúncias)
+                jwt.ts       validação local do token
 public/img/     imagens e ilustrações
 docs/           CONTEUDO.md, guia de quem escreve
 ```
@@ -115,6 +120,11 @@ chama a API direto.
 | Enviar denúncia (multipart, com foto) | `POST /denuncia` |
 | Consultar protocolo | `GET /denuncia/{id}` |
 | Login da equipe (editor) | `POST /users/login` |
+| Triagem: listar denúncias (editor) | `GET /denuncia` |
+| Triagem: mudar o andamento (editor) | `PUT /denuncia/{id}` |
+
+> As rotas de denúncia ainda caem no `anyRequest().denyAll()` do `SecurityConfig`. Enquanto isso
+> não mudar no backend, a tela de triagem carrega e explica o 403 em vez de quebrar.
 
 Variáveis de ambiente no build:
 
