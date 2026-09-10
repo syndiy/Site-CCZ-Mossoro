@@ -262,6 +262,16 @@ select:disabled { opacity: 0.55; cursor: not-allowed; }
 .aviso-api .muted + .muted { margin-top: 10px; }
 .aviso-api code { padding: 1px 5px; border-radius: 4px; background: #eef1f4; font-family: ui-monospace, Consolas, monospace; font-size: 0.85em; }
 
+.detalhe-grade { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.detalhe-grade .card { margin-bottom: 0; }
+.detalhe-titulo { margin: 0 0 14px; color: var(--ink-soft); font-size: 0.78rem; font-weight: 750; letter-spacing: 0.07em; text-transform: uppercase; }
+.detalhe-dados { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 9px 18px; margin: 0; font-size: 0.9rem; }
+.detalhe-dados dt { color: var(--ink-soft); font-size: 0.8rem; font-weight: 650; }
+.detalhe-dados dd { margin: 0; }
+.detalhe-foto { display: block; width: 100%; border: 1px solid var(--border); border-radius: 8px; }
+.status-picker { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--border); }
+.status-recado { min-height: 20px; margin: 8px 0 0; color: var(--success); font-size: 0.82rem; font-weight: 650; }
+
 @media (max-width: 1000px) {
   .workspace-summary { grid-template-columns: 1fr auto; }
   .summary-stats { grid-column: 1 / -1; grid-row: 2; }
@@ -287,6 +297,7 @@ select:disabled { opacity: 0.55; cursor: not-allowed; }
   .filter-tab { flex: 1; }
   .search-field { min-width: 100%; margin-left: 0; }
   .new-links .btn { flex: 1; }
+  .detalhe-grade { grid-template-columns: 1fr; }
   .denuncia-status { width: 100%; margin-left: 0; }
   .denuncia-status select { width: 100%; }
   .triagem-filtros { align-items: stretch; flex-direction: column; }
