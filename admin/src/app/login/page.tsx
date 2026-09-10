@@ -1,21 +1,26 @@
-import { adminPasswordConfigured } from "@/lib/auth";
+import { backendLoginEnabled, loginEnabled } from "@/lib/auth";
 import { LoginForm } from "./login-form";
 
 export const metadata = { title: "Entrar | CCZ Mossoró" };
 
 export default function LoginPage() {
+  const comBackend = backendLoginEnabled();
+
   return (
     <div className="page page-narrow">
       <h1>Acessar o editor</h1>
       <p className="muted">
-        Área restrita à equipe do CCZ. Informe a senha para gerenciar artigos e notícias.
+        {comBackend
+          ? "Área restrita à equipe do CCZ. Entre com o e-mail e a senha do seu usuário."
+          : "Área restrita à equipe do CCZ. Informe a senha para gerenciar artigos e notícias."}
       </p>
-      {adminPasswordConfigured() ? (
-        <LoginForm />
+      {loginEnabled() ? (
+        <LoginForm withEmail={comBackend} />
       ) : (
         <div className="card">
           <p className="error">
-            Defina a variável de ambiente ADMIN_PASSWORD no servidor para habilitar o acesso.
+            Configure CCZ_API_URL e CCZ_JWT_SECRET para usar o login da equipe, ou ADMIN_PASSWORD
+            para o acesso local provisório.
           </p>
         </div>
       )}
