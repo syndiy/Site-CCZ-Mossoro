@@ -1,5 +1,6 @@
 import { fetchWithTimeout } from "./fetch-with-timeout";
 
+
 export type TipoDenuncia =
   | "MAUS_TRATOS"
   | "BARATAS"
@@ -13,7 +14,49 @@ export type StatusDenuncia =
   | "CONCLUIDA"
   | "NAO_RESOLVIDA";
 
-export type DenunciaPayload = {
+export interface DenunciaResponse {
+  idDenuncia: number;
+  protocolo: string;
+  dataCriacao: string;
+  tipoDeDenuncia: TipoDenuncia;
+  statusDenuncia: StatusDenuncia;
+  nomeDenunciante: string | null;
+  numeroTelefone: string | null;
+  imagem: string | null;
+  idEndereco: number;
+  rua: string;
+  numero: string;
+  complemento: string | null;
+  bairro: string;
+  cep: string;
+  cidade: string;
+  estado: string;
+}
+
+export interface DenunciaUpdateRequest {
+  tipoDeDenuncia: TipoDenuncia;
+  statusDenuncia: StatusDenuncia;
+  numeroTelefone: string | null;
+  nomeDenunciante: string | null;
+  logradouro: string;
+  numero: string;
+  complemento: string | null;
+  bairro: string;
+  cep: string;
+  localidade: string;
+  uf: string;
+}
+
+export interface PageResponse<T> {
+  content: T[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+  last: boolean;
+}
+
+export interface DenunciaPayload {
   tipoDeDenuncia: TipoDenuncia;
   nomeDenunciante: string;
   numeroTelefone: string;
@@ -27,45 +70,48 @@ export type DenunciaPayload = {
   imagem: File | null;
   latitude?: number;
   longitude?: number;
+}
+
+export type Denuncia = DenunciaResponse;
+export type DenunciaDetalhe = DenunciaResponse;
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+
+export const getImageUrl = (path: string | null): string => {
+  if (!path) return "";
+
+  if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("data:")) {
+    return path;
+  }
+
+  const baseUrl = API_BASE.replace(/\/+$/, "");
+
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+
+  return `${baseUrl}${normalizedPath}`;
 };
 
-export type Denuncia = {
-  id?: number;
-  protocolo?: string;
-  tipoDeDenuncia?: TipoDenuncia;
-  tipoDenuncia?: TipoDenuncia;
-  statusDenuncia: StatusDenuncia;
-  nomeDenunciante?: string;
-  numeroTelefone?: string;
-  dataCriacao?: string;
-};
+export function responseToUpdateRequest(
+  data: DenunciaResponse,
+  novoStatus?: StatusDenuncia
+): DenunciaUpdateRequest {
+  return {
+    tipoDeDenuncia: data.tipoDeDenuncia,
+    statusDenuncia: novoStatus ?? data.statusDenuncia,
+    nomeDenunciante: data.nomeDenunciante,
+    numeroTelefone: data.numeroTelefone,
+    logradouro: data.rua,
+    numero: data.numero,
+    complemento: data.complemento,
+    bairro: data.bairro,
+    cep: data.cep,
+    localidade: data.cidade,
+    uf: data.estado,
+  };
+}
 
-export type DenunciaDetalhe = {
-  id?: number;
-  idDenuncia?: number;
-  protocolo?: string; // Adicionado para a busca
-  tipoDeDenuncia?: TipoDenuncia;
-  tipoDenuncia?: TipoDenuncia; // O Java retorna sem o "De"
-  statusDenuncia: StatusDenuncia;
-  nomeDenunciante?: string;
-  numeroTelefone?: string;
-  logradouro?: string;
-  numero?: string;
-  complemento?: string;
-  bairro?: string;
-  cep?: string;
-  localidade?: string;
-  uf?: string;
-  imagem?: string;
-};
 
-const SIMULATE = process.env.NEXT_PUBLIC_SIMULATE === "1";
-//const API_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/+$/, "");
-const API_BASE = "http://localhost:8080";
-
-const endpoint = (path: string) => `${API_BASE}${path}`;
-
-export function toDenunciaFormData(payload: DenunciaPayload): FormData {
+export async function criarDenuncia(payload: DenunciaPayload): Promise<DenunciaResponse> {
   const form = new FormData();
   form.append("tipoDeDenuncia", payload.tipoDeDenuncia);
   form.append("statusDenuncia", "EM_ANALISE");
@@ -78,84 +124,77 @@ export function toDenunciaFormData(payload: DenunciaPayload): FormData {
   form.append("bairro", payload.bairro);
   form.append("cidade", payload.localidade);
   form.append("estado", payload.uf);
-  
-  if (Number.isFinite(payload.latitude) && Number.isFinite(payload.longitude)) {
+
+  if (payload.latitude && payload.longitude) {
     form.append("latitude", String(payload.latitude));
     form.append("longitude", String(payload.longitude));
   }
   if (payload.imagem) {
     form.append("imagem", payload.imagem);
   }
-  return form;
-}
 
-export async function criarDenuncia(payload: DenunciaPayload): Promise<Denuncia> {
-  if (SIMULATE) {
-    await new Promise((r) => setTimeout(r, 700));
-    return {
-      id: Math.floor(1000 + Math.random() * 9000),
-      protocolo: "2026-SIMULADO",
-      tipoDeDenuncia: payload.tipoDeDenuncia,
-      statusDenuncia: "EM_ANALISE",
-      nomeDenunciante: payload.nomeDenunciante,
-      numeroTelefone: payload.numeroTelefone,
-    };
-  }
-
-  let res: Response;
-  try {
-    res = await fetchWithTimeout(endpoint("/denuncia"), { method: "POST", body: toDenunciaFormData(payload) }, 15000);
-  } catch (error) {
-    if (error instanceof DOMException && error.name === "AbortError") {
-      throw new Error("O envio demorou mais que o esperado. Verifique a internet e tente novamente.");
-    }
-    throw new Error("Não foi possível conectar ao serviço. Verifique a internet e tente novamente.");
-  }
-  if (!res.ok) {
-    throw new Error(`Não foi possível enviar a denúncia (HTTP ${res.status}).`);
-  }
-  return (await res.json()) as Denuncia;
-}
-
-export async function buscarDenuncia(id: string): Promise<DenunciaDetalhe | null> {
-  if (SIMULATE) {
-    await new Promise((r) => setTimeout(r, 500));
-    return { id: Number(id), protocolo: id, tipoDeDenuncia: "MAUS_TRATOS", statusDenuncia: "EM_ANALISE" };
-  }
-
-  let res: Response;
-  try {
-    res = await fetchWithTimeout(endpoint(`/denuncia/protocolo/${encodeURIComponent(id)}`), {}, 10000);
-  } catch (error) {
-    if (error instanceof DOMException && error.name === "AbortError") {
-      throw new Error("A consulta demorou mais que o esperado. Tente novamente.");
-    }
-    throw new Error("Não foi possível conectar ao serviço. Verifique a internet e tente novamente.");
-  }
-  if (res.status === 404) return null;
-  if (!res.ok) {
-    throw new Error(`Não foi possível consultar a denúncia (HTTP ${res.status}).`);
-  }
-  return (await res.json()) as DenunciaDetalhe;
-
-//login e armazenamento do token
-export async function loginUsuario(email: string, password: string): Promise<string> {
-  const res = await fetch(endpoint("/users/login"), {
+  const res = await fetchWithTimeout(`${API_BASE}/denuncia`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ email, password }),
+    body: form,
   });
 
   if (!res.ok) {
-    throw new Error("E-mail ou senha incorretos.");
+    throw new Error(`Falha ao registrar denúncia (HTTP ${res.status}).`);
   }
+  return (await res.json()) as DenunciaResponse;
+}
 
+export async function buscarDenunciaPorProtocolo(protocolo: string): Promise<DenunciaResponse | null> {
+  const res = await fetchWithTimeout(`${API_BASE}/denuncia/protocolo/${encodeURIComponent(protocolo)}`);
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error("Erro na busca da denúncia.");
+  return (await res.json()) as DenunciaResponse;
+}
+
+export const buscarDenuncia = buscarDenunciaPorProtocolo;
+
+export async function loginUsuario(email: string, password: string): Promise<string> {
+  const res = await fetch(`${API_BASE}/users/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+
+  if (!res.ok) throw new Error("Credenciais inválidas.");
   const data = await res.json();
-  
   return data.token;
 }
 
+export async function listarDenunciasAdmin(
+  pagina: number = 0,
+  tamanho: number = 10
+): Promise<PageResponse<DenunciaResponse>> {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${API_BASE}/denuncia?page=${pagina}&size=${tamanho}`, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
+  if (!res.ok) throw new Error("Sessão expirada ou acesso não autorizado.");
+  return (await res.json()) as PageResponse<DenunciaResponse>;
+}
+
+export async function atualizarDenunciaAdmin(
+  idDenuncia: number,
+  payload: DenunciaUpdateRequest
+): Promise<DenunciaResponse> {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${API_BASE}/denuncia/${idDenuncia}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) throw new Error("Falha ao atualizar registro no servidor.");
+  return (await res.json()) as DenunciaResponse;
 }
