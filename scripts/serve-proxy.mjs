@@ -46,13 +46,43 @@ function proxy(req, res) {
   req.pipe(proxied);
 }
 
+/**
+ * Os payloads RSC do Next sao pedidos com ponto separando os segmentos
+ * (`__next.news.$d$slug.__PAGE__.txt`) mas gravados no disco com barra
+ * (`__next.news/$d$slug/__PAGE__.txt`). Traduz um no outro.
+ */
+function rscCandidate(path) {
+  const corte = path.lastIndexOf("/");
+  const dir = path.slice(0, corte);
+  const nome = path.slice(corte + 1);
+  if (!nome.startsWith("__next.") || !nome.endsWith(".txt")) return null;
+
+  const partes = nome.slice(0, -".txt".length).split(".");
+  if (partes.length < 3) return null;
+
+  const raiz = `${partes[0]}.${partes[1]}`;
+  const resto = partes.slice(2);
+  return join(OUT, dir, raiz, ...resto.slice(0, -1), `${resto[resto.length - 1]}.txt`);
+}
+
+function contentType(file) {
+  // Payload do roteador do Next, nao texto puro (robots.txt continua text/plain).
+  // O nome do arquivo pode ser so `__PAGE__.txt`: quem marca e a pasta `__next.*`.
+  if (extname(file) === ".txt") {
+    const nome = file.split(/[\\/]/).pop() ?? "";
+    if (file.includes("__next") || nome === "index.txt") return "text/x-component";
+  }
+  return MIME[extname(file)] ?? "application/octet-stream";
+}
+
 function serveStatic(req, res) {
   const path = decodeURIComponent(req.url.split("?")[0]);
   const candidates = [
     join(OUT, path),
     join(OUT, path, "index.html"),
     join(OUT, `${path}.html`),
-  ];
+    rscCandidate(path),
+  ].filter(Boolean);
   const file = candidates.find((f) => existsSync(f) && statSync(f).isFile());
 
   if (!file) {
@@ -60,7 +90,7 @@ function serveStatic(req, res) {
     createReadStream(join(OUT, "404.html")).pipe(res);
     return;
   }
-  res.writeHead(200, { "Content-Type": MIME[extname(file)] ?? "application/octet-stream" });
+  res.writeHead(200, { "Content-Type": contentType(file) });
   createReadStream(file).pipe(res);
 }
 
