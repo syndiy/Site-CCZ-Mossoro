@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
+import { Container } from "@/components/layout/container";
 import { Icon } from "@/components/shared/icon";
 import { subscribeToMediaQuery, matchesMediaQuery } from "@/lib/browser-store";
 
@@ -24,9 +25,11 @@ type Props = {
   slides: HeroSlide[];
   fallback: string;
   fallbackAlt: string;
+  /** A chamada principal do hero. Fica na mesma coluna da legenda, acima dela. */
+  children?: ReactNode;
 };
 
-export function HeroNewsBackground({ slides, fallback, fallbackAlt }: Props) {
+export function HeroNewsBackground({ slides, fallback, fallbackAlt, children }: Props) {
   const [atual, setAtual] = useState(0);
   const [pausado, setPausado] = useState(false);
 
@@ -91,70 +94,88 @@ export function HeroNewsBackground({ slides, fallback, fallbackAlt }: Props) {
         className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-white via-white/45 to-transparent"
       />
 
-      {noticia ? (
-        <div className="absolute inset-x-0 bottom-0 z-10 pb-8 sm:pb-10 md:pb-14">
-          <div className="mx-auto w-full max-w-[1200px] border-t border-white/20 px-5 pt-4 sm:px-8 sm:pt-5">
-            <div className="grid min-w-0 gap-4 sm:gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-              {/* aria-live avisa leitores de tela a cada troca. */}
-              <div aria-live="polite" aria-atomic="true" className="min-w-0">
-                <span className="text-xs font-semibold uppercase tracking-widest text-brand-300">
-                  Últimas notícias
-                </span>
-                <Link
-                  href={`/news/${noticia.slug}/`}
-                  className="group mt-2 block max-w-3xl text-white underline-offset-4 hover:underline"
-                >
-                  <span className="block text-xs text-white/75">Publicado em {noticia.publishedLabel}</span>
-                  <span className="mt-1 block line-clamp-3 text-lg font-bold leading-tight sm:line-clamp-2 sm:text-2xl">
-                    {noticia.title}
-                  </span>
-                  {noticia.excerpt ? <span className="mt-2 block line-clamp-3 text-sm leading-relaxed text-white/80 sm:line-clamp-2">{noticia.excerpt}</span> : null}
-                  <span className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-white">
-                    Ler notícia
-                    <Icon name="arrow" size={16} className="transition-transform group-hover:translate-x-1" />
-                  </span>
-                </Link>
-              </div>
+      {/* Chamada e legenda dividem uma coluna só. O justify-between afasta as duas
+          quando sobra espaço, e o fluxo normal empurra em vez de sobrepor quando falta. */}
+      <div className="relative z-20 flex flex-1 flex-col justify-between gap-8 pb-8 sm:gap-10 sm:pb-10 md:pb-12">
+        {children}
 
-              <div className="flex max-w-full flex-wrap items-center gap-1 lg:pb-1">
-                {slides.map((slide, i) => (
-                  <button
-                    key={slide.slug}
-                    type="button"
-                    onClick={() => setAtual(i)}
-                    aria-label={`Mostrar notícia ${i + 1} de ${total}: ${slide.title}`}
-                    aria-current={i === atual}
-                    className="group p-1.5"
+        {noticia ? (
+          <Container>
+            <div className="border-t border-white/20 pt-4 sm:pt-5">
+              <div className="grid min-w-0 gap-4 sm:gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+                {/* aria-live avisa leitores de tela a cada troca. */}
+                <div aria-live="polite" aria-atomic="true" className="min-w-0">
+                  <span className="text-xs font-semibold uppercase tracking-widest text-brand-300">
+                    Últimas notícias
+                  </span>
+                  <Link
+                    href={`/news/${noticia.slug}/`}
+                    className="group mt-2 block max-w-3xl text-white underline-offset-4 hover:underline"
                   >
-                    <span
-                      className={`block h-1.5 rounded-full transition-all ${
-                        i === atual ? "w-6 bg-white" : "w-1.5 bg-white/45 group-hover:bg-white/80"
-                      }`}
-                    />
-                  </button>
-                ))}
+                    <span className="block text-xs text-white/75">
+                      Publicado em {noticia.publishedLabel}
+                    </span>
+                    <span className="mt-1 block line-clamp-3 text-lg font-bold leading-tight sm:line-clamp-2 sm:text-2xl">
+                      {noticia.title}
+                    </span>
+                    {noticia.excerpt ? (
+                      <span className="mt-2 block line-clamp-3 text-sm leading-relaxed text-white/80 sm:line-clamp-2">
+                        {noticia.excerpt}
+                      </span>
+                    ) : null}
+                    <span className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-white">
+                      Ler notícia
+                      <Icon
+                        name="arrow"
+                        size={16}
+                        className="transition-transform group-hover:translate-x-1"
+                      />
+                    </span>
+                  </Link>
+                </div>
 
-                {/* WCAG 2.2.2: conteúdo que se move sozinho precisa poder ser parado. */}
-                {total > 1 && !semMovimento ? (
-                  <button
-                    type="button"
-                    onClick={() => setPausado((p) => !p)}
-                    aria-pressed={pausado}
-                    aria-label={
-                      pausado ? "Retomar a passagem das notícias" : "Pausar a passagem das notícias"
-                    }
-                    className="ml-1 rounded-full p-1.5 text-white/70 transition-colors hover:bg-white/15 hover:text-white"
-                  >
-                    <Icon name={pausado ? "play" : "pause"} size={14} />
-                  </button>
-                ) : null}
+                <div className="flex max-w-full flex-wrap items-center gap-1 lg:pb-1">
+                  {slides.map((slide, i) => (
+                    <button
+                      key={slide.slug}
+                      type="button"
+                      onClick={() => setAtual(i)}
+                      aria-label={`Mostrar notícia ${i + 1} de ${total}: ${slide.title}`}
+                      aria-current={i === atual}
+                      className="group p-1.5"
+                    >
+                      <span
+                        className={`block h-1.5 rounded-full transition-all ${
+                          i === atual ? "w-6 bg-white" : "w-1.5 bg-white/45 group-hover:bg-white/80"
+                        }`}
+                      />
+                    </button>
+                  ))}
+
+                  {/* WCAG 2.2.2: conteúdo que se move sozinho precisa poder ser parado. */}
+                  {total > 1 && !semMovimento ? (
+                    <button
+                      type="button"
+                      onClick={() => setPausado((p) => !p)}
+                      aria-pressed={pausado}
+                      aria-label={
+                        pausado
+                          ? "Retomar a passagem das notícias"
+                          : "Pausar a passagem das notícias"
+                      }
+                      className="ml-1 rounded-full p-1.5 text-white/70 transition-colors hover:bg-white/15 hover:text-white"
+                    >
+                      <Icon name={pausado ? "play" : "pause"} size={14} />
+                    </button>
+                  ) : null}
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      ) : (
-        <span className="sr-only">{fallbackAlt}</span>
-      )}
+          </Container>
+        ) : (
+          <span className="sr-only">{fallbackAlt}</span>
+        )}
+      </div>
     </>
   );
 }
