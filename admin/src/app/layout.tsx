@@ -27,6 +27,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <div className="session-box">
                 <nav className="topbar-nav" aria-label="Seções do editor">
                   <Link href="/" className="site-link">Conteúdo</Link>
+                  <Link href="/denuncias" className="site-link">Denúncias</Link>
                 </nav>
                 <form action="/api/logout" method="post" className="session-box">
                   <span className="session-user">{session.email}</span>

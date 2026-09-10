@@ -140,3 +140,74 @@ export function updateAllowedEmployee(
 export function deleteAllowedEmployee(token: string, id: number): Promise<void> {
   return request<void>(`/allowedEmployee/${id}`, { method: "DELETE", token });
 }
+
+/* ------------------------------------------------------------------ *
+ * Denuncias — DenunciaController, no backend.
+ * ------------------------------------------------------------------ */
+
+export type TipoDenuncia =
+  | "MAUS_TRATOS"
+  | "BARATAS"
+  | "RATOS"
+  | "MORCEGOS"
+  | "ANIMAIS_SINANTROPICOS";
+
+export type StatusDenuncia = "EM_ANALISE" | "VISITA_REALIZADA" | "CONCLUIDA" | "NAO_RESOLVIDA";
+
+export type DenunciaResponse = {
+  idDenuncia: number;
+  tipoDeDenuncia: TipoDenuncia;
+  statusDenuncia: StatusDenuncia;
+  numeroTelefone: string | null;
+  nomeDenunciante: string | null;
+  idEndereco: number | null;
+  logradouro: string | null;
+  numero: string | null;
+  complemento: string | null;
+  bairro: string | null;
+  cep: string | null;
+  localidade: string | null;
+  uf: string | null;
+  /** Data URI base64 montada pelo backend. So vem no GET por id. */
+  imagem: string | null;
+};
+
+/**
+ * O mapper do backend ignora campo nulo, entao da para mandar so o que muda.
+ */
+export type DenunciaUpdateRequest = Partial<{
+  tipoDeDenuncia: TipoDenuncia;
+  statusDenuncia: StatusDenuncia;
+  numeroTelefone: string;
+  nomeDenunciante: string;
+  logradouro: string;
+  numero: string;
+  complemento: string;
+  bairro: string;
+  cep: string;
+  localidade: string;
+  uf: string;
+}>;
+
+/** GET /denuncia — a listagem nao traz a foto. */
+export function listDenuncias(token: string): Promise<DenunciaResponse[]> {
+  return request<DenunciaResponse[]>("/denuncia", { token });
+}
+
+/** GET /denuncia/{id} — traz a foto embutida como data URI. */
+export function getDenuncia(token: string, id: number): Promise<DenunciaResponse> {
+  return request<DenunciaResponse>(`/denuncia/${id}`, { token });
+}
+
+/** PUT /denuncia/{id} */
+export function updateDenuncia(
+  token: string,
+  id: number,
+  dto: DenunciaUpdateRequest,
+): Promise<DenunciaResponse> {
+  return request<DenunciaResponse>(`/denuncia/${id}`, {
+    method: "PUT",
+    token,
+    body: JSON.stringify(dto),
+  });
+}
