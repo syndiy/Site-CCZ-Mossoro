@@ -53,6 +53,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .brand-link strong { font-size: 1rem; }
 .brand-link span { color: var(--ink-soft); font-size: 0.85rem; }
 .site-link { font-size: 0.875rem; font-weight: 650; text-decoration: none; }
+.session-box { display: inline-flex; align-items: center; gap: 12px; }
+.session-box .session-box { gap: 12px; padding-left: 14px; border-left: 1px solid var(--border); }
+.topbar-nav { display: inline-flex; align-items: center; gap: 16px; }
+.session-user { color: var(--ink-soft); font-size: 0.8rem; max-width: 22ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+button.site-link { background: none; border: 0; color: inherit; cursor: pointer; padding: 0; }
 
 .page { width: min(100% - 48px, 920px); margin: 0 auto; padding: 44px 0 96px; }
 .page:has(.workspace) { width: min(100% - 48px, 1360px); }
