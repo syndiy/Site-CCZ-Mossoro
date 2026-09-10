@@ -1,9 +1,15 @@
 import Link from "next/link";
 
-export function BackLink() {
+export function BackLink({
+  href = "/",
+  children = "Voltar para a lista",
+}: {
+  href?: string;
+  children?: React.ReactNode;
+}) {
   return (
-    <Link href="/" className="back-link">
-      Voltar para a lista
+    <Link href={href} className="back-link">
+      {children}
     </Link>
   );
 }
