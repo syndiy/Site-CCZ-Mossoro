@@ -54,6 +54,7 @@ function FieldError({ children }: { children: string }) {
 
 export function ReportForm() {
   const [tipo, setTipo] = useState<TipoDenuncia | "">("");
+  const [descricao, setDescricao] = useState(""); // <-- NOVO CAMPO: Descrição
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
   const [cep, setCep] = useState("");
@@ -228,6 +229,7 @@ export function ReportForm() {
     try {
       const res = await criarDenuncia({
         tipoDeDenuncia: tipo as TipoDenuncia,
+        descricao: descricao.trim(), // <-- NOVO CAMPO: Enviado no Payload
         nomeDenunciante: nome.trim(),
         numeroTelefone: telefone.trim(),
         cep: cep.trim(),
@@ -306,6 +308,26 @@ export function ReportForm() {
               })}
             </div>
             {errors.tipo ? <FieldError>{errors.tipo}</FieldError> : null}
+
+            {/* NOVO CAMPO: Descrição da Ocorrência */}
+            <div className="mt-5 flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="descricao" className="text-sm font-medium">
+                  Descrição dos fatos <span className="text-xs font-normal text-muted-foreground">(opcional)</span>
+                </Label>
+                <span className="text-xs text-muted-foreground">
+                  {descricao.length}/500
+                </span>
+              </div>
+              <textarea
+                id="descricao"
+                maxLength={500}
+                value={descricao}
+                onChange={(e) => setDescricao(e.target.value)}
+                placeholder="Descreva brevemente detalhes que ajudem a fiscalização (ex.: quantidade estimada, horários de maior frequência, ponto de referência interno)..."
+                className="min-h-[100px] w-full resize-none rounded-xl border border-border bg-white p-3 text-sm text-foreground shadow-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-600 disabled:cursor-not-allowed disabled:opacity-50"
+              />
+            </div>
           </section>
 
           <section className="border-t border-border pt-8">
@@ -552,10 +574,20 @@ export function ProtocolLookup() {
         {resultado ? (
           <p className="mt-5 inline-flex flex-wrap items-center justify-center gap-2">
             Denúncia <strong>#{resultado.protocolo ?? resultado.idDenuncia}</strong>
-            <Badge className={statusDenuncia[resultado.statusDenuncia].className}>
-              <Icon name={statusDenuncia[resultado.statusDenuncia].icon} size={14} />
-              {statusDenuncia[resultado.statusDenuncia].label}
-            </Badge>
+            {(() => {
+              const infoStatus = statusDenuncia[resultado.statusDenuncia] ?? {
+                label: resultado.statusDenuncia,
+                className: "bg-gray-100 text-gray-800",
+                icon: "help-circle",
+              };
+
+              return (
+                <Badge className={infoStatus.className}>
+                  <Icon name={infoStatus.icon} size={14} />
+                  {infoStatus.label}
+                </Badge>
+              );
+            })()}
           </p>
         ) : null}
 

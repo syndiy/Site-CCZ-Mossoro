@@ -20,6 +20,7 @@ export interface DenunciaResponse {
   dataCriacao: string;
   tipoDeDenuncia: TipoDenuncia;
   statusDenuncia: StatusDenuncia;
+  descricao?: string
   nomeDenunciante: string | null;
   numeroTelefone: string | null;
   imagem: string | null;
@@ -58,6 +59,7 @@ export interface PageResponse<T> {
 
 export interface DenunciaPayload {
   tipoDeDenuncia: TipoDenuncia;
+  descricao: string;
   nomeDenunciante: string;
   numeroTelefone: string;
   cep: string;
@@ -114,6 +116,7 @@ export function responseToUpdateRequest(
 export async function criarDenuncia(payload: DenunciaPayload): Promise<DenunciaResponse> {
   const form = new FormData();
   form.append("tipoDeDenuncia", payload.tipoDeDenuncia);
+  form.append("descricao", payload.descricao);
   form.append("statusDenuncia", "EM_ANALISE");
   form.append("nomeDenunciante", payload.nomeDenunciante);
   form.append("numeroTelefone", payload.numeroTelefone);

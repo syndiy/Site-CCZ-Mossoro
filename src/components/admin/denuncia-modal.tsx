@@ -29,8 +29,10 @@ interface Props {
 export function DenunciaModal({ denuncia, open, onClose, onUpdateSuccess }: Props) {
   const [salvando, setSalvando] = useState(false);
   const [erroLocal, setErroLocal] = useState("");
+  // Guarda a URL da imagem que falhou ao carregar
+  const [imagemComErro, setImagemComErro] = useState<string | null>(null);
 
-  // Fechar modal ao pressionar ESC
+  // Fechar modal ao pressionar a tecla ESC
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -61,6 +63,11 @@ export function DenunciaModal({ denuncia, open, onClose, onUpdateSuccess }: Prop
         timeStyle: "short",
       }).format(new Date(denuncia.dataCriacao))
     : "Data indisponível";
+
+  const urlImagem = getImageUrl(denuncia.imagem);
+  
+  // Estado derivado: se a URL atual for diferente da URL que deu erro, considera sem erro automaticamente
+  const erroImagem = imagemComErro === urlImagem;
 
   return (
     <div
@@ -119,7 +126,7 @@ export function DenunciaModal({ denuncia, open, onClose, onUpdateSuccess }: Prop
           </Select>
         </div>
 
-        {/* Detalhes da Denúncia */}
+        {/* Detalhes Gerais da Ocorrência */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
           <div>
             <span className="font-semibold text-muted-foreground block">Tipo de Ocorrência:</span>
@@ -140,7 +147,7 @@ export function DenunciaModal({ denuncia, open, onClose, onUpdateSuccess }: Prop
           <div className="sm:col-span-2 bg-muted/20 p-3 rounded-md border">
             <span className="font-semibold text-muted-foreground block mb-1">Endereço da Ocorrência:</span>
             <p className="font-medium leading-relaxed">
-              {denuncia.rua}, Nº {denuncia.numero}
+              {denuncia.rua}, Nº {denuncia.numero || "S/N"}
               {denuncia.complemento ? ` (${denuncia.complemento})` : ""}
               <br />
               {denuncia.bairro} — {denuncia.cidade}/{denuncia.estado}
@@ -148,21 +155,55 @@ export function DenunciaModal({ denuncia, open, onClose, onUpdateSuccess }: Prop
           </div>
         </div>
 
+        {/* Bloco da Descrição dos Fatos */}
+        <div>
+          <span className="font-semibold text-muted-foreground block mb-1.5 text-sm">
+            Descrição do Ocorrido:
+          </span>
+          <div className="bg-muted/20 border rounded-lg p-3.5 text-sm leading-relaxed text-foreground">
+            {denuncia.descricao && denuncia.descricao.trim() ? (
+              <p className="whitespace-pre-wrap break-words">{denuncia.descricao}</p>
+            ) : (
+              <p className="text-muted-foreground italic text-xs">
+                Nenhuma descrição detalhada foi informada pelo denunciante.
+              </p>
+            )}
+          </div>
+        </div>
+
         {/* Evidência Fotográfica */}
         <div>
-          <span className="font-semibold text-muted-foreground block mb-2">Evidência Anexada:</span>
-          {denuncia.imagem ? (
-            <div className="relative overflow-hidden rounded-lg border bg-black/5 flex items-center justify-center max-h-72">
+          <span className="font-semibold text-muted-foreground block mb-2 text-sm">Evidência Anexada:</span>
+          {denuncia.imagem && !erroImagem ? (
+            <div className="relative overflow-hidden rounded-lg border bg-black/5 flex flex-col items-center justify-center p-3">
               <img
-                src={getImageUrl(denuncia.imagem)}
+                src={urlImagem}
                 alt={`Evidência da denúncia ${denuncia.protocolo}`}
-                className="object-contain max-h-72 w-full"
+                className="object-contain max-h-72 w-full rounded-md"
+                onError={() => setImagemComErro(urlImagem)}
               />
+              <a
+                href={urlImagem}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-primary hover:underline mt-2.5 font-medium flex items-center gap-1"
+              >
+                Abrir imagem original em nova aba ↗
+              </a>
             </div>
           ) : (
-            <p className="text-xs text-muted-foreground italic border border-dashed rounded-lg p-4 text-center">
-              Nenhuma imagem foi anexada a esta denúncia.
-            </p>
+            <div className="border border-dashed rounded-lg p-5 text-center text-xs text-muted-foreground bg-muted/10">
+              {denuncia.imagem && erroImagem ? (
+                <div className="flex flex-col gap-1 text-destructive">
+                  <p className="font-semibold">⚠️ Não foi possível carregar a imagem do servidor.</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    Caminho: <code className="bg-muted px-1 py-0.5 rounded text-foreground">{urlImagem}</code>
+                  </p>
+                </div>
+              ) : (
+                <p className="italic">Nenhuma imagem foi anexada a esta denúncia.</p>
+              )}
+            </div>
           )}
         </div>
 
