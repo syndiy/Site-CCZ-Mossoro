@@ -1,6 +1,5 @@
 import { fetchWithTimeout } from "./fetch-with-timeout";
 
-
 export type TipoDenuncia =
   | "MAUS_TRATOS"
   | "BARATAS"
@@ -20,7 +19,7 @@ export interface DenunciaResponse {
   dataCriacao: string;
   tipoDeDenuncia: TipoDenuncia;
   statusDenuncia: StatusDenuncia;
-  descricao?: string
+  descricao?: string;
   nomeDenunciante: string | null;
   numeroTelefone: string | null;
   imagem: string | null;
@@ -74,6 +73,18 @@ export interface DenunciaPayload {
   longitude?: number;
 }
 
+// DTOs para Autorização de Servidor (AllowedEmployee)
+export interface CreateAllowedEmployeeDto {
+  cpf: string;
+  name: string;
+}
+
+export interface AllowedEmployeeResponse {
+  id?: number;
+  cpf: string;
+  name: string;
+}
+
 export type Denuncia = DenunciaResponse;
 export type DenunciaDetalhe = DenunciaResponse;
 
@@ -87,7 +98,6 @@ export const getImageUrl = (path: string | null): string => {
   }
 
   const baseUrl = API_BASE.replace(/\/+$/, "");
-
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
 
   return `${baseUrl}${normalizedPath}`;
@@ -111,7 +121,6 @@ export function responseToUpdateRequest(
     uf: data.estado,
   };
 }
-
 
 export async function criarDenuncia(payload: DenunciaPayload): Promise<DenunciaResponse> {
   const form = new FormData();
@@ -200,4 +209,77 @@ export async function atualizarDenunciaAdmin(
 
   if (!res.ok) throw new Error("Falha ao atualizar registro no servidor.");
   return (await res.json()) as DenunciaResponse;
+}
+
+/**
+ * Cadastra um novo CPF na lista de funcionários permitidos (AllowedEmployee).
+ * Apenas o Administrador pode executar essa rota.
+ */
+export async function cadastrarFuncionarioPermitido(
+  payload: CreateAllowedEmployeeDto
+): Promise<AllowedEmployeeResponse> {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("Sessão expirada. Faça login novamente.");
+
+  // CORREÇÃO AQUI: Mudado de /allowed-employees para /allowedEmployee
+  const res = await fetch(`${API_BASE}/allowedEmployee`, { 
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    if (res.status === 401 || res.status === 403) {
+      throw new Error("Apenas o Administrador pode liberar cadastros de funcionários.");
+    }
+    const erroData = await res.json().catch(() => null);
+    throw new Error(erroData?.message || "Erro ao autorizar funcionário.");
+  }
+
+  return (await res.json()) as AllowedEmployeeResponse;
+}
+
+/**
+ * Lista todos os funcionários permitidos (AllowedEmployees)
+ */
+export async function listarFuncionariosPermitidos(): Promise<AllowedEmployeeResponse[]> {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("Sessão expirada. Faça login novamente.");
+
+  const res = await fetch(`${API_BASE}/allowedEmployee`, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) throw new Error("Erro ao buscar a lista de servidores.");
+  
+  // Dependendo de como seu backend retorna, pode ser um array direto ou paginado. 
+  // Assumindo que retorna um array (List<AllowedEmployee>)
+  return (await res.json()) as AllowedEmployeeResponse[];
+}
+
+export async function atualizarFuncionarioPermitido(
+  id: number,
+  payload: CreateAllowedEmployeeDto
+): Promise<AllowedEmployeeResponse> {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("Sessão expirada. Faça login novamente.");
+
+  const res = await fetch(`${API_BASE}/allowedEmployee/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) throw new Error("Erro ao atualizar os dados do servidor.");
+  
+  return (await res.json()) as AllowedEmployeeResponse;
 }

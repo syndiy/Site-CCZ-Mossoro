@@ -8,6 +8,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { listarDenunciasAdmin, DenunciaResponse } from "@/lib/api";
 import { StatusBadge, formatarTipo } from "@/components/admin/status-badge";
 import { DenunciaModal } from "@/components/admin/denuncia-modal";
+import { AllowedEmployeesManager } from "@/components/admin/allowed-employees-manager"; 
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -16,14 +17,17 @@ export default function AdminDashboard() {
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
 
+  // Estado para controlar as ABAS
+  const [abaAtiva, setAbaAtiva] = useState<"denuncias" | "servidores">("denuncias");
+
   // Paginação Spring Data
   const [paginaAtual, setPaginaAtual] = useState(0);
   const [totalPaginas, setTotalPaginas] = useState(1);
   const [totalElementos, setTotalElementos] = useState(0);
 
-  // Controle de Modal
+  // Controle do Modal de Ocorrências
   const [denunciaSelecionada, setDenunciaSelecionada] = useState<DenunciaResponse | null>(null);
-  const [modalAberto, setModalAberto] = useState(false);
+  const [modalDenunciaAberto, setModalDenunciaAberto] = useState(false);
 
   const carregarDados = useCallback(async (page: number) => {
     setCarregando(true);
@@ -49,7 +53,6 @@ export default function AdminDashboard() {
     }
 
     let isMounted = true;
-
     async function inicializar() {
       setCarregando(true);
       try {
@@ -77,9 +80,9 @@ export default function AdminDashboard() {
     };
   }, [router]);
 
-  function handleAbrirModal(item: DenunciaResponse) {
+  function handleAbrirModalDenuncia(item: DenunciaResponse) {
     setDenunciaSelecionada(item);
-    setModalAberto(true);
+    setModalDenunciaAberto(true);
   }
 
   function handleUpdateSuccess(atualizada: DenunciaResponse) {
@@ -105,17 +108,44 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-muted/30 p-6 md:p-10">
       <div className="max-w-7xl mx-auto flex flex-col gap-6">
-        <header className="flex items-center justify-between border-b pb-5">
+        
+        {/* Cabeçalho */}
+        <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Painel do CCZ</h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Centro de Controle de Zoonoses — Sistema de Gestão de Ocorrências
+              Centro de Controle de Zoonoses — Sistema de Gestão
             </p>
           </div>
+          
           <Button onClick={handleLogout} variant="destructive" size="sm">
             Encerrar Sessão
           </Button>
         </header>
+
+        {/* Menu de Navegação (Abas) */}
+        <div className="flex border-b gap-6 text-sm font-medium">
+          <button
+            onClick={() => setAbaAtiva("denuncias")}
+            className={`pb-3 border-b-2 transition-colors ${
+              abaAtiva === "denuncias" 
+                ? "border-primary text-primary" 
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Gestão de Ocorrências
+          </button>
+          <button
+            onClick={() => setAbaAtiva("servidores")}
+            className={`pb-3 border-b-2 transition-colors ${
+              abaAtiva === "servidores" 
+                ? "border-primary text-primary" 
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Servidores Autorizados
+          </button>
+        </div>
 
         {erro && (
           <Alert variant="destructive">
@@ -123,101 +153,109 @@ export default function AdminDashboard() {
           </Alert>
         )}
 
-        <Card className="shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-4">
-            <div>
-              <CardTitle className="text-lg font-semibold">Denúncias Cadastradas</CardTitle>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {totalElementos} registro{totalElementos !== 1 ? "s" : ""} localizado
-                {totalElementos !== 1 ? "s" : ""}
-              </p>
-            </div>
-            <Button onClick={() => carregarDados(paginaAtual)} variant="outline" size="sm">
-              Atualizar
-            </Button>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-4">
-            {carregando ? (
-              <div className="py-12 text-center text-sm text-muted-foreground">
-                Carregando ocorrências...
+        {/* Renderização Condicional baseada na aba ativa */}
+        {abaAtiva === "denuncias" ? (
+          <Card className="shadow-sm animate-in fade-in duration-300">
+            <CardHeader className="flex flex-row items-center justify-between pb-4">
+              <div>
+                <CardTitle className="text-lg font-semibold">Denúncias Cadastradas</CardTitle>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {totalElementos} registro{totalElementos !== 1 ? "s" : ""} localizado
+                  {totalElementos !== 1 ? "s" : ""}
+                </p>
               </div>
-            ) : denuncias.length === 0 ? (
-              <div className="py-12 text-center text-sm text-muted-foreground">
-                Nenhuma ocorrência foi cadastrada até o momento.
-              </div>
-            ) : (
-              <>
-                <div className="overflow-x-auto rounded-lg border">
-                  <table className="w-full text-sm text-left border-collapse">
-                    <thead className="bg-muted/60 text-muted-foreground uppercase text-[11px] font-bold tracking-wider border-b">
-                      <tr>
-                        <th className="p-3.5">Protocolo</th>
-                        <th className="p-3.5">Tipo</th>
-                        <th className="p-3.5">Denunciante</th>
-                        <th className="p-3.5">Status</th>
-                        <th className="p-3.5 text-right">Ações</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y">
-                      {denuncias.map((item) => (
-                        <tr key={item.idDenuncia} className="hover:bg-muted/30 transition-colors">
-                          <td className="p-3.5 font-semibold text-foreground">{item.protocolo}</td>
-                          <td className="p-3.5">{formatarTipo(item.tipoDeDenuncia)}</td>
-                          <td className="p-3.5">{item.nomeDenunciante || "Anônimo"}</td>
-                          <td className="p-3.5">
-                            <StatusBadge status={item.statusDenuncia} />
-                          </td>
-                          <td className="p-3.5 text-right">
-                            <Button
-                              onClick={() => handleAbrirModal(item)}
-                              variant="outline"
-                              size="sm"
-                            >
-                              Detalhes
-                            </Button>
-                          </td>
+              <Button onClick={() => carregarDados(paginaAtual)} variant="outline" size="sm">
+                Atualizar
+              </Button>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-4">
+              {carregando ? (
+                <div className="py-12 text-center text-sm text-muted-foreground">
+                  Carregando ocorrências...
+                </div>
+              ) : denuncias.length === 0 ? (
+                <div className="py-12 text-center text-sm text-muted-foreground">
+                  Nenhuma ocorrência foi cadastrada até o momento.
+                </div>
+              ) : (
+                <>
+                  <div className="overflow-x-auto rounded-lg border">
+                    <table className="w-full text-sm text-left border-collapse">
+                      <thead className="bg-muted/60 text-muted-foreground uppercase text-[11px] font-bold tracking-wider border-b">
+                        <tr>
+                          <th className="p-3.5">Protocolo</th>
+                          <th className="p-3.5">Tipo</th>
+                          <th className="p-3.5">Denunciante</th>
+                          <th className="p-3.5">Status</th>
+                          <th className="p-3.5 text-right">Ações</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* Controles de Paginação */}
-                <div className="flex items-center justify-between pt-2 text-xs text-muted-foreground">
-                  <span>
-                    Página {paginaAtual + 1} de {Math.max(totalPaginas, 1)}
-                  </span>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      disabled={paginaAtual === 0 || carregando}
-                      onClick={() => carregarDados(paginaAtual - 1)}
-                    >
-                      Anterior
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      disabled={paginaAtual + 1 >= totalPaginas || carregando}
-                      onClick={() => carregarDados(paginaAtual + 1)}
-                    >
-                      Próxima
-                    </Button>
+                      </thead>
+                      <tbody className="divide-y">
+                        {denuncias.map((item) => (
+                          <tr key={item.idDenuncia} className="hover:bg-muted/30 transition-colors">
+                            <td className="p-3.5 font-semibold text-foreground">{item.protocolo}</td>
+                            <td className="p-3.5">{formatarTipo(item.tipoDeDenuncia)}</td>
+                            <td className="p-3.5">{item.nomeDenunciante || "Anônimo"}</td>
+                            <td className="p-3.5">
+                              <StatusBadge status={item.statusDenuncia} />
+                            </td>
+                            <td className="p-3.5 text-right">
+                              <Button
+                                onClick={() => handleAbrirModalDenuncia(item)}
+                                variant="outline"
+                                size="sm"
+                              >
+                                Detalhes
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
-                </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
+
+                  {/* Controles de Paginação */}
+                  <div className="flex items-center justify-between pt-2 text-xs text-muted-foreground">
+                    <span>
+                      Página {paginaAtual + 1} de {Math.max(totalPaginas, 1)}
+                    </span>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={paginaAtual === 0 || carregando}
+                        onClick={() => carregarDados(paginaAtual - 1)}
+                      >
+                        Anterior
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={paginaAtual + 1 >= totalPaginas || carregando}
+                        onClick={() => carregarDados(paginaAtual + 1)}
+                      >
+                        Próxima
+                      </Button>
+                    </div>
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        ) : (
+          /* NOVO GERENCIADOR DE SERVIDORES RENDERIZADO AQUI */
+          <div className="animate-in fade-in duration-300">
+            <AllowedEmployeesManager />
+          </div>
+        )}
       </div>
 
-      {/* Componente Modal */}
+      {/* Modal de Detalhes da Denúncia */}
       {denunciaSelecionada && (
         <DenunciaModal
-          open={modalAberto}
+          open={modalDenunciaAberto}
           denuncia={denunciaSelecionada}
-          onClose={() => setModalAberto(false)}
+          onClose={() => setModalDenunciaAberto(false)}
           onUpdateSuccess={handleUpdateSuccess}
         />
       )}
