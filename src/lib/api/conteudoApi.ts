@@ -1,4 +1,5 @@
 import { API_BASE, getToken } from "./apiClient";
+import type { DestaqueItem } from "../types/conteudo";
 import { 
   ColecaoConteudo, 
   ConteudoListResponse, 
@@ -79,4 +80,30 @@ export async function atualizarDestaques(slugs: string[]): Promise<void> {
     body: JSON.stringify({ slugsDestaque: slugs }),
   });
   if (!res.ok) throw new Error("Erro ao atualizar a ordem dos destaques.");
+}
+
+export async function listarDestaques(): Promise<DestaqueItem[]> {
+  const res = await fetch(`${API_BASE}/conteudo/destaques`, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!res.ok) throw new Error("Erro ao buscar a lista de destaques.");
+  return (await res.json()) as DestaqueItem[];
+}
+
+export async function atualizarOrdemDestaques(slugsOrdenados: string[]): Promise<void> {
+  const token = getToken(); // ou a forma que você obtém o token
+  
+  const res = await fetch(`${API_BASE}/conteudo/destaques`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ slugsDestaque: slugsOrdenados }), 
+  });
+
+  if (!res.ok) throw new Error("Falha ao salvar a nova ordem no servidor.");
 }

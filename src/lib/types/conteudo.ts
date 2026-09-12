@@ -25,3 +25,10 @@ export interface ConteudoRequest {
   corpo: string;
   imagemCapaUrl: string | null;
 }
+
+export interface DestaqueItem {
+  id: number;
+  titulo: string;
+  tipo: "NOTICIA" | "ARTIGO";
+  ordem: number;
+}
