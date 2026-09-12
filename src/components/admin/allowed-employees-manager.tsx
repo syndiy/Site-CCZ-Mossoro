@@ -13,7 +13,6 @@ import {
 
 export function AllowedEmployeesManager() {
   const [servidores, setServidores] = useState<AllowedEmployeeResponse[]>([]);
-  // Inicia como true para dispensar o setCarregando(true) síncrono no useEffect
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
 
@@ -26,7 +25,7 @@ export function AllowedEmployeesManager() {
   const [nome, setNome] = useState("");
   const [salvando, setSalvando] = useState(false);
 
-  // 1. Busca inicial sem chamar setState síncrono no ciclo de render
+  // Busca inicial sem chamar setState síncrono
   useEffect(() => {
     let isMounted = true;
 
@@ -54,7 +53,7 @@ export function AllowedEmployeesManager() {
     };
   }, []);
 
-  // 2. Função exclusiva para recarregar manualmente via clique ou pós-edição
+  // Recarregar lista manualmente
   async function recarregarLista() {
     setCarregando(true);
     setErro("");
@@ -90,7 +89,10 @@ export function AllowedEmployeesManager() {
 
     try {
       if (servidorEmEdicao && servidorEmEdicao.id) {
-        await atualizarFuncionarioPermitido(servidorEmEdicao.id, { cpf, name: nome });
+        await atualizarFuncionarioPermitido(servidorEmEdicao.id, {
+          cpf,
+          name: nome,
+        });
       } else {
         await cadastrarFuncionarioPermitido({ cpf, name: nome });
       }
@@ -145,6 +147,7 @@ export function AllowedEmployeesManager() {
                 <tr>
                   <th className="p-3.5">Nome</th>
                   <th className="p-3.5">CPF</th>
+                  <th className="p-3.5">Status</th>
                   <th className="p-3.5 text-right">Ações</th>
                 </tr>
               </thead>
@@ -153,6 +156,17 @@ export function AllowedEmployeesManager() {
                   <tr key={srv.id || index} className="hover:bg-muted/30 transition-colors">
                     <td className="p-3.5 font-medium">{srv.name || "Não informado"}</td>
                     <td className="p-3.5">{srv.cpf}</td>
+                    <td className="p-3.5">
+                      {srv.registered ? (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                          Cadastrado
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200">
+                          Pendente
+                        </span>
+                      )}
+                    </td>
                     <td className="p-3.5 text-right">
                       <Button onClick={() => abrirModalEditar(srv)} variant="outline" size="sm">
                         Editar

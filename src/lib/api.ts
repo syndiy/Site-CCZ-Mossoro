@@ -73,7 +73,7 @@ export interface DenunciaPayload {
   longitude?: number;
 }
 
-// DTOs para Autorização de Servidor (AllowedEmployee)
+
 export interface CreateAllowedEmployeeDto {
   cpf: string;
   name: string;
@@ -83,6 +83,31 @@ export interface AllowedEmployeeResponse {
   id?: number;
   cpf: string;
   name: string;
+  registered?: boolean;
+}
+
+export interface UpdateAllowedEmployeeDto {
+  id?: number;
+  cpf: string;
+  name: string;
+  registered?: boolean;
+}
+
+export interface CreateUserDto {
+  username: string;
+  password?: string;
+  email: string;
+  phone: string;
+  CPF: string;
+  role?: string; 
+}
+
+export interface UserResponse {
+  id: number;
+  username: string;
+  email: string;
+  phone: string;
+  CPF: string;
 }
 
 export type Denuncia = DenunciaResponse;
@@ -211,10 +236,6 @@ export async function atualizarDenunciaAdmin(
   return (await res.json()) as DenunciaResponse;
 }
 
-/**
- * Cadastra um novo CPF na lista de funcionários permitidos (AllowedEmployee).
- * Apenas o Administrador pode executar essa rota.
- */
 export async function cadastrarFuncionarioPermitido(
   payload: CreateAllowedEmployeeDto
 ): Promise<AllowedEmployeeResponse> {
@@ -258,14 +279,13 @@ export async function listarFuncionariosPermitidos(): Promise<AllowedEmployeeRes
 
   if (!res.ok) throw new Error("Erro ao buscar a lista de servidores.");
   
-  // Dependendo de como seu backend retorna, pode ser um array direto ou paginado. 
-  // Assumindo que retorna um array (List<AllowedEmployee>)
+
   return (await res.json()) as AllowedEmployeeResponse[];
 }
 
 export async function atualizarFuncionarioPermitido(
   id: number,
-  payload: CreateAllowedEmployeeDto
+  payload: UpdateAllowedEmployeeDto
 ): Promise<AllowedEmployeeResponse> {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("Sessão expirada. Faça login novamente.");
@@ -282,4 +302,24 @@ export async function atualizarFuncionarioPermitido(
   if (!res.ok) throw new Error("Erro ao atualizar os dados do servidor.");
   
   return (await res.json()) as AllowedEmployeeResponse;
+}
+
+export async function criarUsuario(payload: CreateUserDto): Promise<UserResponse> {
+  const res = await fetch(`${API_BASE}/users`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ ...payload, role: "ROLE_EDITOR" }), 
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => null);
+    throw new Error(
+      errorData?.message || 
+      "Erro ao realizar cadastro. Verifique se o CPF está autorizado."
+    );
+  }
+
+  return (await res.json()) as UserResponse;
 }
