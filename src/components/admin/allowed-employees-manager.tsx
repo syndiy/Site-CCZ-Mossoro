@@ -4,12 +4,12 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import type { AllowedEmployeeResponse } from "@/lib/types/usuario";
 import {
-  AllowedEmployeeResponse,
   listarFuncionariosPermitidos,
   cadastrarFuncionarioPermitido,
   atualizarFuncionarioPermitido,
-} from "@/lib/api";
+} from "@/lib/api/usuarioApi";
 
 export function AllowedEmployeesManager() {
   const [servidores, setServidores] = useState<AllowedEmployeeResponse[]>([]);

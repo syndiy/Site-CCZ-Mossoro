@@ -3,7 +3,8 @@
 import { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { listarDenunciasAdmin, DenunciaResponse } from "@/lib/api";
+import type { DenunciaResponse } from "@/lib/types/denuncia";
+import { listarDenunciasAdmin } from "@/lib/api/denunciaApi";
 import { StatusBadge, formatarTipo } from "@/components/admin/status-badge";
 import { DenunciaModal } from "@/components/admin/denuncia-modal";
 

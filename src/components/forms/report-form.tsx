@@ -2,13 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { tiposDenuncia, statusDenuncia } from "@/lib/content";
-import {
-  criarDenuncia,
-  buscarDenuncia,
-  type Denuncia,
-  type DenunciaDetalhe,
-  type TipoDenuncia,
-} from "@/lib/api";
+import { criarDenuncia, buscarDenuncia } from "@/lib/api/denunciaApi";
+import type { Denuncia, DenunciaDetalhe, TipoDenuncia } from "@/lib/types/denuncia";
 import {
   buscarPorCep,
   coordenadasDoEndereco,
@@ -229,7 +224,7 @@ export function ReportForm() {
     try {
       const res = await criarDenuncia({
         tipoDeDenuncia: tipo as TipoDenuncia,
-        descricao: descricao.trim(), // <-- NOVO CAMPO: Enviado no Payload
+        descricao: descricao.trim(),
         nomeDenunciante: nome.trim(),
         numeroTelefone: telefone.trim(),
         cep: cep.trim(),

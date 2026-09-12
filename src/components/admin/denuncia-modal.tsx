@@ -1,13 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { DenunciaResponse, StatusDenuncia } from "@/lib/types/denuncia";
 import {
-  DenunciaResponse,
-  StatusDenuncia,
   atualizarDenunciaAdmin,
   responseToUpdateRequest,
-  getImageUrl,
-} from "@/lib/api";
+} from "@/lib/api/denunciaApi";
+import { getImageUrl } from "@/lib/api/apiClient";
 import { StatusBadge, formatarTipo } from "./status-badge";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";

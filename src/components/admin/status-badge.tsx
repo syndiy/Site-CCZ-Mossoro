@@ -1,4 +1,4 @@
-import { StatusDenuncia, TipoDenuncia } from "@/lib/api";
+import type { StatusDenuncia, TipoDenuncia } from "@/lib/types/denuncia";
 
 const STATUS_CONFIG: Record<StatusDenuncia, { label: string; className: string }> = {
   EM_ANALISE: {

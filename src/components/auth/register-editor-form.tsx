@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { criarUsuario } from "@/lib/api";
+import { criarUsuario } from "@/lib/api/usuarioApi";
 
 export function RegisterEditorForm() {
   const [formData, setFormData] = useState({
