@@ -1,165 +1,222 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { GripVertical } from "lucide-react"; 
-
-import { listarDestaques, atualizarOrdemDestaques } from "@/lib/api/conteudoApi";
-import type { DestaqueItem } from "@/lib/types/conteudo";
+import { useState, useEffect } from 'react';
+import { 
+  listarConteudo, 
+  listarDestaques, 
+  atualizarOrdemDestaques 
+} from '@/lib/api/conteudoApi';
+import { ConteudoListResponse, ColecaoConteudo } from '@/lib/types/conteudo';
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 
 export default function DestaquesPage() {
-  const [itens, setItens] = useState<DestaqueItem[]>([]);
-  const [carregando, setCarregando] = useState(true);
-  const [salvando, setSalvando] = useState(false);
-  const [erro, setErro] = useState("");
-  const [sucesso, setSucesso] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
-  // Busca inicial dos dados reais do backend
+  const [destaques, setDestaques] = useState<ConteudoListResponse[]>([]);
+  const [disponiveis, setDisponiveis] = useState<ConteudoListResponse[]>([]);
+  
+  // Estado para controlar o item sendo arrastado
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+
   useEffect(() => {
-    async function carregar() {
+    let isMounted = true;
+
+    async function carregarDados() {
       try {
-        const dados = await listarDestaques();
-        // Garante que a lista comece ordenada pelo campo 'ordem' vindo do banco
-        const ordenados = dados.sort((a, b) => a.ordem - b.ordem);
-        setItens(ordenados);
+        const destaquesAtuais = (await listarDestaques()) as unknown as ConteudoListResponse[];
+
+        const [noticiasRaw, artigosRaw] = await Promise.all([
+          listarConteudo('noticias'),
+          listarConteudo('artigos'),
+        ]);
+
+        if (!isMounted) return;
+
+        const noticias = noticiasRaw.map((n) => ({ ...n, colecao: 'noticias' as ColecaoConteudo }));
+        const artigos = artigosRaw.map((a) => ({ ...a, colecao: 'artigos' as ColecaoConteudo }));
+
+        const todos = [...noticias, ...artigos];
+        
+        const idsDestaque = new Set(destaquesAtuais.map((d) => d.slug));
+        const naoDestaques = todos.filter((item) => !idsDestaque.has(item.slug));
+
+        setDestaques(destaquesAtuais);
+        setDisponiveis(naoDestaques);
       } catch (err) {
-        setErro(err instanceof Error ? err.message : "Erro ao carregar destaques.");
+        console.error('Erro ao carregar dados dos destaques:', err);
       } finally {
-        setCarregando(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     }
-    carregar();
+
+    carregarDados();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  // Função disparada quando o usuário solta o card
-  const handleDragEnd = (result: DropResult) => {
-    // Se soltou fora da lista, ignora
-    if (!result.destination) return;
+  // --- LÓGICA DE DRAG AND DROP NATIVO ---
+  function handleDragStart(index: number) {
+    setDraggedIndex(index);
+  }
 
-    const startIndex = result.source.index;
-    const endIndex = result.destination.index;
+  function handleDragOver(e: React.DragEvent, targetIndex: number) {
+    e.preventDefault(); // Necessário para permitir o drop
+    
+    if (draggedIndex === null || draggedIndex === targetIndex) return;
 
-    // Se soltou no mesmo lugar, ignora
-    if (startIndex === endIndex) return;
+    const novosDestaques = [...destaques];
+    const itemArrastado = novosDestaques[draggedIndex];
+    
+    // Remove o item da posição original e insere na nova posição
+    novosDestaques.splice(draggedIndex, 1);
+    novosDestaques.splice(targetIndex, 0, itemArrastado);
 
-    // Reordena o array localmente
-    const novaLista = Array.from(itens);
-    const [itemArrastado] = novaLista.splice(startIndex, 1);
-    novaLista.splice(endIndex, 0, itemArrastado);
+    setDraggedIndex(targetIndex);
+    setDestaques(novosDestaques);
+  }
 
-    // Atualiza a propriedade 'ordem' de todos os itens com base na nova posição
-    const listaAtualizada = novaLista.map((item, index) => ({
-      ...item,
-      ordem: index + 1,
-    }));
+  function handleDragEnd() {
+    setDraggedIndex(null);
+  }
+  // ----------------------------------------
 
-    setItens(listaAtualizada);
-    setSucesso(false);
-  };
+  function adicionarAosDestaques(item: ConteudoListResponse) {
+    setDestaques((prev) => [...prev, item]);
+    setDisponiveis((prev) => prev.filter((i) => i.slug !== item.slug));
+  }
 
- const handleSalvarOrdem = async () => {
-    setSalvando(true);
-    setErro("");
-    setSucesso(false);
+  function removerDosDestaques(item: ConteudoListResponse) {
+    setDestaques((prev) => prev.filter((i) => i.slug !== item.slug));
+    setDisponiveis((prev) => [...prev, item]);
+  }
 
+  async function handleSalvarOrdem() {
     try {
-      const novaOrdemSlugs = itens.map((item) => String(item.id));
-      
-      await atualizarOrdemDestaques(novaOrdemSlugs);
-      
-      setSucesso(true);
+      setSaving(true);
+      const slugs = destaques.map((item) => item.slug);
+      await atualizarOrdemDestaques(slugs);
+      alert('Ordem dos destaques salva com sucesso!');
     } catch (err) {
-      setErro(err instanceof Error ? err.message : "Erro ao salvar a nova ordem.");
+      console.error('Erro ao salvar ordem dos destaques:', err);
+      alert('Erro ao salvar a nova ordem dos destaques.');
     } finally {
-      setSalvando(false);
+      setSaving(false);
     }
-  };
+  }
+
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto p-6 text-center text-gray-500">
+        Carregando destaques e conteúdos...
+      </div>
+    );
+  }
 
   return (
-    <Card className="max-w-3xl mx-auto shadow-sm">
-      <CardHeader className="flex flex-row items-center justify-between pb-4 border-b">
-        <div>
-          <CardTitle className="text-xl font-bold">Destaques da Home</CardTitle>
-          <p className="text-xs text-muted-foreground mt-1">
-            Arraste os itens para alterar a ordem de exibição na página inicial.
-          </p>
-        </div>
-        <Button onClick={handleSalvarOrdem} disabled={salvando || carregando}>
-          {salvando ? "Salvando..." : "Salvar Ordem"}
-        </Button>
-      </CardHeader>
-
-      <CardContent className="pt-6">
-        {erro && (
-          <Alert variant="destructive" className="mb-4">
-            <AlertDescription>{erro}</AlertDescription>
-          </Alert>
-        )}
-        
-        {sucesso && (
-          <Alert className="mb-4 bg-emerald-50 text-emerald-800 border-emerald-200">
-            <AlertDescription>Ordem atualizada com sucesso!</AlertDescription>
-          </Alert>
-        )}
-
-        {carregando ? (
-          <div className="py-12 text-center text-sm text-muted-foreground">
-            Carregando destaques...
+    <div className="space-y-6 max-w-4xl mx-auto">
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>Destaques Atuais</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Arraste os cards para reordenar a exibição na página inicial.
+            </p>
           </div>
-        ) : itens.length === 0 ? (
-          <div className="py-12 text-center text-sm text-muted-foreground">
-            Nenhum destaque configurado no momento.
-          </div>
-        ) : (
-          <DragDropContext onDragEnd={handleDragEnd}>
-            <Droppable droppableId="destaques-lista">
-              {(provided) => (
-                <div
-                  {...provided.droppableProps}
-                  ref={provided.innerRef}
-                  className="flex flex-col gap-3"
+
+          <Button
+            onClick={handleSalvarOrdem}
+            disabled={saving || destaques.length === 0}
+          >
+            {saving ? 'Salvando...' : 'Salvar Ordem'}
+          </Button>
+        </CardHeader>
+        <CardContent>
+          {destaques.length === 0 ? (
+            <p className="text-sm text-gray-500 border border-dashed p-4 rounded-md text-center">
+              Nenhum item em destaque. Adicione itens da lista abaixo.
+            </p>
+          ) : (
+            <ul className="space-y-2">
+              {destaques.map((item, index) => (
+                <li
+                  key={item.slug}
+                  draggable
+                  onDragStart={() => handleDragStart(index)}
+                  onDragOver={(e) => handleDragOver(e, index)}
+                  onDragEnd={handleDragEnd}
+                  className={`flex items-center justify-between p-3 bg-white border rounded-lg shadow-sm cursor-grab active:cursor-grabbing transition-all ${
+                    draggedIndex === index ? 'opacity-40 border-blue-500 bg-blue-50' : ''
+                  }`}
                 >
-                  {itens.map((item, index) => (
-                    <Draggable key={item.id} draggableId={String(item.id)} index={index}>
-                      {(provided, snapshot) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          className={`flex items-center gap-3 p-3 rounded-lg border bg-background transition-shadow ${
-                            snapshot.isDragging ? "shadow-lg ring-1 ring-primary/20" : ""
-                          }`}
-                        >
-                          <div
-                            {...provided.dragHandleProps}
-                            className="cursor-grab hover:text-primary p-1 text-muted-foreground active:cursor-grabbing"
-                          >
-                            <GripVertical size={20} />
-                          </div>
-                          
-                          <div className="flex flex-col">
-                            <span className="font-medium text-sm">{item.titulo}</span>
-                            <span className="text-[11px] font-semibold text-muted-foreground uppercase">
-                              {item.tipo}
-                            </span>
-                          </div>
-                          
-                          <div className="ml-auto text-xs font-mono text-muted-foreground bg-muted px-2 py-1 rounded">
-                            Pos: {index + 1}
-                          </div>
-                        </div>
+                  <div className="flex items-center gap-3 select-none">
+                    {/* Ícone Indicador de Arraste */}
+                    <div className="text-gray-400 font-mono tracking-tighter text-lg">
+                      ⋮⋮
+                    </div>
+                    <span className="font-bold text-gray-400">#{index + 1}</span>
+                    <div>
+                      <p className="font-medium text-gray-900">{item.titulo}</p>
+                      {item.colecao && (
+                        <span className="text-xs text-gray-500 uppercase">{item.colecao}</span>
                       )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-          </DragDropContext>
-        )}
-      </CardContent>
-    </Card>
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => removerDosDestaques(item)}
+                  >
+                    Remover
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Seção de Conteúdos Disponíveis para Adicionar */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Notícias e Artigos Disponíveis</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {disponiveis.length === 0 ? (
+            <p className="text-sm text-gray-500">
+              Todos os conteúdos cadastrados já estão nos destaques.
+            </p>
+          ) : (
+            <ul className="space-y-2">
+              {disponiveis.map((item) => (
+                <li
+                  key={item.slug}
+                  className="flex items-center justify-between p-3 bg-gray-50 border rounded-lg"
+                >
+                  <div>
+                    <p className="font-medium text-gray-800">{item.titulo}</p>
+                    {item.colecao && (
+                      <span className="text-xs text-gray-500 uppercase">{item.colecao}</span>
+                    )}
+                  </div>
+                  <Button
+                    variant="default"
+                    size="sm"
+                    onClick={() => adicionarAosDestaques(item)}
+                  >
+                    Adicionar
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }

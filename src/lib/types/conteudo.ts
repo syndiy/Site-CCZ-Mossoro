@@ -7,6 +7,7 @@ export interface ConteudoListResponse {
   status: StatusConteudo;
   dataModificacao: string;
   modificadoPor: string;
+  colecao?: ColecaoConteudo;
 }
 
 export interface ConteudoCompletoResponse {
