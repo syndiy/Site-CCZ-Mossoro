@@ -39,8 +39,14 @@ export default function DestaquesPage() {
 
         const todos = [...noticias, ...artigos];
         
-        const idsDestaque = new Set(destaquesAtuais.map((d) => d.slug));
-        const naoDestaques = todos.filter((item) => !idsDestaque.has(item.slug));
+        // Casa por slug e tambem por titulo: quando a resposta de destaques nao
+        // traz o slug, so o titulo identifica a publicacao, e sem isso ela
+        // aparece ao mesmo tempo como destaque e como disponivel.
+        const slugsDestaque = new Set(destaquesAtuais.map((d) => d.slug).filter(Boolean));
+        const titulosDestaque = new Set(destaquesAtuais.map((d) => d.titulo));
+        const naoDestaques = todos.filter(
+          (item) => !slugsDestaque.has(item.slug) && !titulosDestaque.has(item.titulo),
+        );
 
         setDestaques(destaquesAtuais);
         setDisponiveis(naoDestaques);

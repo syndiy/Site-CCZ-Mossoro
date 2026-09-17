@@ -13,6 +13,8 @@ const INTERVALO = 6500;
 
 export type HeroSlide = {
   slug: string;
+  /** Destino do slide. As noticias publicadas apos o build moram em /news/ver/. */
+  href?: string;
   title: string;
   excerpt: string;
   publishedAt: string;
@@ -109,7 +111,7 @@ export function HeroNewsBackground({ slides, fallback, fallbackAlt, children }: 
                     Últimas notícias
                   </span>
                   <Link
-                    href={`/news/${noticia.slug}/`}
+                    href={noticia.href ?? `/news/${noticia.slug}/`}
                     className="group mt-2 block max-w-3xl text-white underline-offset-4 hover:underline"
                   >
                     <span className="block text-xs text-white/75">

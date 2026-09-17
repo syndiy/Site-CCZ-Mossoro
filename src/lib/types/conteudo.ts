@@ -32,4 +32,7 @@ export interface DestaqueItem {
   titulo: string;
   tipo: "NOTICIA" | "ARTIGO";
   ordem: number;
+  // O slug e o que liga o destaque a publicacao. Opcional porque nem toda
+  // resposta do backend traz o campo; sem ele, casa-se pelo titulo.
+  slug?: string;
 }

@@ -1,7 +1,8 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
 import { Container } from "@/components/layout/container";
-import { HeroNewsBackground, type HeroSlide } from "./hero-news";
+import { type HeroSlide } from "./hero-news";
+import { HeroSlidesAoVivo } from "./hero-slides-ao-vivo";
 
 type HeroProps = {
   eyebrow?: string;
@@ -59,9 +60,9 @@ export function Hero({ eyebrow, title, subtitle, image, imageAlt, slides, childr
   // então por mais alta que a notícia fique, uma nunca sobe por cima da outra.
   return (
     <section className="relative flex min-h-[560px] flex-col overflow-hidden bg-brand-900 md:min-h-[640px]">
-      <HeroNewsBackground slides={slides!} fallback={image} fallbackAlt={imageAlt}>
+      <HeroSlidesAoVivo slidesDoBuild={slides!} fallback={image} fallbackAlt={imageAlt}>
         {chamada}
-      </HeroNewsBackground>
+      </HeroSlidesAoVivo>
     </section>
   );
 }
