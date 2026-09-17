@@ -8,6 +8,12 @@ export async function fetchWithTimeout(
 
   try {
     return await fetch(input, { ...init, signal: controller.signal });
+  } catch (err) {
+    // Sem isto a pessoa recebe "Failed to fetch" ou "AbortError" na tela.
+    if (err instanceof DOMException && err.name === "AbortError") {
+      throw new Error("O servidor demorou para responder. Tente novamente em instantes.");
+    }
+    throw new Error("Não foi possível falar com o servidor. Verifique sua conexão.");
   } finally {
     globalThis.clearTimeout(timer);
   }

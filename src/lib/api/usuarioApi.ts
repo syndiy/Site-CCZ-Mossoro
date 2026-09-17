@@ -1,4 +1,4 @@
-import { API_BASE, getToken } from "./apiClient";
+import { API_BASE, getToken, requisitar } from "./apiClient";
 import {
   CreateUserDto,
   UserResponse,
@@ -8,7 +8,7 @@ import {
 } from "../types/usuario";
 
 export async function loginUsuario(email: string, password: string): Promise<string> {
-  const res = await fetch(`${API_BASE}/users/login`, {
+  const res = await requisitar(`${API_BASE}/users/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
@@ -20,7 +20,7 @@ export async function loginUsuario(email: string, password: string): Promise<str
 }
 
 export async function criarUsuario(payload: CreateUserDto): Promise<UserResponse> {
-  const res = await fetch(`${API_BASE}/users`, {
+  const res = await requisitar(`${API_BASE}/users`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -44,7 +44,7 @@ export async function cadastrarFuncionarioPermitido(
   const token = getToken();
   if (!token) throw new Error("Sessão expirada. Faça login novamente.");
 
-  const res = await fetch(`${API_BASE}/allowedEmployee`, {
+  const res = await requisitar(`${API_BASE}/allowedEmployee`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -68,7 +68,7 @@ export async function listarFuncionariosPermitidos(): Promise<AllowedEmployeeRes
   const token = getToken();
   if (!token) throw new Error("Sessão expirada. Faça login novamente.");
 
-  const res = await fetch(`${API_BASE}/allowedEmployee`, {
+  const res = await requisitar(`${API_BASE}/allowedEmployee`, {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
@@ -86,7 +86,7 @@ export async function atualizarFuncionarioPermitido(
   const token = getToken();
   if (!token) throw new Error("Sessão expirada. Faça login novamente.");
 
-  const res = await fetch(`${API_BASE}/allowedEmployee/${id}`, {
+  const res = await requisitar(`${API_BASE}/allowedEmployee/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",

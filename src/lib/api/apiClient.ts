@@ -16,3 +16,16 @@ export const getToken = (): string | null => {
   }
   return null;
 };
+
+/**
+ * Traduz as falhas de rede do fetch. Sem isto o editor mostra "Failed to fetch",
+ * que nao diz nada a quem esta publicando; o problema quase sempre e a API fora
+ * do ar ou o endereco errado em NEXT_PUBLIC_API_URL.
+ */
+export async function requisitar(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+  try {
+    return await fetch(input, init);
+  } catch {
+    throw new Error("Não foi possível falar com o servidor. Verifique se a API está no ar.");
+  }
+}
