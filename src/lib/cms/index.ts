@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
 import GithubSlugger from "github-slugger";
+import { formatDate } from "@/lib/format-date";
 
 const CONTENT_ROOT = path.join(process.cwd(), "content");
 
@@ -163,13 +164,4 @@ export function getNews(slug: string): Doc<NewsMeta> | null {
   return doc.meta.draft ? null : doc;
 }
 
-export function formatDate(iso: string): string {
-  if (!iso) return "";
-  // "2026-08-12" é lido como meia-noite UTC e voltaria um dia no fuso do Brasil.
-  const parts = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
-  const date = parts
-    ? new Date(Number(parts[1]), Number(parts[2]) - 1, Number(parts[3]))
-    : new Date(iso);
-  if (Number.isNaN(date.getTime())) return iso;
-  return date.toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" });
-}
+export { formatDate };

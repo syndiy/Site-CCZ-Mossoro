@@ -123,6 +123,23 @@ O site é exportado estaticamente, então as publicações **não existem como p
 build**: o slug da edição vai no query string (`?slug=`), e não no caminho, porque o
 Next precisaria conhecer todos os slugs antes de eles serem criados.
 
+### Como a publicação chega ao site
+
+O que a equipe publica aparece no portal **na hora**, sem esperar um novo deploy:
+
+1. As páginas `/news/` e `/articles/` trazem, no HTML do build, o conteúdo de `content/`.
+2. Já no navegador, elas perguntam ao backend o que foi publicado depois disso e mostram
+   essas publicações numa seção "Publicado recentemente".
+3. Quem clica numa delas abre `/news/ver/?slug=...`, que lê o texto direto do backend.
+
+Essas rotas de leitura ficam **fora do índice de busca** (`robots: noindex`): o endereço
+definitivo de uma notícia é `/news/<slug>/`, que nasce no build seguinte. Ou seja, o SEO
+continua vindo do site estático — a leitura ao vivo existe para o conteúdo não ficar
+invisível enquanto o próximo build não acontece.
+
+Com `NEXT_PUBLIC_API_URL` vazia, ou com a API fora do ar, nada disso aparece e o site
+serve apenas o conteúdo do build. O visitante nunca vê erro técnico.
+
 > **Atenção — dois editores no repositório.** `src/app/admin/` (acima) fala com o
 > backend e guarda o token no navegador. `admin/` é o app separado da porta 4001, que
 > grava Markdown em `content/` e valida o JWT no servidor. Os dois funcionam, mas têm

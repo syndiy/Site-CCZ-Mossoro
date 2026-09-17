@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { formatDate } from "@/lib/cms";
+import { formatDate } from "@/lib/format-date";
 
 type ContentCardProps = {
   href: string;

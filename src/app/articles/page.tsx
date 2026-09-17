@@ -4,6 +4,7 @@ import { JsonLd } from "@/components/shared/json-ld";
 import { ContentCard, ContentGrid } from "@/components/cards/content-card";
 import { breadcrumbJsonLd } from "@/lib/seo";
 import { getAllArticles } from "@/lib/cms";
+import { PublicacoesRecentes } from "@/components/content/publicacoes-recentes";
 
 export const metadata: Metadata = {
   title: "Artigos",
@@ -56,6 +57,8 @@ export default function ArtigosPage() {
             </ContentGrid>
           </div>
         )}
+
+        <PublicacoesRecentes colecao="artigos" slugsNoBuild={artigos.map((a) => a.slug)} />
       </Container>
     </div>
   );

@@ -3,13 +3,14 @@
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
+import { Markdown } from "tiptap-markdown";
 import { uploadMidia } from "@/lib/api/midiaApi";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
 interface TiptapEditorProps {
   content: string;
-  onChange: (html: string) => void;
+  onChange: (markdown: string) => void;
 }
 
 export function TiptapEditor({ content, onChange }: TiptapEditorProps) {
@@ -23,11 +24,14 @@ export function TiptapEditor({ content, onChange }: TiptapEditorProps) {
           class: "rounded-lg max-h-96 object-cover my-4 mx-auto",
         },
       }),
+      // O site renderiza os textos como Markdown; sem isto o editor devolveria
+      // HTML, que o react-markdown descarta, e a publicacao sairia em branco.
+      Markdown.configure({ html: false, transformPastedText: true }),
     ],
     content,
     immediatelyRender: false,
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
+      onChange(editor.storage.markdown.getMarkdown());
     },
     editorProps: {
       attributes: {
