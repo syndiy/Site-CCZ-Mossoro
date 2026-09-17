@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -78,6 +79,14 @@ export default function LoginPage() {
             <Button type="submit" size="lg" disabled={carregando} className="mt-2 w-full">
               {carregando ? "Autenticando..." : "Entrar"}
             </Button>
+
+            <p className="text-center text-sm text-muted-foreground">
+              Primeiro acesso?{" "}
+              <Link href="/cadastro" className="font-medium text-primary underline">
+                Crie sua conta
+              </Link>
+              .
+            </p>
           </form>
         </CardContent>
       </Card>

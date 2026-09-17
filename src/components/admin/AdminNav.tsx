@@ -1,37 +1,47 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+
+const navItems = [
+  { label: "Notícias", href: "/admin/noticias" },
+  { label: "Artigos", href: "/admin/artigos" },
+  { label: "Destaques da home", href: "/admin/destaques" },
+  { label: "Denúncias e equipe", href: "/admin" },
+];
 
 export function AdminNav() {
   const pathname = usePathname();
+  const router = useRouter();
 
-  const navItems = [
-    { label: 'Notícias', href: '/admin/noticias' },
-    { label: 'Artigos', href: '/admin/artigos' },
-    { label: 'Organizar Destaques', href: '/admin/destaques' },
-  ];
+  function sair() {
+    localStorage.removeItem("token");
+    router.replace("/login");
+  }
 
   return (
-    <header className="w-full bg-white border-b border-gray-200 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center gap-6">
-            <span className="font-bold text-lg text-gray-900">Painel de Conteúdo</span>
+    <header className="w-full border-b border-border bg-white shadow-sm">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between gap-4">
+          <div className="flex items-center gap-6 overflow-x-auto">
+            <span className="whitespace-nowrap text-lg font-bold">Painel do CCZ</span>
 
-            {/* Botões de Navegação */}
-            <nav className="flex space-x-2">
+            <nav className="flex gap-2">
               {navItems.map((item) => {
-                const isActive = pathname.startsWith(item.href);
+                // "/admin" casaria com todas as telas, entao so ele exige igualdade.
+                const ativo =
+                  item.href === "/admin" ? pathname === "/admin" : pathname.startsWith(item.href);
 
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                      isActive
-                        ? 'bg-blue-600 text-white'
-                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                    aria-current={ativo ? "page" : undefined}
+                    className={`whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                      ativo
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
                     }`}
                   >
                     {item.label}
@@ -40,6 +50,10 @@ export function AdminNav() {
               })}
             </nav>
           </div>
+
+          <Button onClick={sair} variant="outline" size="sm" className="whitespace-nowrap">
+            Sair
+          </Button>
         </div>
       </div>
     </header>

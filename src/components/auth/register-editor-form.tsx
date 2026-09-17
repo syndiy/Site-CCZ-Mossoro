@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -67,7 +68,11 @@ export function RegisterEditorForm() {
           {sucesso && (
             <Alert className="mb-6 bg-emerald-50 text-emerald-900 border-emerald-200">
               <AlertDescription>
-                Cadastro realizado com sucesso! Você já pode fazer login no painel.
+                Cadastro realizado com sucesso!{" "}
+                <Link href="/login" className="font-medium underline">
+                  Entrar no painel
+                </Link>
+                .
               </AlertDescription>
             </Alert>
           )}
