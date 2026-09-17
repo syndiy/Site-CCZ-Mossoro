@@ -1,5 +1,5 @@
 import type { IconName } from "@/components/shared/icon";
-import type { StatusDenuncia, TipoDenuncia } from "./api";
+import type { StatusDenuncia, TipoDenuncia } from "./types/denuncia";
 
 export type ServiceItem = {
   title: string;

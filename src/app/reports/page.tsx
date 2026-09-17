@@ -5,6 +5,7 @@ import { Container } from "@/components/layout/container";
 import { SectionHeading } from "@/components/layout/section-heading";
 import { breadcrumbJsonLd } from "@/lib/seo";
 
+
 export const metadata: Metadata = {
   title: "Denúncias",
   description:
