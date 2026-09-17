@@ -88,11 +88,13 @@ src/
   lib/
     site.ts     ⚙️ dados institucionais (contato, endereço, domínio)
     cms/        leitura dos .md de content/
-    api.ts      🔌 integração com o backend Spring
+    api/        🔌 integração com o backend Spring (denúncias, conteúdo, usuários)
+    types/      contratos (DTOs) espelhados do backend
     seo.ts      metadata + JSON-LD
 content/
   articles/     artigos de educação em saúde
   news/         campanhas, mutirões e avisos
+src/app/admin/  painel de conteúdo servido pelo próprio site (ver abaixo)
 admin/          editor de conteúdo e triagem (app Next.js separado)
   src/app/      /            conteúdo do site
                 /denuncias/  denúncias recebidas e andamento dos protocolos
@@ -103,10 +105,34 @@ public/img/     imagens e ilustrações
 docs/           CONTEUDO.md, guia de quem escreve
 ```
 
+## Painel de conteúdo (`/admin`)
+
+Painel servido pelo próprio site, que grava direto no backend Spring. É o caminho
+para a equipe publicar sem depender de commit no repositório.
+
+| Rota | Para que serve |
+| --- | --- |
+| `/login` | entrada da equipe (e-mail e senha do backend) |
+| `/cadastro` | primeiro acesso de quem já teve o CPF liberado |
+| `/admin/noticias`, `/admin/artigos` | lista, publica, despublica e exclui |
+| `/admin/noticias/novo` | escreve uma publicação nova |
+| `/admin/noticias/editar?slug=...` | edita uma publicação existente |
+| `/admin/destaques` | escolhe e ordena o que aparece na home |
+
+O site é exportado estaticamente, então as publicações **não existem como página no
+build**: o slug da edição vai no query string (`?slug=`), e não no caminho, porque o
+Next precisaria conhecer todos os slugs antes de eles serem criados.
+
+> **Atenção — dois editores no repositório.** `src/app/admin/` (acima) fala com o
+> backend e guarda o token no navegador. `admin/` é o app separado da porta 4001, que
+> grava Markdown em `content/` e valida o JWT no servidor. Os dois funcionam, mas têm
+> logins independentes; a unificação ainda está em aberto.
+
 ## Conteúdo
 
 Artigos e notícias são arquivos Markdown em `content/`, com um cabeçalho de metadados.
 O campo `draft` decide se aparece no site: `true` fica só no editor, `false` vai ao ar.
+Isso vale para o editor `admin/`; o painel `/admin` grava as publicações no backend.
 
 Detalhes em [docs/CONTEUDO.md](docs/CONTEUDO.md).
 
