@@ -3,6 +3,7 @@ import { mesclarPorSlug } from "@/lib/publicacoes";
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  vi.unstubAllEnvs();
 });
 
 describe("mesclarPorSlug", () => {
@@ -29,7 +30,10 @@ describe("mesclarPorSlug", () => {
 
 describe("publicacoes vindas da API", () => {
   it("ignora rascunhos e devolve apenas o que esta publicado", async () => {
+    // API_BASE e lido uma vez no import do modulo, entao o ambiente precisa
+    // estar definido antes dele: por isso o vi.resetModules + import dinamico.
     vi.stubEnv("NEXT_PUBLIC_API_URL", "http://api.teste");
+    vi.resetModules();
     vi.stubGlobal("fetch", vi.fn(async () => ({
       ok: true,
       json: async () => [
@@ -45,6 +49,8 @@ describe("publicacoes vindas da API", () => {
   });
 
   it("devolve lista vazia quando a API esta fora do ar, para o site nao quebrar", async () => {
+    vi.stubEnv("NEXT_PUBLIC_API_URL", "http://api.teste");
+    vi.resetModules();
     vi.stubGlobal("fetch", vi.fn(async () => {
       throw new Error("sem rede");
     }) as unknown as typeof fetch);

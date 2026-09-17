@@ -1,4 +1,6 @@
-export const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+// Sem valor definido fica vazia de proposito: o fallback para localhost faria o
+// site publicado procurar a API na maquina de quem visita.
+export const API_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/+$/, "");
 
 export const getImageUrl = (path: string | null): string => {
   if (!path) return "";
