@@ -4,3 +4,7 @@ out
 .git
 npm-debug.log
 _prototype
+output
+**/.env*
+admin/node_modules
+admin/.next

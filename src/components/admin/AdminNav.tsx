@@ -23,11 +23,11 @@ export function AdminNav() {
   return (
     <header className="w-full border-b border-border bg-white shadow-sm">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between gap-4">
-          <div className="flex items-center gap-6 overflow-x-auto">
+        <div className="flex flex-wrap items-center justify-between gap-3 py-3">
+          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-3 sm:gap-6">
             <span className="whitespace-nowrap text-lg font-bold">Painel do CCZ</span>
 
-            <nav className="flex gap-2">
+            <nav className="flex w-full flex-wrap gap-2 sm:w-auto" aria-label="Painel administrativo">
               {navItems.map((item) => {
                 // "/admin" casaria com todas as telas, entao so ele exige igualdade.
                 const ativo =
@@ -51,7 +51,7 @@ export function AdminNav() {
             </nav>
           </div>
 
-          <Button onClick={sair} variant="outline" size="sm" className="whitespace-nowrap">
+          <Button onClick={sair} variant="outline" size="sm" className="self-start whitespace-nowrap sm:self-center">
             Sair
           </Button>
         </div>

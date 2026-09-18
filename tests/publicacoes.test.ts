@@ -60,3 +60,17 @@ describe("publicacoes vindas da API", () => {
     await expect(noticiasPublicadas()).resolves.toEqual([]);
   });
 });
+
+ it("resolve capa relativa usando a API e preserva ordem de destaque", async () => {
+    vi.stubEnv("NEXT_PUBLIC_API_URL", "https://api.teste");
+    vi.resetModules();
+    vi.stubGlobal("fetch", vi.fn(async () => ({
+      ok: true,
+      json: async () => [{ titulo: "Campanha", slug: "campanha", status: "PUBLICADO", dataModificacao: "2026-09-17", imagemCapaUrl: "/midia/capa.png", ordemDestaque: 2 }],
+    })));
+    const { noticiasPublicadas } = await import("@/lib/publicacoes");
+    const [noticia] = await noticiasPublicadas();
+    expect(noticia.cover).toBe("https://api.teste/midia/capa.png");
+    expect(noticia.home).toBe(true);
+    expect(noticia.homeOrder).toBe(2);
+  });

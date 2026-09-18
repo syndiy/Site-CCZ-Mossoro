@@ -37,7 +37,7 @@ export default function DestaquesPage() {
         const noticias = noticiasRaw.map((n) => ({ ...n, colecao: 'noticias' as ColecaoConteudo }));
         const artigos = artigosRaw.map((a) => ({ ...a, colecao: 'artigos' as ColecaoConteudo }));
 
-        const todos = [...noticias, ...artigos];
+        const todos = [...noticias, ...artigos].filter((item) => item.status === "PUBLICADO");
         
         // Casa por slug e tambem por titulo: quando a resposta de destaques nao
         // traz o slug, so o titulo identifica a publicacao, e sem isso ela
@@ -137,7 +137,7 @@ export default function DestaquesPage() {
 
           <Button
             onClick={handleSalvarOrdem}
-            disabled={saving || destaques.length === 0}
+            disabled={saving}
           >
             {saving ? 'Salvando...' : 'Salvar Ordem'}
           </Button>

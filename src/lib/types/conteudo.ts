@@ -8,6 +8,9 @@ export interface ConteudoListResponse {
   dataModificacao: string;
   modificadoPor: string;
   colecao?: ColecaoConteudo;
+  imagemCapaUrl?: string | null;
+  ordemDestaque?: number | null;
+  dataPublicacao?: string | null;
 }
 
 export interface ConteudoCompletoResponse {

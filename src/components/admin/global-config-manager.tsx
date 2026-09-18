@@ -1,5 +1,7 @@
 "use client";
 
+import { API_BASE, requisitar } from "@/lib/api/apiClient";
+
 import { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -49,7 +51,7 @@ export function GlobalConfigManager() {
     setMensagem(null);
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:8080/configuracaoGlobal", {
+      const res = await requisitar(`${API_BASE}/configuracaoGlobal`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -101,7 +103,7 @@ export function GlobalConfigManager() {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:8080/configuracaoGlobal", {
+      const res = await requisitar(`${API_BASE}/configuracaoGlobal`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -122,6 +124,7 @@ export function GlobalConfigManager() {
         ...data,
         estado: data.estado || data.uf || "",
       });
+      window.dispatchEvent(new Event("ccz-site-config-updated"));
       setMensagem({ tipo: "sucesso", texto: "Configurações atualizadas com sucesso!" });
       
       setTimeout(() => setMensagem(null), 3000);

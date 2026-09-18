@@ -49,13 +49,13 @@ export const site = {
   },
 } as const;
 
-export const mapsRotaUrl = () =>
+export const mapsRotaUrl = (address: { street: string; district: string; city: string; state: string } = site.address) =>
   `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
-    `${site.address.street}, ${site.address.district}, ${site.address.city}, ${site.address.state}`,
+    `${address.street}, ${address.district}, ${address.city}, ${address.state}`,
   )}`;
 
-export const whatsappUrl = (message?: string) =>
-  `https://wa.me/${site.contact.whatsapp}${
+export const whatsappUrl = (message?: string, whatsapp: string = site.contact.whatsapp) =>
+  `https://wa.me/${whatsapp}${
     message ? `?text=${encodeURIComponent(message)}` : ""
   }`;
 

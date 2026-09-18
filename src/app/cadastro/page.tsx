@@ -7,9 +7,9 @@ export const metadata = {
 
 export default function CadastroPage() {
   return (
-    <main className="min-h-screen bg-muted/30 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-muted/30 flex items-center justify-center p-4">
       {/* Aqui estamos chamando o componente que você já criou */}
       <RegisterEditorForm />
-    </main>
+    </div>
   );
 }

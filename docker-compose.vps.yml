@@ -1,0 +1,35 @@
+# Uma VPS, uma URL: compose base + este arquivo.
+services:
+  db:
+    restart: unless-stopped
+  minio:
+    restart: unless-stopped
+  backend:
+    restart: unless-stopped
+    environment:
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-https://${SITE_DOMAIN}}
+    ports: !reset []
+  frontend:
+    restart: unless-stopped
+    build:
+      args:
+        NEXT_PUBLIC_API_URL: /api
+    ports: !reset []
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN:?Defina SITE_DOMAIN com o dominio ou :80 para teste local}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - frontend
+volumes:
+  caddy-data:
+  caddy-config:

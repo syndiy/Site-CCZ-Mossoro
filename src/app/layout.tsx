@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
+import { SiteConfigProvider } from "@/components/layout/site-config-provider";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { AccessibilityBar } from "@/components/widgets/accessibility-bar";
@@ -43,12 +44,14 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         </a>
         <JsonLd data={organizationJsonLd()} />
         <JsonLd data={websiteJsonLd()} />
+        <SiteConfigProvider>
         <AccessibilityBar />
         <Header />
         <main id="content">{children}</main>
         <Footer />
         <BackToTop />
         <CookieBanner />
+        </SiteConfigProvider>
       </body>
     </html>
   );

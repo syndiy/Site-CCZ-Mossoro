@@ -1,4 +1,4 @@
-import { API_BASE, getToken } from "./apiClient";
+import { API_BASE, getToken, requisitar } from "./apiClient";
 import { fetchWithTimeout } from "../fetch-with-timeout";
 import { PageResponse } from "../types/common";
 import {
@@ -42,7 +42,7 @@ export async function criarDenuncia(payload: DenunciaPayload): Promise<DenunciaR
   form.append("cidade", payload.localidade);
   form.append("estado", payload.uf);
 
-  if (payload.latitude && payload.longitude) {
+  if (payload.latitude != null && payload.longitude != null) {
     form.append("latitude", String(payload.latitude));
     form.append("longitude", String(payload.longitude));
   }
@@ -75,7 +75,7 @@ export async function listarDenunciasAdmin(
   tamanho: number = 10
 ): Promise<PageResponse<DenunciaResponse>> {
   const token = getToken();
-  const res = await fetch(`${API_BASE}/denuncia?page=${pagina}&size=${tamanho}`, {
+  const res = await requisitar(`${API_BASE}/denuncia?page=${pagina}&size=${tamanho}`, {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
@@ -91,7 +91,7 @@ export async function atualizarDenunciaAdmin(
   payload: DenunciaUpdateRequest
 ): Promise<DenunciaResponse> {
   const token = getToken();
-  const res = await fetch(`${API_BASE}/denuncia/${idDenuncia}`, {
+  const res = await requisitar(`${API_BASE}/denuncia/${idDenuncia}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",

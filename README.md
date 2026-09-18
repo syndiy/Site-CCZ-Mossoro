@@ -1,209 +1,41 @@
 # Portal CCZ Mossoró
 
-Portal institucional do **Centro de Controle de Zoonoses de Mossoró**, da Vigilância em Saúde.
+Portal institucional com Next.js exportado como site estático e API Java Spring Boot. O painel operacional está em `/login` e `/admin`, dentro do próprio site.
 
-Site **100% estático** (Next.js com `output: "export"`), otimizado para SEO. Roda em qualquer
-hospedagem, sem servidor Node. O conteúdo é escrito num editor próprio e o serviço de denúncias
-conversa com um backend Spring Boot.
+As instruções de execução e hospedagem estão neste arquivo; o conteúdo editorial oficial fica em `content/`.
 
-## Como funciona
+## Executar localmente
 
-```mermaid
-flowchart LR
-    C["👤 Cidadão"]
-    EQ["👥 Equipe CCZ"]
+Requisitos: Node.js 20+, Java 21 para desenvolvimento do backend, ou Docker com Compose recente para o conjunto integrado.
 
-    subgraph front["Frontend (este repositório)"]
-        E["Editor de conteúdo<br/>admin/ (Node, porta 4001)"]
-        MD[("content/*.md<br/>artigos e notícias")]
-        S["Site estático<br/>out/ servido por nginx"]
-    end
-
-    subgraph back["Backend Spring Boot"]
-        API["API REST<br/>/denuncia"]
-        SEC["Spring Security<br/>login da equipe"]
-        DB[("PostgreSQL")]
-    end
-
-    EQ -->|escreve| E
-    E -->|"grava .md + commit no git"| MD
-    MD -->|npm run build| S
-    C -->|navega| S
-    C -->|"denúncia e protocolo"| API
-    API --> DB
-    SEC -->|"login da equipe (JWT)"| E
+```sh
+npm ci
+cp .env.deploy.example .env
+# Preencha as credenciais e ajuste o caminho do Java atualizado.
+docker compose up -d --build
 ```
 
-Duas coisas importantes nesse desenho:
+O Compose local publica site em localhost:4000 e API em localhost:8080. Se a porta estiver ocupada, ajuste o mapeamento. Para desenvolver somente o frontend, use `npm run dev` e configure `NEXT_PUBLIC_API_URL` com a API disponível. O diretório `admin/` é um editor local legado, não o painel de produção.
 
-- **O site não depende do editor nem do backend para ficar no ar.** Se os dois caírem, as páginas
-  continuam servidas normalmente, porque são HTML pronto.
-- **Publicar não atualiza o site sozinho.** O editor grava o `.md` e commita; o site só muda
-  depois de um `npm run build`.
+## Hospedar em uma VPS
 
-## Rodando
+Todos os componentes rodam juntos: Caddy com HTTPS, nginx com site estático, Java, PostgreSQL e MinIO. Configure `.env` com domínio, `CORS_ALLOWED_ORIGINS=https://seu-dominio`, senhas exclusivas e caminho do backend corrigido.
 
-```bash
-npm install
-npm run dev      # site em http://localhost:3000
-npm run build    # gera o site estático em ./out
+```sh
+docker compose -f docker-compose.yml -f docker-compose.vps.yml up -d --build
+```
+
+A API fica em `/api` na mesma URL do site. DNS deve apontar para o servidor, com portas 80/443 liberadas. Administrador inicial: `admin@ccz.gov.br`, senha definida em `ADMIN_DEFAULT_PASSWORD`.
+
+Banco e imagens usam volumes persistentes. Não execute `down -v` com dados reais; mantenha backup externo. O Java indicado está em `../_ccz-back-mvp`, derivado de origin/feat/conteudo com as correções da auditoria. Leve essa versão ao servidor.
+
+## Verificar
+
+```sh
+npm test
 npm run lint
-npm test         # testes unitários do front e do contrato do editor
+npx tsc --noEmit
+npm run build
 ```
 
-Para configurar o front local, copie `.env.example` para `.env.local`. Use
-`NEXT_PUBLIC_SIMULATE=1` apenas para demonstrar o formulário sem uma API real.
-
-Editor de conteúdo (app separado, precisa de servidor Node):
-
-```bash
-cd admin
-npm install
-npm run dev      # editor em http://localhost:4001
-```
-
-O admin é um editor demonstrativo local: ele grava Markdown e imagens no repositório e cria
-commits para manter o histórico. Ele ainda não publica sozinho nem substitui a integração com o
-backend; depois de revisar uma alteração, rode `npm run build` no front para gerar o site estático.
-Defina `ADMIN_PASSWORD` e `ADMIN_SESSION_SECRET` no `admin/.env.local` usando
-[`admin/.env.example`](admin/.env.example).
-
-Tudo junto com o backend e o banco:
-
-```bash
-docker compose up --build   # site :4000, API :8080, Postgres :5432
-```
-
-> O compose espera o backend clonado como pasta irmã (`../SiteInstitucionalCCZ-BackEnd`).
-> Só o site: `docker compose up --build frontend`.
-
-## Estrutura
-
-```
-src/
-  app/          rotas: page.tsx, services/, news/, articles/, reports/
-                about/, contact/, accessibility/, privacy/
-                sitemap.ts, robots.ts, manifest.ts
-  components/   layout, home, cards, forms, maps, ui, widgets
-  lib/
-    site.ts     ⚙️ dados institucionais (contato, endereço, domínio)
-    cms/        leitura dos .md de content/
-    api/        🔌 integração com o backend Spring (denúncias, conteúdo, usuários)
-    types/      contratos (DTOs) espelhados do backend
-    seo.ts      metadata + JSON-LD
-content/
-  articles/     artigos de educação em saúde
-  news/         campanhas, mutirões e avisos
-src/app/admin/  painel de conteúdo servido pelo próprio site (ver abaixo)
-admin/          editor de conteúdo e triagem (app Next.js separado)
-  src/app/      /            conteúdo do site
-                /denuncias/  denúncias recebidas e andamento dos protocolos
-                /login/      login da equipe
-  src/lib/      backend.ts   🔌 cliente do Spring (auth, usuários, denúncias)
-                jwt.ts       validação local do token
-public/img/     imagens e ilustrações
-docs/           CONTEUDO.md, guia de quem escreve
-```
-
-## Painel de conteúdo (`/admin`)
-
-Painel servido pelo próprio site, que grava direto no backend Spring. É o caminho
-para a equipe publicar sem depender de commit no repositório.
-
-| Rota | Para que serve |
-| --- | --- |
-| `/login` | entrada da equipe (e-mail e senha do backend) |
-| `/cadastro` | primeiro acesso de quem já teve o CPF liberado |
-| `/admin/noticias`, `/admin/artigos` | lista, publica, despublica e exclui |
-| `/admin/noticias/novo` | escreve uma publicação nova |
-| `/admin/noticias/editar?slug=...` | edita uma publicação existente |
-| `/admin/destaques` | escolhe e ordena o que aparece na home |
-
-O site é exportado estaticamente, então as publicações **não existem como página no
-build**: o slug da edição vai no query string (`?slug=`), e não no caminho, porque o
-Next precisaria conhecer todos os slugs antes de eles serem criados.
-
-### Como a publicação chega ao site
-
-O que a equipe publica aparece no portal **na hora**, sem esperar um novo deploy:
-
-1. As páginas `/news/` e `/articles/` trazem, no HTML do build, o conteúdo de `content/`.
-2. Já no navegador, elas perguntam ao backend o que foi publicado depois disso e mostram
-   essas publicações numa seção "Publicado recentemente".
-3. Quem clica numa delas abre `/news/ver/?slug=...`, que lê o texto direto do backend.
-
-Essas rotas de leitura ficam **fora do índice de busca** (`robots: noindex`): o endereço
-definitivo de uma notícia é `/news/<slug>/`, que nasce no build seguinte. Ou seja, o SEO
-continua vindo do site estático — a leitura ao vivo existe para o conteúdo não ficar
-invisível enquanto o próximo build não acontece.
-
-Com `NEXT_PUBLIC_API_URL` vazia, ou com a API fora do ar, nada disso aparece e o site
-serve apenas o conteúdo do build. O visitante nunca vê erro técnico.
-
-> **Atenção — dois editores no repositório.** `src/app/admin/` (acima) fala com o
-> backend e guarda o token no navegador. `admin/` é o app separado da porta 4001, que
-> grava Markdown em `content/` e valida o JWT no servidor. Os dois funcionam, mas têm
-> logins independentes; a unificação ainda está em aberto.
-
-## Conteúdo
-
-Artigos e notícias são arquivos Markdown em `content/`, com um cabeçalho de metadados.
-O campo `draft` decide se aparece no site: `true` fica só no editor, `false` vai ao ar.
-Isso vale para o editor `admin/`; o painel `/admin` grava as publicações no backend.
-
-Detalhes em [docs/CONTEUDO.md](docs/CONTEUDO.md).
-
-## Backend Spring
-
-Toda a comunicação está isolada em [`src/lib/api.ts`](src/lib/api.ts). Nenhum componente de UI
-chama a API direto.
-
-| Ação | Endpoint |
-| --- | --- |
-| Enviar denúncia (multipart, com foto) | `POST /denuncia` |
-| Consultar protocolo | `GET /denuncia/{id}` |
-| Login da equipe (editor) | `POST /users/login` |
-| Triagem: listar denúncias (editor) | `GET /denuncia` |
-| Triagem: mudar o andamento (editor) | `PUT /denuncia/{id}` |
-
-> As rotas de denúncia ainda caem no `anyRequest().denyAll()` do `SecurityConfig`. Enquanto isso
-> não mudar no backend, a tela de triagem carrega e explica o 403 em vez de quebrar.
-
-Variáveis de ambiente no build:
-
-| Variável | Para que serve |
-| --- | --- |
-| `NEXT_PUBLIC_API_URL` | Endereço da API. Ex.: `http://localhost:8080` |
-| `NEXT_PUBLIC_SIMULATE` | `1` gera protocolo falso no navegador, sem backend. Útil para demonstrar a UI. |
-
-## Login da equipe
-
-O editor autentica no **Spring Security do backend**, com usuário individual por pessoa.
-
-```
-POST /users/login  { email, password }  ->  { token }   # JWT HS256, 4h
-```
-
-O token vai para um cookie `httpOnly` e é validado localmente a cada navegação
-([`admin/src/lib/jwt.ts`](admin/src/lib/jwt.ts)): assinatura, emissor e validade. O editor não
-guarda senha nenhuma. O cliente do backend fica isolado em
-[`admin/src/lib/backend.ts`](admin/src/lib/backend.ts), espelhando os DTOs do Spring.
-
-| Variável (em `admin/.env.local`) | Para que serve |
-| --- | --- |
-| `CCZ_API_URL` | Endereço da API. Definida, liga o login por usuário. |
-| `CCZ_JWT_SECRET` | Mesmo segredo do `JwtTokenService` no backend. |
-| `CCZ_JWT_ISSUER` | Emissor do token. Padrão: `SiteInstitucionalCcz`. |
-
-Sem `CCZ_API_URL`, o editor cai no modo local antigo: senha única em `ADMIN_PASSWORD`, útil para
-mexer no editor sem subir o backend. Sem nenhuma das duas, ninguém entra.
-
-Quem entra no sistema é decidido pelo backend em duas etapas: um administrador libera o CPF em
-`POST /allowedEmployee` e a pessoa só então consegue ter usuário criado.
-
-## Acessibilidade e SEO
-
-Conformidade-alvo **eMAG** e **WCAG 2.1 AA**, obrigatórias para portais públicos: navegação por
-teclado, foco visível, "pular para o conteúdo", HTML semântico, VLibras e barra de contraste.
-No SEO, HTML pré-renderizado, metadata por página, `sitemap.xml`, `robots.txt` e JSON-LD de
-`GovernmentOrganization`, `WebSite` e `BreadcrumbList`.
+Conteúdo novo do painel aparece ao vivo sem rebuild. Notícias e artigos Markdown existentes continuam no build; a rota ao vivo atende publicações novas sem alterar o build estático.

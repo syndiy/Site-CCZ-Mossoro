@@ -7,7 +7,7 @@
  * build. Se a API estiver fora do ar, o visitante continua vendo o conteúdo do
  * build — por isso toda falha aqui devolve lista vazia em vez de estourar.
  */
-import { API_BASE } from "@/lib/api/apiClient";
+import { API_BASE, getImageUrl } from "@/lib/api/apiClient";
 import type { ArticleMeta, NewsMeta } from "@/lib/cms";
 import type { ColecaoConteudo, ConteudoListResponse } from "@/lib/types/conteudo";
 
@@ -24,7 +24,7 @@ function base(item: ItemPublicado) {
   return {
     slug: item.slug,
     title: item.titulo,
-    cover: item.imagemCapaUrl || null,
+    cover: item.imagemCapaUrl ? getImageUrl(item.imagemCapaUrl) : null,
     coverAlt: item.titulo,
     publishedAt: (item.dataPublicacao || item.dataModificacao || "").slice(0, 10),
     tags: [] as string[],

@@ -1,3 +1,4 @@
+import { InstitutionalText } from "@/components/layout/institutional-links";
 import type { Metadata } from "next";
 import { Container } from "@/components/layout/container";
 import { SectionHeading } from "@/components/layout/section-heading";
@@ -40,7 +41,7 @@ export default function SobrePage() {
 
         <div className="mx-auto max-w-[70ch]">
           <p className="text-lg text-ink-soft">
-            O {site.legalName} é uma unidade da {site.department}, ligada à {site.parentOrg}.
+            O <InstitutionalText field="name" /> é uma unidade da {site.department}, ligada à {site.parentOrg}.
             Oficialmente, a unidade é chamada de Unidade de Vigilância em Zoonoses (UVZ).
           </p>
 
@@ -62,9 +63,9 @@ export default function SobrePage() {
 
           <h2 className="mt-12 text-2xl font-bold">Onde estamos</h2>
           <p className="mt-3 text-ink-soft">
-            {site.address.street}, {site.address.district}, {site.address.city}/{site.address.state}.
+            <InstitutionalText field="address" />.
             <br />
-            {site.hours.label}.
+            <InstitutionalText field="hours" />.
           </p>
 
           <div className="mt-10 flex flex-wrap gap-4">

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { criarUsuario } from "@/lib/api/usuarioApi";
 
@@ -53,7 +53,7 @@ export function RegisterEditorForm() {
     <div className="flex items-center justify-center min-h-[80vh] p-4">
       <Card className="w-full max-w-lg shadow-lg">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold tracking-tight">Cadastro de Editor</CardTitle>
+          <h1 className="text-2xl font-bold tracking-tight">Cadastro de Editor</h1>
           <CardDescription>
             Preencha seus dados para criar sua conta. Seu CPF deve estar previamente autorizado pelo administrador.
           </CardDescription>

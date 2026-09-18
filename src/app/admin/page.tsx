@@ -8,9 +8,12 @@ import { DenunciasManager } from "@/components/admin/denuncias-manager";
 import { EditorsManager } from "@/components/admin/editors-manager";
 // 1. Importação adicionada
 import { GlobalConfigManager } from "@/components/admin/global-config-manager"; 
+import { useAdminSession } from "@/components/admin/auth-guard";
 
 export default function AdminDashboard() {
   const router = useRouter();
+  const session = useAdminSession();
+  const isAdministrator = session?.roles.includes("ROLE_ADMINISTRATOR");
   const [autorizado, setAutorizado] = useState(false);
   
   // 2. Estado atualizado para incluir "configuracoes"
@@ -43,11 +46,11 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-muted/30 p-6 md:p-10">
+    <div className="bg-muted/30 sm:p-6 md:p-10">
       <div className="max-w-7xl mx-auto flex flex-col gap-6">
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Painel do CCZ (Admin)</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Painel do CCZ</h1>
             <p className="text-sm text-muted-foreground mt-1">
               Centro de Controle de Zoonoses — Sistema de Gestão
             </p>
@@ -68,7 +71,7 @@ export default function AdminDashboard() {
           >
             Gestão de Ocorrências
           </button>
-          <button
+          {isAdministrator && <button
             onClick={() => setAbaAtiva("servidores")}
             className={`pb-3 border-b-2 transition-colors ${
               abaAtiva === "servidores" 
@@ -77,8 +80,8 @@ export default function AdminDashboard() {
             }`}
           >
             Servidores Autorizados
-          </button>
-          <button
+          </button>}
+          {isAdministrator && <button
             onClick={() => setAbaAtiva("editores")}
             className={`pb-3 border-b-2 transition-colors ${
               abaAtiva === "editores" 
@@ -87,7 +90,7 @@ export default function AdminDashboard() {
             }`}
           >
             Editores Cadastrados
-          </button>
+          </button>}
           
           {/* 3. Botão do menu adicionado */}
           <button
@@ -104,13 +107,13 @@ export default function AdminDashboard() {
 
         {abaAtiva === "denuncias" && <DenunciasManager />}
 
-        {abaAtiva === "servidores" && (
+        {isAdministrator && abaAtiva === "servidores" && (
           <div className="animate-in fade-in duration-300">
             <AllowedEmployeesManager />
           </div>
         )}
 
-        {abaAtiva === "editores" && (
+        {isAdministrator && abaAtiva === "editores" && (
           <div className="animate-in fade-in duration-300">
             <EditorsManager />
           </div>

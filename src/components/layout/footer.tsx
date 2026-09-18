@@ -1,5 +1,7 @@
+"use client";
+
 import Link from "next/link";
-import { site } from "@/lib/site";
+import { useSiteConfig } from "./site-config-provider";
 import { services } from "@/lib/content";
 import { Container } from "./container";
 import { Icon } from "@/components/shared/icon";
@@ -13,6 +15,7 @@ function Heading({ children }: { children: string }) {
 }
 
 export function Footer() {
+  const site = useSiteConfig();
   return (
     <footer className="mt-24 bg-brand-900 text-gray-300">
       <Container className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-12 py-16">

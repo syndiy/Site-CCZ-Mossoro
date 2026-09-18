@@ -1,3 +1,4 @@
+import { InstitutionalText, InstitutionalEmailLink } from "@/components/layout/institutional-links";
 import type { Metadata } from "next";
 import { Container } from "@/components/layout/container";
 import { site } from "@/lib/site";
@@ -16,7 +17,7 @@ export default function PrivacyPage() {
         <article className="max-w-[70ch]">
           <h1 className="mb-5 text-4xl font-bold">Privacidade e proteção de dados</h1>
           <p className="mb-3 text-ink-soft">
-            Esta página explica como o {site.legalName} trata os dados pessoais coletados neste
+            Esta página explica como o <InstitutionalText field="name" /> trata os dados pessoais coletados neste
             portal, conforme a Lei nº 13.709/2018 (Lei Geral de Proteção de Dados, a LGPD).
           </p>
 
@@ -38,9 +39,7 @@ export default function PrivacyPage() {
           <p className="mb-3 text-ink-soft">
             Você pode pedir informações sobre o uso dos seus dados, sua correção ou exclusão. Para
             isso, entre em contato pelo e-mail{" "}
-            <a href={`mailto:${site.contact.email}`} className="text-brand-600 hover:underline">
-              {site.contact.email}
-            </a>
+            <InstitutionalEmailLink className="text-brand-600 hover:underline" />
             .
           </p>
 

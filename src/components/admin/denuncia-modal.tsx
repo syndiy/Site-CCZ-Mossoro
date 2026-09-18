@@ -151,6 +151,16 @@ export function DenunciaModal({ denuncia, open, onClose, onUpdateSuccess }: Prop
               <br />
               {denuncia.bairro} — {denuncia.cidade}/{denuncia.estado}
             </p>
+            {denuncia.latitude != null && denuncia.longitude != null ? (
+              <a
+                href={`https://www.google.com/maps?q=${denuncia.latitude},${denuncia.longitude}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 inline-block font-medium text-primary underline"
+              >
+                Abrir ponto marcado no mapa
+              </a>
+            ) : null}
           </div>
         </div>
 

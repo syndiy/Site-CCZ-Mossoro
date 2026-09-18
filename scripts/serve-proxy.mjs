@@ -24,14 +24,14 @@ const MIME = {
 };
 
 function isBackendPath(path) {
-  return path === "/denuncia" || path.startsWith("/denuncia/");
+  return path.startsWith("/api/") || path === "/denuncia" || path.startsWith("/denuncia/");
 }
 
 function proxy(req, res) {
   const options = {
     host: BACKEND.host,
     port: BACKEND.port,
-    path: req.url,
+    path: req.url.startsWith("/api/") ? req.url.slice(4) : req.url,
     method: req.method,
     headers: { ...req.headers, host: `${BACKEND.host}:${BACKEND.port}` },
   };

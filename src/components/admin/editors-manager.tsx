@@ -1,5 +1,7 @@
 "use client";
 
+import { API_BASE, requisitar } from "@/lib/api/apiClient";
+
 import { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,7 +31,7 @@ export function EditorsManager() {
     setErro("");
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:8080/users/list", {
+      const res = await requisitar(`${API_BASE}/users/list`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -66,7 +68,7 @@ export function EditorsManager() {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`http://localhost:8080/users/${id}`, {
+      const res = await requisitar(`${API_BASE}/users/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -98,14 +100,15 @@ export function EditorsManager() {
     setSalvando(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`http://localhost:8080/users/${editorEmEdicao.id}`, {
+      const res = await requisitar(`${API_BASE}/users`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          name: nomeForm,
+          id: editorEmEdicao.id,
+          username: nomeForm,
           email: emailForm,
         }),
       });

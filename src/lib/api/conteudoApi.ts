@@ -8,13 +8,17 @@ import {
 } from "../types/conteudo";
 
 export async function listarConteudo(colecao: ColecaoConteudo): Promise<ConteudoListResponse[]> {
-  const res = await requisitar(`${API_BASE}/conteudo/${colecao}`);
+  const res = await requisitar(`${API_BASE}/conteudo/${colecao}`, {
+    headers: getToken() ? { Authorization: `Bearer ${getToken()}` } : {},
+  });
   if (!res.ok) throw new Error(`Erro ao listar ${colecao}.`);
   return (await res.json()) as ConteudoListResponse[];
 }
 
 export async function buscarConteudoPorSlug(colecao: ColecaoConteudo, slug: string): Promise<ConteudoCompletoResponse> {
-  const res = await requisitar(`${API_BASE}/conteudo/${colecao}/${slug}`);
+  const res = await requisitar(`${API_BASE}/conteudo/${colecao}/${encodeURIComponent(slug)}`, {
+    headers: getToken() ? { Authorization: `Bearer ${getToken()}` } : {},
+  });
   if (!res.ok) throw new Error("Conteúdo não encontrado.");
   return (await res.json()) as ConteudoCompletoResponse;
 }
@@ -29,6 +33,7 @@ export async function criarConteudo(colecao: ColecaoConteudo, payload: ConteudoR
     },
     body: JSON.stringify(payload),
   });
+  if (res.status === 409) throw new Error("Já existe conteúdo com esse título. Escolha outro título.");
   if (!res.ok) throw new Error(`Erro ao criar registro em ${colecao}.`);
   return (await res.json()) as ConteudoListResponse;
 }
@@ -43,6 +48,7 @@ export async function editarConteudo(colecao: ColecaoConteudo, slug: string, pay
     },
     body: JSON.stringify(payload),
   });
+  if (res.status === 409) throw new Error("Já existe conteúdo com esse título. Escolha outro título.");
   if (!res.ok) throw new Error("Erro ao editar conteúdo.");
   return (await res.json()) as ConteudoListResponse;
 }

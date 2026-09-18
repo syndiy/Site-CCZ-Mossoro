@@ -7,6 +7,7 @@ export const getImageUrl = (path: string | null): string => {
   if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("data:")) {
     return path;
   }
+  if (API_BASE.startsWith("/") && path.startsWith(`${API_BASE}/`)) return path;
   const baseUrl = API_BASE.replace(/\/+$/, "");
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
   return `${baseUrl}${normalizedPath}`;
@@ -25,9 +26,15 @@ export const getToken = (): string | null => {
  * do ar ou o endereco errado em NEXT_PUBLIC_API_URL.
  */
 export async function requisitar(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+  let response: Response;
   try {
-    return await fetch(input, init);
+    response = await fetch(input, init);
   } catch {
     throw new Error("Não foi possível falar com o servidor. Verifique se a API está no ar.");
   }
+  if (response.status === 401 && new Headers(init?.headers).has("Authorization")) {
+    if (typeof window !== "undefined") window.dispatchEvent(new Event("ccz-session-expired"));
+    throw new Error("Sua sessão expirou. Entre novamente no painel.");
+  }
+  return response;
 }

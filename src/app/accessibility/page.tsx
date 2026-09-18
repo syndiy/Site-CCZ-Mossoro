@@ -1,3 +1,4 @@
+import { InstitutionalText, InstitutionalEmailLink } from "@/components/layout/institutional-links";
 import type { Metadata } from "next";
 import { Container } from "@/components/layout/container";
 import { site } from "@/lib/site";
@@ -16,7 +17,7 @@ export default function AccessibilityPage() {
         <article className="max-w-[70ch]">
           <h1 className="mb-5 text-4xl font-bold">Acessibilidade</h1>
           <p className="mb-3 text-ink-soft">
-            O portal do {site.legalName} é feito para ser acessível ao maior número possível de
+            O portal do <InstitutionalText field="name" /> é feito para ser acessível ao maior número possível de
             pessoas, seguindo o Modelo de Acessibilidade em Governo Eletrônico (eMAG) e as
             diretrizes internacionais WCAG 2.1, nível AA.
           </p>
@@ -38,9 +39,7 @@ export default function AccessibilityPage() {
           <ul className="list-disc space-y-2 pl-5 text-ink-soft">
             <li>
               E-mail:{" "}
-              <a href={`mailto:${site.contact.email}`} className="text-brand-600 hover:underline">
-                {site.contact.email}
-              </a>
+              <InstitutionalEmailLink className="text-brand-600 hover:underline" />
             </li>
             <li>
               Telefone:{" "}

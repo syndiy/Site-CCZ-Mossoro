@@ -29,6 +29,8 @@ export interface DenunciaResponse {
   cep: string;
   cidade: string;
   estado: string;
+  latitude?: number | null;
+  longitude?: number | null;
 }
 
 export interface DenunciaUpdateRequest {

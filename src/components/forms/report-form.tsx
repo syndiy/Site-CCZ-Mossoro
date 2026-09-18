@@ -216,7 +216,6 @@ export function ReportForm() {
     if (!logradouro.trim()) next.logradouro = "Informe a rua.";
     if (!localidade.trim()) next.localidade = "Informe a cidade.";
     if (!uf.trim()) next.uf = "Informe a UF.";
-    if (!imagem) next.imagem = "Anexe uma foto da ocorrência.";
     setErrors(next);
     if (Object.keys(next).length > 0) return;
 
@@ -262,7 +261,15 @@ export function ReportForm() {
             Nossa equipe vai analisar a ocorrência. Se você informou um telefone, poderá receber um
             retorno.
           </p>
-          <Button variant="outline" onClick={() => setResultado(null)}>
+          <Button variant="outline" onClick={() => {
+            cepRequest.current += 1;
+            ultimoCepConsultado.current = "";
+            setTipo(""); setDescricao(""); setNome(""); setTelefone("");
+            setCep(""); setLogradouro(""); setNumero(""); setComplemento(""); setBairro("");
+            setLocalidade(site.address.city); setUf(site.address.state);
+            setImagem(null); setPreview(""); setPonto(null); setAviso("");
+            setErrors({}); setErroEnvio(""); setResultado(null);
+          }}>
             Registrar outra denúncia
           </Button>
         </CardContent>
@@ -432,7 +439,7 @@ export function ReportForm() {
           </section>
 
           <section className="border-t border-border pt-8">
-            <Step number={3} title="Foto da ocorrência" />
+            <Step number={3} title="Foto da ocorrência (opcional)" />
             <Label
               htmlFor="imagem"
               className={cn(
@@ -458,7 +465,7 @@ export function ReportForm() {
                   />
                   <span>
                     <strong className="text-brand-800">Clique para anexar</strong> uma foto da
-                    ocorrência <span className="text-destructive">*</span>
+                    ocorrência (opcional)
                   </span>
                 </>
               )}
@@ -519,6 +526,7 @@ export function ProtocolLookup() {
   const [carregando, setCarregando] = useState(false);
   const [resultado, setResultado] = useState<DenunciaDetalhe | null>(null);
   const [naoEncontrado, setNaoEncontrado] = useState(false);
+  const [erroConsulta, setErroConsulta] = useState("");
 
   async function consultar(e: React.FormEvent) {
     e.preventDefault();
@@ -530,12 +538,13 @@ export function ProtocolLookup() {
     setCarregando(true);
     setResultado(null);
     setNaoEncontrado(false);
+    setErroConsulta("");
     try {
       const res = await buscarDenuncia(protocolo);
       if (res) setResultado(res);
       else setNaoEncontrado(true);
     } catch {
-      setNaoEncontrado(true);
+      setErroConsulta("Não foi possível consultar agora. Confira sua conexão e tente novamente.");
     } finally {
       setCarregando(false);
     }
@@ -566,6 +575,7 @@ export function ProtocolLookup() {
           </Button>
         </form>
 
+        {erroConsulta ? <p className="mt-5 text-destructive" role="alert">{erroConsulta}</p> : null}
         {resultado ? (
           <p className="mt-5 inline-flex flex-wrap items-center justify-center gap-2">
             Denúncia <strong>#{resultado.protocolo ?? resultado.idDenuncia}</strong>

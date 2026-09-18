@@ -4,11 +4,13 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { nav, site, whatsappUrl } from "@/lib/site";
+import { useSiteConfig } from "./site-config-provider";
+import { nav, whatsappUrl } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { Icon } from "@/components/shared/icon";
 
 export function Header() {
+  const site = useSiteConfig();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [rolou, setRolou] = useState(false);
@@ -114,7 +116,7 @@ export function Header() {
               <Icon name="mail" size={18} /> E-mail
             </a>
             <a
-              href={whatsappUrl("Olá, gostaria de informações do CCZ Mossoró.")}
+              href={whatsappUrl("Olá, gostaria de informações do CCZ Mossoró.", site.contact.whatsapp)}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-success-600 px-4 text-sm font-semibold text-white no-underline transition-colors hover:brightness-110"

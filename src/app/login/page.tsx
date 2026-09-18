@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { loginUsuario } from "@/lib/api/usuarioApi";
 
@@ -39,7 +39,7 @@ export default function LoginPage() {
     <div className="flex min-h-[60vh] items-center justify-center p-4">
       <Card className="w-full max-w-md rounded-2xl shadow-card">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">Acesso Restrito</CardTitle>
+          <h1 className="text-2xl font-bold">Acesso Restrito</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Área exclusiva para funcionários do CCZ.
           </p>
@@ -52,6 +52,7 @@ export default function LoginPage() {
               <Input
                 id="email"
                 type="email"
+                autoComplete="username"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -64,6 +65,7 @@ export default function LoginPage() {
               <Input
                 id="password"
                 type="password"
+                autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
