@@ -5,69 +5,120 @@ import { notFound } from "next/navigation";
 import { Container } from "@/components/layout/container";
 import { ButtonLink } from "@/components/layout/button-link";
 import { JsonLd } from "@/components/shared/json-ld";
-import { Markdown } from "@/components/shared/markdown";
 import { breadcrumbJsonLd, contentArticleJsonLd } from "@/lib/seo";
-import { getNews, getNewsSlugs, formatDate } from "@/lib/cms";
+import { formatDate } from "@/lib/cms";
 
-export const dynamicParams = false;
-
-export function generateStaticParams() {
-  return getNewsSlugs().map((slug) => ({ slug }));
+interface ConteudoCompletoResponse {
+  titulo: string;
+  slug: string;
+  resumo?: string | null;
+  corpo: string;
+  imagemCapaUrl?: string | null;
+  status: "RASCUNHO" | "PUBLICADO";
+  ordemDestaque?: number | null;
+  dataModificacao?: string;
+  dataPublicacao?: string;
 }
 
-export async function generateMetadata({
-  params,
-}: {
+type Props = {
   params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
+};
+
+// Busca os dados da notícia na API do Spring Boot
+async function getNoticiaBackend(slug: string): Promise<ConteudoCompletoResponse | null> {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+    const res = await fetch(`${baseUrl}/conteudo/noticias/${slug}`, {
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      if (res.status === 404) return null;
+      console.error(`[API Error] Status: ${res.status}`);
+      return null;
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error("Erro ao conectar com a API de notícias:", error);
+    return null;
+  }
+}
+
+// SEO Dinâmico gerado via API
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const doc = getNews(slug);
-  if (!doc) return {};
+  const noticia = await getNoticiaBackend(slug);
+
+  if (!noticia || noticia.status !== "PUBLICADO") {
+    return { title: "Notícia não encontrada" };
+  }
+
+  const descricaoLimpa = noticia.resumo
+    ? noticia.resumo
+    : noticia.corpo.replace(/<[^>]*>/g, "").slice(0, 160) + "...";
+
+  const dataPublicacaoOuModificacao = noticia.dataPublicacao || noticia.dataModificacao || undefined;
+
   return {
-    title: doc.meta.title,
-    description: doc.meta.excerpt,
-    alternates: { canonical: `/news/${doc.meta.slug}/` },
+    title: `${noticia.titulo} | CCZ Mossoró`,
+    description: descricaoLimpa,
+    alternates: { canonical: `/news/${noticia.slug}/` },
     openGraph: {
       type: "article",
-      title: doc.meta.title,
-      description: doc.meta.excerpt,
-      url: `/news/${doc.meta.slug}/`,
-      publishedTime: doc.meta.publishedAt || undefined,
-      tags: doc.meta.tags,
-      images: doc.meta.cover ? [doc.meta.cover] : undefined,
+      title: noticia.titulo,
+      description: descricaoLimpa,
+      url: `/news/${noticia.slug}/`,
+      publishedTime: dataPublicacaoOuModificacao,
+      images: noticia.imagemCapaUrl ? [noticia.imagemCapaUrl] : undefined,
     },
-    twitter: { card: "summary_large_image", title: doc.meta.title, description: doc.meta.excerpt },
+    twitter: {
+      card: "summary_large_image",
+      title: noticia.titulo,
+      description: descricaoLimpa,
+    },
   };
 }
 
-export default async function NewsPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function NewsPage({ params }: Props) {
   const { slug } = await params;
-  const doc = getNews(slug);
-  if (!doc) notFound();
+  const noticia = await getNoticiaBackend(slug);
 
-  const { meta, body } = doc;
+  // Redireciona para 404 se a notícia não existir no banco ou não estiver publicada
+  if (!noticia || noticia.status !== "PUBLICADO") {
+    notFound();
+  }
+
+  const dataExibicao = noticia.dataPublicacao || noticia.dataModificacao || "";
+  const coverUrl = noticia.imagemCapaUrl ?? null;
+  const descricaoTexto = noticia.resumo
+    ? noticia.resumo
+    : noticia.corpo.replace(/<[^>]*>/g, "").slice(0, 160);
 
   return (
     <article className="py-12 lg:py-20">
+      {/* Schemas de SEO para Motores de Busca */}
       <JsonLd
         data={contentArticleJsonLd({
           type: "NewsArticle",
-          title: meta.title,
-          description: meta.excerpt,
-          path: `/news/${meta.slug}/`,
-          cover: meta.cover,
-          publishedAt: meta.publishedAt,
-          tags: meta.tags,
+          title: noticia.titulo,
+          description: descricaoTexto,
+          path: `/news/${noticia.slug}/`,
+          cover: coverUrl,
+          publishedAt: dataExibicao,
+          tags: [],
         })}
       />
       <JsonLd
         data={breadcrumbJsonLd([
           { name: "Início", path: "/" },
           { name: "Notícias", path: "/news/" },
-          { name: meta.title, path: `/news/${meta.slug}/` },
+          { name: noticia.titulo, path: `/news/${noticia.slug}/` },
         ])}
       />
+
       <Container>
+        {/* Trilha de Navegação */}
         <nav aria-label="Trilha de navegação" className="mb-8 text-sm text-muted-foreground">
           <Link href="/" className="hover:text-brand-600">
             Início
@@ -77,38 +128,51 @@ export default async function NewsPage({ params }: { params: Promise<{ slug: str
             Notícias
           </Link>
           <span className="mx-2">/</span>
-          <span className="text-ink">{meta.title}</span>
+          <span className="text-ink">{noticia.titulo}</span>
         </nav>
 
+        {/* Cabeçalho */}
         <header className="max-w-3xl">
-          {meta.publishedAt ? (
+          {dataExibicao ? (
             <span className="text-xs font-semibold uppercase tracking-widest text-brand-600">
-              {formatDate(meta.publishedAt)}
+              {formatDate(dataExibicao)}
             </span>
           ) : null}
-          <h1 className="mt-3 text-4xl font-bold md:text-5xl">{meta.title}</h1>
-          <p className="mt-5 text-lg text-ink-soft">{meta.excerpt}</p>
+          <h1 className="mt-3 text-4xl font-bold md:text-5xl">{noticia.titulo}</h1>
+          {noticia.resumo && (
+            <p className="mt-5 text-lg text-ink-soft">{noticia.resumo}</p>
+          )}
         </header>
 
-        {meta.cover ? (
-          <div className="relative mt-8 aspect-video w-full max-w-3xl overflow-hidden rounded-2xl border border-line/70 bg-info-50">
+        {/* Imagem de Capa */}
+        {noticia.imagemCapaUrl ? (
+          <div className="relative mt-8 aspect-video w-full max-w-3xl overflow-hidden rounded-2xl border border-line/70 bg-info-50 shadow-soft">
             <Image
-              src={meta.cover}
-              alt={meta.coverAlt}
+              src={noticia.imagemCapaUrl}
+              alt={`Capa da notícia: ${noticia.titulo}`}
               fill
+              priority
               sizes="(max-width: 768px) 100vw, 768px"
-              className="object-contain p-8"
+              className="object-cover"
             />
           </div>
         ) : null}
 
+        {/* Corpo do Texto (HTML vindo do Editor RichText) */}
         <div className="mt-10 max-w-3xl">
-          <Markdown>{body}</Markdown>
+          <div
+            className="prose prose-lg max-w-none leading-relaxed text-ink-soft 
+                       prose-headings:font-bold prose-headings:text-ink 
+                       prose-a:text-brand-600 hover:prose-a:text-brand-700 
+                       prose-img:rounded-xl prose-strong:text-ink"
+            dangerouslySetInnerHTML={{ __html: noticia.corpo }}
+          />
         </div>
 
+        {/* Botão de Voltar */}
         <div className="mt-12 max-w-3xl">
           <ButtonLink href="/news/" variant="outline">
-            ← Voltar para as notícias
+            &larr; Voltar para as notícias
           </ButtonLink>
         </div>
       </Container>

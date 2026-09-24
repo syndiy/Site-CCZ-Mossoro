@@ -3,7 +3,6 @@ import { Container } from "@/components/layout/container";
 import { JsonLd } from "@/components/shared/json-ld";
 import { ContentCard, ContentGrid } from "@/components/cards/content-card";
 import { breadcrumbJsonLd } from "@/lib/seo";
-import { getAllArticles } from "@/lib/cms";
 
 export const metadata: Metadata = {
   title: "Artigos",
@@ -12,8 +11,38 @@ export const metadata: Metadata = {
   alternates: { canonical: "/articles/" },
 };
 
-export default function ArtigosPage() {
-  const artigos = getAllArticles();
+// Interface alinhada com o DTO do Spring Boot
+interface ArtigoResponse {
+  slug: string;
+  titulo: string;
+  resumo: string;
+  imagemCapaUrl?: string | null; // O backend já devolve a URL completa
+  dataModificacao?: string;
+  autor?: string;
+}
+
+async function getArtigosBackend(): Promise<ArtigoResponse[]> {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+    
+    const res = await fetch(`${baseUrl}/conteudo/artigos?status=PUBLICADO`, {
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      console.error(`[API Error] Status: ${res.status}`);
+      return [];
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error("Erro de conexão com a API:", error);
+    return [];
+  }
+}
+
+export default async function ArtigosPage() {
+  const artigos = await getArtigosBackend();
 
   return (
     <div className="py-12 lg:py-20">
@@ -41,15 +70,16 @@ export default function ArtigosPage() {
           <div className="mt-12">
             <ContentGrid>
               {artigos.map((artigo) => (
-                <li key={artigo.slug}>
+                <li key={artigo.slug} className="flex w-full">
                   <ContentCard
                     href={`/articles/${artigo.slug}/`}
-                    title={artigo.title}
-                    summary={artigo.description}
-                    cover={artigo.cover}
-                    coverAlt={artigo.coverAlt}
-                    eyebrow={artigo.eyebrow}
-                    publishedAt={artigo.publishedAt}
+                    title={artigo.titulo}
+                    summary={artigo.resumo}
+                    // Repassa a URL diretamente; o fallback cuida caso seja nulo
+                    cover={artigo.imagemCapaUrl || null}
+                    coverAlt={`Capa do artigo sobre ${artigo.titulo}`}
+                    eyebrow="Artigo"
+                    publishedAt={artigo.dataModificacao}
                   />
                 </li>
               ))}
