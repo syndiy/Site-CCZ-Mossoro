@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { TiptapEditor } from "@/components/editor/tiptap-editor";
+import RichTextEditor from "@/components/textEditor/RichTextEditor";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -142,10 +142,10 @@ export function ConteudoForm({ colecao, dadosIniciais }: ConteudoFormProps) {
             )}
           </div>
 
-          {/* Editor Tiptap */}
+          {/* Editor CKEditor 5 */}
           <div className="flex flex-col gap-2">
             <label className="text-sm font-medium">Corpo do Texto</label>
-            <TiptapEditor content={corpo} onChange={setCorpo} />
+            <RichTextEditor value={corpo} onChange={setCorpo} />
           </div>
 
           {/* Ações */}

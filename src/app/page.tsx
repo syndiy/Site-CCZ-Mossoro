@@ -144,6 +144,16 @@ export default function HomePage() {
             </a>
           </InfoCard>
         </Container>
+        
+        {/* Botão de Acesso Restrito adicionado aqui */}
+        <Container className="mt-12 flex justify-center">
+          <Reveal delay={240}>
+            <ButtonLink href="/login" variant="secondary" size="sm">
+              <Icon name="shield" size={16} className="mr-2 inline-block" />
+              Acesso Restrito (Servidores)
+            </ButtonLink>
+          </Reveal>
+        </Container>
       </section>
     </>
   );

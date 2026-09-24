@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link"; // <-- Importação adicionada
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -75,9 +76,19 @@ export default function LoginPage() {
               </Alert>
             ) : null}
 
-            <Button type="submit" size="lg" disabled={carregando} className="mt-2 w-full">
-              {carregando ? "Autenticando..." : "Entrar"}
-            </Button>
+            <div className="flex flex-col gap-3 mt-2">
+              <Button type="submit" size="lg" disabled={carregando} className="w-full">
+                {carregando ? "Autenticando..." : "Entrar"}
+              </Button>
+              
+              {/* Botão/Link para a tela de cadastro adicionado aqui */}
+              <div className="text-center text-sm text-muted-foreground mt-2">
+                Ainda não possui acesso?{" "}
+                <Link href="/cadastro" className="font-semibold text-primary hover:underline">
+                  Cadastre-se como Editor
+                </Link>
+              </div>
+            </div>
           </form>
         </CardContent>
       </Card>

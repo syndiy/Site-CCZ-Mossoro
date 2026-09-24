@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -33,7 +34,6 @@ export function RegisterEditorForm() {
     try {
       await criarUsuario(formData);
       setSucesso(true);
-      // Limpar formulário após sucesso
       setFormData({
         username: "",
         email: "",
@@ -46,6 +46,30 @@ export function RegisterEditorForm() {
     } finally {
       setCarregando(false);
     }
+  }
+
+  if (sucesso) {
+    return (
+      <div className="flex items-center justify-center min-h-[80vh] p-4">
+        <Card className="w-full max-w-md shadow-lg text-center py-6">
+          <CardHeader className="space-y-3">
+            <CardTitle className="text-2xl font-bold text-emerald-600">
+              Cadastro Concluído!
+            </CardTitle>
+            <CardDescription className="text-base">
+              Sua conta de editor foi criada com sucesso. Você já pode acessar o painel.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-4">
+            <Link href="/login" className="w-full block">
+              <Button type="button" size="lg" className="w-full">
+                Ir para a tela de Login
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   return (
@@ -61,14 +85,6 @@ export function RegisterEditorForm() {
           {erro && (
             <Alert variant="destructive" className="mb-6">
               <AlertDescription>{erro}</AlertDescription>
-            </Alert>
-          )}
-
-          {sucesso && (
-            <Alert className="mb-6 bg-emerald-50 text-emerald-900 border-emerald-200">
-              <AlertDescription>
-                Cadastro realizado com sucesso! Você já pode fazer login no painel.
-              </AlertDescription>
             </Alert>
           )}
 
@@ -159,6 +175,13 @@ export function RegisterEditorForm() {
             <Button type="submit" className="w-full mt-6" disabled={carregando}>
               {carregando ? "Cadastrando..." : "Finalizar Cadastro"}
             </Button>
+            
+            <div className="text-center text-sm text-muted-foreground mt-4">
+              Já possui cadastro?{" "}
+              <Link href="/login" className="font-medium text-primary hover:underline">
+                Faça login
+              </Link>
+            </div>
           </form>
         </CardContent>
       </Card>

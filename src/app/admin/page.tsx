@@ -6,15 +6,16 @@ import { Button } from "@/components/ui/button";
 import { AllowedEmployeesManager } from "@/components/admin/allowed-employees-manager"; 
 import { DenunciasManager } from "@/components/admin/denuncias-manager";
 import { EditorsManager } from "@/components/admin/editors-manager";
-// 1. Importação adicionada
 import { GlobalConfigManager } from "@/components/admin/global-config-manager"; 
+import { AuditoriaManager } from "@/components/admin/auditoria-manager";
 
 export default function AdminDashboard() {
   const router = useRouter();
   const [autorizado, setAutorizado] = useState(false);
   
-  // 2. Estado atualizado para incluir "configuracoes"
-  const [abaAtiva, setAbaAtiva] = useState<"denuncias" | "servidores" | "editores" | "configuracoes">("denuncias");
+  const [abaAtiva, setAbaAtiva] = useState<
+    "denuncias" | "servidores" | "editores" | "configuracoes" | "auditoria"
+  >("denuncias");
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -88,8 +89,6 @@ export default function AdminDashboard() {
           >
             Editores Cadastrados
           </button>
-          
-          {/* 3. Botão do menu adicionado */}
           <button
             onClick={() => setAbaAtiva("configuracoes")}
             className={`pb-3 border-b-2 transition-colors ${
@@ -99,6 +98,16 @@ export default function AdminDashboard() {
             }`}
           >
             Configurações Globais
+          </button>
+          <button
+            onClick={() => setAbaAtiva("auditoria")}
+            className={`pb-3 border-b-2 transition-colors ${
+              abaAtiva === "auditoria" 
+                ? "border-primary text-primary" 
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Trilha de Auditoria
           </button>
         </div>
 
@@ -116,10 +125,15 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* 4. Renderização do componente adicionada */}
         {abaAtiva === "configuracoes" && (
           <div className="animate-in fade-in duration-300">
             <GlobalConfigManager />
+          </div>
+        )}
+
+        {abaAtiva === "auditoria" && (
+          <div className="animate-in fade-in duration-300">
+            <AuditoriaManager />
           </div>
         )}
       </div>
