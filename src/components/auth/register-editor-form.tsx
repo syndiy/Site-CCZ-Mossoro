@@ -7,12 +7,29 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { criarUsuario } from "@/lib/api/usuarioApi";
 
+const formatarCPF = (value: string) => {
+  return value
+    .replace(/\D/g, "") // Remove tudo o que não é dígito
+    .replace(/(\d{3})(\d)/, "$1.$2") // Coloca o primeiro ponto
+    .replace(/(\d{3})(\d)/, "$1.$2") // Coloca o segundo ponto
+    .replace(/(\d{3})(\d{1,2})$/, "$1-$2") // Coloca o hífen
+    .slice(0, 14); // Limita o tamanho
+};
+
+const formatarTelefone = (value: string) => {
+  return value
+    .replace(/\D/g, "")
+    .replace(/(\d{2})(\d)/, "($1) $2")
+    .replace(/(\d{5})(\d)/, "$1-$2")
+    .slice(0, 15); // Limita para (99) 99999-9999
+};
+
 export function RegisterEditorForm() {
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     phone: "",
-    CPF: "",
+    cpf: "",
     password: "",
   });
 
@@ -22,7 +39,12 @@ export function RegisterEditorForm() {
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    
+    let valorFormatado = value;
+    if (name === "cpf") valorFormatado = formatarCPF(value); // Ajustado para "cpf"
+    if (name === "phone") valorFormatado = formatarTelefone(value);
+
+    setFormData((prev) => ({ ...prev, [name]: valorFormatado }));
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -38,7 +60,7 @@ export function RegisterEditorForm() {
         username: "",
         email: "",
         phone: "",
-        CPF: "",
+        cpf: "",
         password: "",
       });
     } catch (err) {
@@ -107,17 +129,19 @@ export function RegisterEditorForm() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label htmlFor="CPF" className="text-sm font-medium leading-none">
+                <label htmlFor="cpf" className="text-sm font-medium leading-none">
                   CPF
                 </label>
                 <input
-                  id="CPF"
-                  name="CPF"
+                  id="cpf"
+                  name="cpf" // Ajustado para "cpf"
                   type="text"
                   required
+                  inputMode="numeric"
+                  maxLength={14}
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   placeholder="000.000.000-00"
-                  value={formData.CPF}
+                  value={formData.cpf}
                   onChange={handleChange}
                 />
               </div>
@@ -131,6 +155,8 @@ export function RegisterEditorForm() {
                   name="phone"
                   type="text"
                   required
+                  inputMode="numeric"
+                  maxLength={15}
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   placeholder="(00) 00000-0000"
                   value={formData.phone}

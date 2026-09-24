@@ -11,21 +11,28 @@ import {
   atualizarFuncionarioPermitido,
 } from "@/lib/api/usuarioApi";
 
+const formatarCPF = (value: string) => {
+  if (!value) return "";
+  return value
+    .replace(/\D/g, "")
+    .replace(/(\d{3})(\d)/, "$1.$2")
+    .replace(/(\d{3})(\d)/, "$1.$2")
+    .replace(/(\d{3})(\d{1,2})$/, "$1-$2")
+    .slice(0, 14);
+};
+
 export function AllowedEmployeesManager() {
   const [servidores, setServidores] = useState<AllowedEmployeeResponse[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
 
-  // Estados do Modal
   const [modalAberto, setModalAberto] = useState(false);
   const [servidorEmEdicao, setServidorEmEdicao] = useState<AllowedEmployeeResponse | null>(null);
   
-  // Estados do Formulário
   const [cpf, setCpf] = useState("");
   const [nome, setNome] = useState("");
   const [salvando, setSalvando] = useState(false);
 
-  // Busca inicial sem chamar setState síncrono
   useEffect(() => {
     let isMounted = true;
 
@@ -77,7 +84,7 @@ export function AllowedEmployeesManager() {
 
   function abrirModalEditar(servidor: AllowedEmployeeResponse) {
     setServidorEmEdicao(servidor);
-    setCpf(servidor.cpf);
+    setCpf(formatarCPF(servidor.cpf));
     setNome(servidor.name);
     setErro("");
     setModalAberto(true);
@@ -155,7 +162,8 @@ export function AllowedEmployeesManager() {
                 {servidores.map((srv, index) => (
                   <tr key={srv.id || index} className="hover:bg-muted/30 transition-colors">
                     <td className="p-3.5 font-medium">{srv.name || "Não informado"}</td>
-                    <td className="p-3.5">{srv.cpf}</td>
+                    {/* Formata o CPF diretamente na tabela para garantir a visualização padronizada */}
+                    <td className="p-3.5">{formatarCPF(srv.cpf)}</td>
                     <td className="p-3.5">
                       {srv.registered ? (
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
@@ -209,10 +217,12 @@ export function AllowedEmployeesManager() {
               <label className="text-sm font-semibold">CPF</label>
               <input
                 type="text"
+                inputMode="numeric"
+                maxLength={14}
                 className="border p-2 rounded-md bg-background"
                 placeholder="000.000.000-00"
                 value={cpf}
-                onChange={(e) => setCpf(e.target.value)}
+                onChange={(e) => setCpf(formatarCPF(e.target.value))}
               />
             </div>
 

@@ -22,7 +22,7 @@ export interface CreateUserDto {
   password?: string;
   email: string;
   phone: string;
-  CPF: string;
+  cpf: string;
   role?: string; 
 }
 
@@ -31,5 +31,5 @@ export interface UserResponse {
   username: string;
   email: string;
   phone: string;
-  CPF: string;
+  cpf: string;
 }

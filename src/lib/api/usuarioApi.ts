@@ -7,6 +7,16 @@ import {
   UpdateAllowedEmployeeDto,
 } from "../types/usuario";
 
+// Helper para extrair a mensagem de erro retornada pelo Spring Boot
+async function extrairMensagemErro(res: Response, mensagemPadrao: string): Promise<string> {
+  try {
+    const errorData = await res.json();
+    return errorData?.message || errorData?.error || mensagemPadrao;
+  } catch {
+    return mensagemPadrao;
+  }
+}
+
 export async function loginUsuario(email: string, password: string): Promise<string> {
   const res = await fetch(`${API_BASE}/users/login`, {
     method: "POST",
@@ -14,7 +24,11 @@ export async function loginUsuario(email: string, password: string): Promise<str
     body: JSON.stringify({ email, password }),
   });
 
-  if (!res.ok) throw new Error("Credenciais inválidas.");
+  if (!res.ok) {
+    const mensagem = await extrairMensagemErro(res, "Credenciais inválidas.");
+    throw new Error(mensagem);
+  }
+
   const data = await res.json();
   return data.token;
 }
@@ -29,12 +43,13 @@ export async function criarUsuario(payload: CreateUserDto): Promise<UserResponse
   });
 
   if (!res.ok) {
-    const errorData = await res.json().catch(() => null);
-    throw new Error(
-      errorData?.message ||
-        "Erro ao realizar cadastro. Verifique se o CPF está autorizado."
+    const mensagem = await extrairMensagemErro(
+      res,
+      "Erro ao realizar cadastro. Verifique se o CPF está autorizado."
     );
+    throw new Error(mensagem);
   }
+
   return (await res.json()) as UserResponse;
 }
 
@@ -57,8 +72,8 @@ export async function cadastrarFuncionarioPermitido(
     if (res.status === 401 || res.status === 403) {
       throw new Error("Apenas o Administrador pode liberar cadastros de funcionários.");
     }
-    const erroData = await res.json().catch(() => null);
-    throw new Error(erroData?.message || "Erro ao autorizar funcionário.");
+    const mensagem = await extrairMensagemErro(res, "Erro ao autorizar funcionário.");
+    throw new Error(mensagem);
   }
 
   return (await res.json()) as AllowedEmployeeResponse;
@@ -75,7 +90,11 @@ export async function listarFuncionariosPermitidos(): Promise<AllowedEmployeeRes
     },
   });
 
-  if (!res.ok) throw new Error("Erro ao buscar a lista de servidores.");
+  if (!res.ok) {
+    const mensagem = await extrairMensagemErro(res, "Erro ao buscar a lista de servidores.");
+    throw new Error(mensagem);
+  }
+
   return (await res.json()) as AllowedEmployeeResponse[];
 }
 
@@ -95,6 +114,13 @@ export async function atualizarFuncionarioPermitido(
     body: JSON.stringify(payload),
   });
 
-  if (!res.ok) throw new Error("Erro ao atualizar os dados do servidor.");
+  if (!res.ok) {
+    if (res.status === 401 || res.status === 403) {
+      throw new Error("Apenas o Administrador pode atualizar cadastros de funcionários.");
+    }
+    const mensagem = await extrairMensagemErro(res, "Erro ao atualizar os dados do servidor.");
+    throw new Error(mensagem);
+  }
+
   return (await res.json()) as AllowedEmployeeResponse;
 }
