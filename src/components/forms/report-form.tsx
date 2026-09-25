@@ -522,15 +522,15 @@ export function ReportForm() {
 }
 
 export function ProtocolLookup() {
-  const [id, setId] = useState("");
   const [carregando, setCarregando] = useState(false);
   const [resultado, setResultado] = useState<DenunciaDetalhe | null>(null);
   const [naoEncontrado, setNaoEncontrado] = useState(false);
   const [erroConsulta, setErroConsulta] = useState("");
 
-  async function consultar(e: React.FormEvent) {
+  async function consultar(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const protocolo = id.trim();
+    // Campo não controlado: o React não apaga o que foi digitado antes da página hidratar.
+    const protocolo = String(new FormData(e.currentTarget).get("protocolo") ?? "").trim().toUpperCase();
     if (!protocolo) {
       setNaoEncontrado(true);
       return;
@@ -564,11 +564,12 @@ export function ProtocolLookup() {
           </Label>
           <Input
             id="id"
-            value={id}
-            onChange={(e) => setId(e.target.value.toUpperCase())}
+            name="protocolo"
+            autoCapitalize="characters"
+            autoComplete="off"
             placeholder="Ex.: 2026-ZYHJ-MQSC"
             maxLength={25}
-            className="max-w-56"
+            className="max-w-56 uppercase"
           />
           <Button type="submit" variant="outline" disabled={carregando}>
             {carregando ? "Consultando…" : "Consultar"}
