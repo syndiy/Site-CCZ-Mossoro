@@ -30,6 +30,10 @@ docker compose up -d --build
 
 Site: `http://localhost:4000`. API para diagnóstico local: `http://localhost:8080`. O navegador usa `/api`, encaminhado pelo nginx ao Spring. Banco e armazenamento não expõem portas públicas. `npm run preview` também constrói o frontend e inicia suas dependências pelo Compose, usando esse mesmo `.env`.
 
+## VM de 1 GB (Oracle Always Free micro)
+
+`deploy/docker-compose.micro.yml` roda o conjunto numa VM pequena: as imagens `ccz-frontend` e `ccz-backend` são geradas em outra máquina e carregadas com `docker load`, e as fotos ficam num S3 externo (Oracle Object Storage) no lugar do MinIO. As variáveis estão no cabeçalho do arquivo.
+
 ## Produção em VPS
 
 Configure `.env` com `SITE_DOMAIN`, `CCZ_BACKEND_PATH` e credenciais exclusivas. `CORS_ALLOWED_ORIGINS` pode ficar vazio para derivar `https://SITE_DOMAIN` na configuração VPS.
