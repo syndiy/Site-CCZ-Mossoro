@@ -4,6 +4,7 @@ import "./globals.css";
 import { SiteConfigProvider } from "@/components/layout/site-config-provider";
 import { SiteShell } from "@/components/layout/site-shell";
 import { JsonLd } from "@/components/shared/json-ld";
+import { site } from "@/lib/site";
 import { baseMetadata, organizationJsonLd, websiteJsonLd } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 
@@ -31,6 +32,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="pt-BR" className={cn("font-sans", geist.variable)} data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: PREFERENCIAS_ACESSIBILIDADE }} />
+        {/* No head de todas as páginas: o alternates das páginas substituiria o do layout. */}
+        <link rel="alternate" type="application/rss+xml" title={`Notícias e artigos do ${site.name}`} href="/feed.xml" />
       </head>
       <body>
         <a href="#content" className="skip-link">

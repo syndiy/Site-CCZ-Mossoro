@@ -122,6 +122,8 @@ export function contentArticleJsonLd({
   path,
   cover,
   publishedAt,
+  updatedAt,
+  section,
   tags,
 }: {
   type: "Article" | "NewsArticle";
@@ -130,8 +132,11 @@ export function contentArticleJsonLd({
   path: string;
   cover: string | null;
   publishedAt: string;
+  updatedAt?: string;
+  section?: string;
   tags: string[];
 }) {
+  const imagem = !cover ? `${site.url}/img/home2.avif` : /^https?:\/\//.test(cover) ? cover : `${site.url}${cover}`;
   return {
     "@context": "https://schema.org",
     "@type": type,
@@ -139,10 +144,12 @@ export function contentArticleJsonLd({
     description,
     url: `${site.url}${path}`,
     mainEntityOfPage: { "@type": "WebPage", "@id": `${site.url}${path}` },
-    image: cover ? `${site.url}${cover}` : `${site.url}/img/home2.avif`,
+    image: [imagem],
     datePublished: publishedAt || undefined,
-    dateModified: publishedAt || undefined,
-    author: { "@type": "Organization", name: site.parentOrg },
+    dateModified: updatedAt || publishedAt || undefined,
+    articleSection: section,
+    isAccessibleForFree: true,
+    author: { "@type": "GovernmentOrganization", name: site.legalName, url: site.url },
     publisher: {
       "@type": "GovernmentOrganization",
       name: site.legalName,
@@ -150,5 +157,6 @@ export function contentArticleJsonLd({
     },
     keywords: tags.length > 0 ? tags.join(", ") : undefined,
     inLanguage: "pt-BR",
+    spatialCoverage: { "@type": "City", name: `${site.address.city}, ${site.address.state}` },
   };
 }

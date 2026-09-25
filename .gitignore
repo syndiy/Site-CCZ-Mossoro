@@ -51,3 +51,6 @@ next-env.d.ts
 /Relatorio*
 /*.png
 /*.pdf
+
+# Publicacoes do painel trazidas para o build (scripts/sincronizar-conteudo.mjs)
+/content/.painel/

@@ -35,6 +35,9 @@ export async function generateMetadata({
       description: doc.meta.description,
       url: `/articles/${doc.meta.slug}/`,
       publishedTime: doc.meta.publishedAt || undefined,
+      modifiedTime: doc.meta.updatedAt || undefined,
+      section: "Educação em saúde",
+      locale: "pt_BR",
       tags: doc.meta.tags,
       images: doc.meta.cover ? [doc.meta.cover] : undefined,
     },
@@ -59,6 +62,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           path: `/articles/${meta.slug}/`,
           cover: meta.cover,
           publishedAt: meta.publishedAt,
+          updatedAt: meta.updatedAt,
+          section: "Educação em saúde",
           tags: meta.tags,
         })}
       />

@@ -18,10 +18,14 @@ export function FeaturedArticlesAoVivo({ doBuild }: { doBuild: ArticleMeta[] }) 
     let ativo = true;
     void artigosPublicados().then((aoVivo) => {
       if (!ativo || aoVivo.length === 0) return;
-      const vistos = new Set(aoVivo.map((a) => a.slug));
+      // O que já está no build tem página própria (melhor para busca); só o que
+      // foi publicado depois do último build usa a rota provisória.
+      const noBuild = new Set(doBuild.map((a) => a.slug));
+      const novos = aoVivo.filter((a) => !noBuild.has(a.slug));
+      if (novos.length === 0) return;
       setArtigos([
-        ...aoVivo.map((a) => ({ ...a, href: `/articles/ver/?slug=${encodeURIComponent(a.slug)}` })),
-        ...doBuild.filter((a) => !vistos.has(a.slug)).map((a) => ({ ...a, href: `/articles/${a.slug}/` })),
+        ...novos.map((a) => ({ ...a, href: `/articles/ver/?slug=${encodeURIComponent(a.slug)}` })),
+        ...doBuild.map((a) => ({ ...a, href: `/articles/${a.slug}/` })),
       ].slice(0, 3));
     });
     return () => { ativo = false; };

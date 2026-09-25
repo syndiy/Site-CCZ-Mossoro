@@ -33,6 +33,9 @@ export async function generateMetadata({
       description: doc.meta.excerpt,
       url: `/news/${doc.meta.slug}/`,
       publishedTime: doc.meta.publishedAt || undefined,
+      modifiedTime: doc.meta.updatedAt || undefined,
+      section: "Notícias",
+      locale: "pt_BR",
       tags: doc.meta.tags,
       images: doc.meta.cover ? [doc.meta.cover] : undefined,
     },
@@ -57,6 +60,8 @@ export default async function NewsPage({ params }: { params: Promise<{ slug: str
           path: `/news/${meta.slug}/`,
           cover: meta.cover,
           publishedAt: meta.publishedAt,
+          updatedAt: meta.updatedAt,
+          section: "Notícias",
           tags: meta.tags,
         })}
       />

@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/sincronizar-conteudo.mjs",
     "build": "next build",
     "preview": "docker compose up -d --build frontend",
     "lint": "eslint",

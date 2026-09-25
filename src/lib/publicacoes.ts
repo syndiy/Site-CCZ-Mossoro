@@ -27,6 +27,7 @@ function base(item: ItemPublicado) {
     cover: item.imagemCapaUrl ? getImageUrl(item.imagemCapaUrl) : null,
     coverAlt: item.titulo,
     publishedAt: (item.dataPublicacao || item.dataModificacao || "").slice(0, 10),
+    updatedAt: (item.dataModificacao || item.dataPublicacao || "").slice(0, 10),
     tags: [] as string[],
     draft: false,
     home: item.ordemDestaque != null,

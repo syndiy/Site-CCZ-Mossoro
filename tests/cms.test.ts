@@ -24,7 +24,7 @@ describe("CMS publico", () => {
     for (const document of documents) {
       expect(document.slug).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
       expect(document.title.trim().length).toBeGreaterThan(0);
-      expect(document.cover).toMatch(/^\/img\/.+\.(avif|jpe?g|png|webp)$/i);
+      expect(document.cover).toMatch(/^\/(?:img|api\/midia)\/.+\.(avif|jpe?g|png|webp)$/i);
       expect(document.coverAlt.trim().length).toBeGreaterThan(0);
       expect(document.publishedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/);
       expect(document.tags.length).toBeGreaterThan(0);

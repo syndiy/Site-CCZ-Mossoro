@@ -5,6 +5,8 @@ import GithubSlugger from "github-slugger";
 import { formatDate } from "@/lib/format-date";
 
 const CONTENT_ROOT = path.join(process.cwd(), "content");
+// Publicações do painel, gravadas por scripts/sincronizar-conteudo.mjs antes do build.
+const PAINEL_ROOT = path.join(CONTENT_ROOT, ".painel");
 
 export type TocItem = { id: string; title: string };
 
@@ -14,6 +16,7 @@ type BaseMeta = {
   cover: string | null;
   coverAlt: string;
   publishedAt: string;
+  updatedAt: string;
   tags: string[];
   draft: boolean;
   home: boolean;
@@ -32,8 +35,7 @@ export type NewsMeta = BaseMeta & {
 
 export type Doc<Meta> = { meta: Meta; body: string; toc: TocItem[] };
 
-function readCollection(collection: string): { slug: string; raw: string }[] {
-  const dir = path.join(CONTENT_ROOT, collection);
+function readDir(dir: string): { slug: string; raw: string }[] {
   if (!fs.existsSync(dir)) return [];
   return fs
     .readdirSync(dir)
@@ -42,6 +44,13 @@ function readCollection(collection: string): { slug: string; raw: string }[] {
       slug: file.replace(/\.mdx?$/, ""),
       raw: fs.readFileSync(path.join(dir, file), "utf8"),
     }));
+}
+
+function readCollection(collection: string): { slug: string; raw: string }[] {
+  const doPainel = readDir(path.join(PAINEL_ROOT, collection));
+  const doPainelSlugs = new Set(doPainel.map((item) => item.slug));
+  // Se o mesmo slug existir nos dois lugares, vale a versão do painel.
+  return [...readDir(path.join(CONTENT_ROOT, collection)).filter((item) => !doPainelSlugs.has(item.slug)), ...doPainel];
 }
 
 function buildToc(body: string): TocItem[] {
@@ -73,6 +82,7 @@ function baseMeta(slug: string, data: Record<string, unknown>): BaseMeta {
     cover: data.cover ? String(data.cover) : null,
     coverAlt: String(data.coverAlt ?? ""),
     publishedAt: String(data.publishedAt ?? ""),
+    updatedAt: String(data.updatedAt ?? data.publishedAt ?? ""),
     tags: toStringArray(data.tags),
     draft: Boolean(data.draft),
     home: data.home === undefined ? Boolean(data.featured) : Boolean(data.home),
@@ -128,10 +138,15 @@ export function getFeaturedArticles(limit = 3): ArticleMeta[] {
     .slice(0, limit);
 }
 
-// Inclui rascunhos: a rota estática precisa de ao menos uma página no export, e o
-// rascunho responde "não encontrado" (o conteúdo agora vive no painel).
+// Rotas estáticas: as publicadas. Rascunhos só entram quando não há nenhuma
+// publicada, porque o export exige ao menos uma página; nesse caso respondem
+// "não encontrado". Com publicações, endereços antigos dão 404 de verdade.
+function slugsParaRotas(publicados: string[], collection: string): string[] {
+  return publicados.length > 0 ? publicados : readCollection(collection).map(({ slug }) => slug);
+}
+
 export function getArticleSlugs(): string[] {
-  return readCollection("articles").map(({ slug }) => slug);
+  return slugsParaRotas(getAllArticles().map(({ slug }) => slug), "articles");
 }
 
 export function getArticle(slug: string): Doc<ArticleMeta> | null {
@@ -156,7 +171,7 @@ export function getLatestNews(limit = 3): NewsMeta[] {
 }
 
 export function getNewsSlugs(): string[] {
-  return readCollection("news").map(({ slug }) => slug);
+  return slugsParaRotas(getAllNews().map(({ slug }) => slug), "news");
 }
 
 export function getNews(slug: string): Doc<NewsMeta> | null {

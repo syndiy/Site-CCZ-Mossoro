@@ -4,7 +4,9 @@ export const site = {
   parentOrg: "Prefeitura Municipal de Mossoró",
   department: "Secretaria Municipal de Saúde. Vigilância em Saúde",
 
-  url: "https://ccz.mossoro.rn.gov.br",
+  // Endereço público usado em links canônicos, sitemap, feed e dados estruturados.
+  // Enquanto o domínio oficial não existe, o build informa o endereço em uso.
+  url: (process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://ccz.mossoro.rn.gov.br").replace(/\/+$/, ""),
 
   description:
     "Centro de Controle de Zoonoses de Mossoró: vacinação antirrábica, castração, " +

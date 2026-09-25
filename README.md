@@ -30,6 +30,16 @@ docker compose up -d --build
 
 Site: `http://localhost:4000`. API para diagnóstico local: `http://localhost:8080`. O navegador usa `/api`, encaminhado pelo nginx ao Spring. Banco e armazenamento não expõem portas públicas. `npm run preview` também constrói o frontend e inicia suas dependências pelo Compose, usando esse mesmo `.env`.
 
+## Notícias, artigos e SEO
+
+O que a equipe publica no painel vai para o backend. Antes de cada `npm run build`, `scripts/sincronizar-conteudo.mjs` busca essas publicações em `CONTENT_API_URL` e grava em `content/.painel/`, e cada uma vira uma página HTML pronta em `/news/<slug>/` ou `/articles/<slug>/`, com metadados, dados estruturados (`NewsArticle`/`Article`) e entrada no `sitemap.xml`. O build também gera `feed.xml` (RSS), `llms.txt` e `llms-full.txt` (descrição do site para assistentes de IA). O que for publicado depois do último build aparece no portal na hora, pela rota provisória `/news/ver/?slug=` (fora do índice), até o próximo build.
+
+```sh
+CONTENT_API_URL=https://endereco-do-servidor/api NEXT_PUBLIC_SITE_URL=https://endereco-publico npm run build
+```
+
+No Git Bash do Windows, não passe `NEXT_PUBLIC_API_URL=/api` pela linha de comando: o terminal converte `/api` em um caminho do Windows. Sem essa variável, o site já usa `/api`.
+
 ## VM de 1 GB (Oracle Always Free micro)
 
 `deploy/docker-compose.micro.yml` roda o conjunto numa VM pequena: as imagens `ccz-frontend` e `ccz-backend` são geradas em outra máquina e carregadas com `docker load`, e as fotos ficam num S3 externo (Oracle Object Storage) no lugar do MinIO. As variáveis estão no cabeçalho do arquivo.
