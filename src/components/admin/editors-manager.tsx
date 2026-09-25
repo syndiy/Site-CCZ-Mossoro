@@ -5,6 +5,7 @@ import { API_BASE, requisitar } from "@/lib/api/apiClient";
 import { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner";
 
 export interface EditorUser {
   id: number;
@@ -81,7 +82,7 @@ export function EditorsManager() {
 
       setEditores((prev) => prev.filter((e) => e.id !== id));
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Erro ao excluir editor.");
+      toast.error(err instanceof Error ? err.message : "Erro ao excluir editor.");
     }
   }
 
@@ -124,7 +125,7 @@ export function EditorsManager() {
       );
       setEditorEmEdicao(null);
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Erro ao salvar alterações.");
+      toast.error(err instanceof Error ? err.message : "Erro ao salvar alterações.");
     } finally {
       setSalvando(false);
     }

@@ -1,3 +1,4 @@
+import { AuthLayout } from "@/components/auth/auth-layout";
 import { RegisterEditorForm } from "@/components/auth/register-editor-form";
 
 export const metadata = {
@@ -7,9 +8,8 @@ export const metadata = {
 
 export default function CadastroPage() {
   return (
-    <div className="min-h-screen bg-muted/30 flex items-center justify-center p-4">
-      {/* Aqui estamos chamando o componente que você já criou */}
+    <AuthLayout titulo="Criar conta de editor" descricao="Seu CPF precisa ter sido autorizado antes pelo administrador do CCZ.">
       <RegisterEditorForm />
-    </div>
+    </AuthLayout>
   );
 }

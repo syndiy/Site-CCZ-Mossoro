@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { criarUsuario } from "@/lib/api/usuarioApi";
 
@@ -50,15 +49,7 @@ export function RegisterEditorForm() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-[80vh] p-4">
-      <Card className="w-full max-w-lg shadow-lg">
-        <CardHeader className="space-y-1">
-          <h1 className="text-2xl font-bold tracking-tight">Cadastro de Editor</h1>
-          <CardDescription>
-            Preencha seus dados para criar sua conta. Seu CPF deve estar previamente autorizado pelo administrador.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+    <div>
           {erro && (
             <Alert variant="destructive" className="mb-6">
               <AlertDescription>{erro}</AlertDescription>
@@ -87,7 +78,7 @@ export function RegisterEditorForm() {
                 name="username"
                 type="text"
                 required
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="flex h-11 w-full rounded-md border border-input bg-white px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 placeholder="Ex: João da Silva"
                 value={formData.username}
                 onChange={handleChange}
@@ -104,7 +95,7 @@ export function RegisterEditorForm() {
                   name="cpf"
                   type="text"
                   required
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="flex h-11 w-full rounded-md border border-input bg-white px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   placeholder="000.000.000-00"
                   value={formData.cpf}
                   onChange={handleChange}
@@ -120,7 +111,7 @@ export function RegisterEditorForm() {
                   name="phone"
                   type="text"
                   required
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="flex h-11 w-full rounded-md border border-input bg-white px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   placeholder="(00) 00000-0000"
                   value={formData.phone}
                   onChange={handleChange}
@@ -137,7 +128,7 @@ export function RegisterEditorForm() {
                 name="email"
                 type="email"
                 required
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="flex h-11 w-full rounded-md border border-input bg-white px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 placeholder="exemplo@email.com"
                 value={formData.email}
                 onChange={handleChange}
@@ -154,19 +145,23 @@ export function RegisterEditorForm() {
                 type="password"
                 required
                 minLength={6}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="flex h-11 w-full rounded-md border border-input bg-white px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 placeholder="Crie uma senha segura"
                 value={formData.password}
                 onChange={handleChange}
               />
             </div>
 
-            <Button type="submit" className="w-full mt-6" disabled={carregando}>
-              {carregando ? "Cadastrando..." : "Finalizar Cadastro"}
+            <Button type="submit" size="lg" className="mt-6 h-11 w-full" disabled={carregando}>
+              {carregando ? "Cadastrando…" : "Criar conta"}
             </Button>
           </form>
-        </CardContent>
-      </Card>
+      <p className="mt-6 text-center text-sm text-muted-foreground">
+        Já tem conta?{" "}
+        <Link href="/login" className="font-medium text-brand-800 underline underline-offset-4">
+          Entrar no painel
+        </Link>
+      </p>
     </div>
   );
 }

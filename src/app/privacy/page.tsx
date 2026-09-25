@@ -43,7 +43,7 @@ export default function PrivacyPage() {
             .
           </p>
 
-          <p className="mt-6 text-sm italic text-muted">
+          <p className="mt-6 text-sm italic text-muted-foreground">
             Este texto é um modelo inicial e deve ser revisado pelo setor jurídico da{" "}
             {site.parentOrg} antes da publicação oficial.
           </p>

@@ -9,6 +9,8 @@ import {
 import { ConteudoListResponse, ColecaoConteudo } from '@/lib/types/conteudo';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { toast } from 'sonner';
+import { AdminPageHeader } from '@/components/admin/admin-page-header';
 
 export default function DestaquesPage() {
   const [loading, setLoading] = useState(true);
@@ -107,10 +109,10 @@ export default function DestaquesPage() {
       setSaving(true);
       const slugs = destaques.map((item) => item.slug);
       await atualizarOrdemDestaques(slugs);
-      alert('Ordem dos destaques salva com sucesso!');
+      toast.success('Destaques salvos. A home já mostra a nova ordem.');
     } catch (err) {
       console.error('Erro ao salvar ordem dos destaques:', err);
-      alert('Erro ao salvar a nova ordem dos destaques.');
+      toast.error('Não foi possível salvar os destaques.');
     } finally {
       setSaving(false);
     }
@@ -125,7 +127,8 @@ export default function DestaquesPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <div className="space-y-6">
+      <AdminPageHeader secao="Conteúdo do portal" titulo="Destaques da home" descricao="Escolha e ordene as publicações que passam no carrossel do topo da página inicial." />
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>

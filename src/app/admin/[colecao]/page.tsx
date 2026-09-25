@@ -3,7 +3,10 @@
 import { use, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Plus } from "lucide-react";
+import { toast } from "sonner";
+import { Card, CardContent } from "@/components/ui/card";
+import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   listarConteudo,
@@ -50,9 +53,10 @@ export default function ConteudoListPage({ params }: PageProps) {
     const acao = item.status === "PUBLICADO" ? "despublicar" : "publicar";
     try {
       await alterarStatusConteudo(colecao, item.slug, acao);
+      toast.success(acao === "publicar" ? "Publicado no portal." : "Retirado do portal.");
       await carregarDados();
     } catch (err) {
-      alert(err instanceof Error ? err.message : `Erro ao ${acao} conteúdo.`);
+      toast.error(err instanceof Error ? err.message : `Erro ao ${acao} conteúdo.`);
     }
   };
 
@@ -60,29 +64,29 @@ export default function ConteudoListPage({ params }: PageProps) {
     if (!confirm("Tem certeza que deseja excluir este item?")) return;
     try {
       await excluirConteudo(colecao, slug);
+      toast.success("Publicação excluída.");
       await carregarDados();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Erro ao excluir conteúdo.");
+      toast.error(err instanceof Error ? err.message : "Erro ao excluir conteúdo.");
     }
   };
 
   const tituloPagina = colecao === "noticias" ? "Notícias" : "Artigos";
 
   return (
-    <Card className="shadow-sm">
-      <CardHeader className="flex flex-row items-center justify-between pb-4">
-        <div>
-          <CardTitle className="text-xl font-bold">{tituloPagina}</CardTitle>
-          <p className="text-xs text-muted-foreground mt-1">
-            Gerencie as publicações de {tituloPagina.toLowerCase()} do portal.
-          </p>
-        </div>
-        <Link href={`/admin/${colecao}/novo`}>
-          <Button size="sm">+ Criar {colecao === "noticias" ? "Notícia" : "Artigo"}</Button>
+    <>
+    <AdminPageHeader
+      secao="Conteúdo do portal"
+      titulo={tituloPagina}
+      descricao={`Rascunhos ficam só no painel. Ao publicar, ${colecao === "noticias" ? "a notícia aparece" : "o artigo aparece"} no portal na hora.`}
+      acoes={
+        <Link href={`/admin/${colecao}/novo`} className="inline-flex h-9 items-center gap-2 rounded-lg bg-brand-800 px-4 text-sm font-medium text-white hover:bg-brand-900">
+          <Plus className="size-4" /> {colecao === "noticias" ? "Nova notícia" : "Novo artigo"}
         </Link>
-      </CardHeader>
-
-      <CardContent>
+      }
+    />
+    <Card className="rounded-2xl shadow-sm">
+      <CardContent className="pt-6">
         {erro && (
           <Alert variant="destructive" className="mb-4">
             <AlertDescription>{erro}</AlertDescription>
@@ -134,10 +138,11 @@ export default function ConteudoListPage({ params }: PageProps) {
                       >
                         {item.status === "PUBLICADO" ? "Despublicar" : "Publicar"}
                       </Button>
-                      <Link href={`/admin/${colecao}/editar?slug=${encodeURIComponent(item.slug)}`}>
-                        <Button variant="outline" size="sm">
-                          Editar
-                        </Button>
+                      <Link
+                        href={`/admin/${colecao}/editar?slug=${encodeURIComponent(item.slug)}`}
+                        className="inline-flex h-8 items-center rounded-lg border bg-white px-3 text-sm font-medium hover:bg-muted/40"
+                      >
+                        Editar
                       </Link>
                       <Button
                         onClick={() => handleExcluir(item.slug)}
@@ -155,5 +160,6 @@ export default function ConteudoListPage({ params }: PageProps) {
         )}
       </CardContent>
     </Card>
+    </>
   );
 }

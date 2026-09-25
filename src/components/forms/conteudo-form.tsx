@@ -5,7 +5,10 @@ import { useRouter } from "next/navigation";
 import { TiptapEditor } from "@/components/editor/tiptap-editor";
 import { Markdown } from "@/components/shared/markdown";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { uploadMidia } from "@/lib/api/midiaApi";
 import { getImageUrl } from "@/lib/api/apiClient";
@@ -103,24 +106,28 @@ export function ConteudoForm({ colecao, dadosIniciais }: ConteudoFormProps) {
     }
   };
 
-  const nomeColecaoSingular = colecao === "noticias" ? "Notícia" : "Artigo";
+  const tituloTela = colecao === "noticias" ? (editando ? "Editar notícia" : "Nova notícia") : (editando ? "Editar artigo" : "Novo artigo");
 
   return (
-    <Card className="max-w-4xl mx-auto shadow-sm">
-      <CardHeader>
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <CardTitle className="text-xl font-bold">
-            {editando ? `Editar ${nomeColecaoSingular}` : `Nova ${nomeColecaoSingular}`}
-          </CardTitle>
+    <>
+    <AdminPageHeader
+      secao="Conteúdo do portal"
+      titulo={tituloTela}
+      acoes={
+        <>
           {naoSalvo ? (
-            <span role="status" className="text-xs font-medium text-amber-700">
+            <span role="status" className="self-center rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700">
               Alterações não salvas
             </span>
           ) : null}
-        </div>
-      </CardHeader>
-
-      <CardContent>
+          <Link href={`/admin/${colecao}`} className="inline-flex h-9 items-center gap-2 rounded-lg border bg-white px-4 text-sm font-medium hover:bg-muted/40">
+            <ArrowLeft className="size-4" /> {colecao === "noticias" ? "Todas as notícias" : "Todos os artigos"}
+          </Link>
+        </>
+      }
+    />
+    <Card className="rounded-2xl shadow-sm">
+      <CardContent className="pt-6">
         <form onSubmit={handleSalvar} className="space-y-6">
           {erro && (
             <Alert variant="destructive">
@@ -136,7 +143,7 @@ export function ConteudoForm({ colecao, dadosIniciais }: ConteudoFormProps) {
               type="text"
               value={titulo}
               onChange={(e) => setTitulo(e.target.value)}
-              placeholder={`Digite o título da ${nomeColecaoSingular.toLowerCase()}...`}
+              placeholder={colecao === "noticias" ? "Digite o título da notícia…" : "Digite o título do artigo…"}
               className="w-full rounded-md border p-2 text-base focus:outline-none focus:ring-2 focus:ring-ring"
               required
             />
@@ -248,5 +255,6 @@ export function ConteudoForm({ colecao, dadosIniciais }: ConteudoFormProps) {
         </form>
       </CardContent>
     </Card>
+    </>
   );
 }
