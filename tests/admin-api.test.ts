@@ -48,6 +48,17 @@ describe("integração do painel com Spring", () => {
     expect(responseToUpdateRequest(data, "CONCLUIDA")).toEqual({ tipoDeDenuncia: "RATOS", statusDenuncia: "CONCLUIDA", nomeDenunciante: null, numeroTelefone: null, logradouro: "Rua A", localidade: "Mossoró", uf: "RN", numero: "10", complemento: null, bairro: "Centro", cep: "59600-000" });
   });
 
+  it("cadastra editor com o campo cpf que o Spring valida", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, status: 201, json: async () => ({ id: 2 }) });
+    vi.stubGlobal("fetch", fetchMock);
+    vi.stubGlobal("window", new EventTarget());
+    const { criarUsuario } = await import("@/lib/api/usuarioApi");
+    await criarUsuario({ username: "Ana", email: "ana@ccz.test", phone: "84999990000", cpf: "52998224725", password: "segredo1" });
+    const body = JSON.parse(fetchMock.mock.calls[0][1].body);
+    expect(body).toMatchObject({ cpf: "52998224725", role: "ROLE_EDITOR" });
+    expect(body).not.toHaveProperty("CPF");
+  });
+
   it("usa a mesma origem quando o endereço da API não foi configurado", async () => {
     vi.stubEnv("NEXT_PUBLIC_API_URL", "");
     const { API_BASE } = await import("@/lib/api/apiClient");

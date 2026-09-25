@@ -12,7 +12,7 @@ export function RegisterEditorForm() {
     username: "",
     email: "",
     phone: "",
-    CPF: "",
+    cpf: "",
     password: "",
   });
 
@@ -39,7 +39,7 @@ export function RegisterEditorForm() {
         username: "",
         email: "",
         phone: "",
-        CPF: "",
+        cpf: "",
         password: "",
       });
     } catch (err) {
@@ -96,17 +96,17 @@ export function RegisterEditorForm() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label htmlFor="CPF" className="text-sm font-medium leading-none">
+                <label htmlFor="cpf" className="text-sm font-medium leading-none">
                   CPF
                 </label>
                 <input
-                  id="CPF"
-                  name="CPF"
+                  id="cpf"
+                  name="cpf"
                   type="text"
                   required
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   placeholder="000.000.000-00"
-                  value={formData.CPF}
+                  value={formData.cpf}
                   onChange={handleChange}
                 />
               </div>
