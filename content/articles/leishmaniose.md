@@ -10,7 +10,7 @@ tags:
   - proteção animal
   - vetores
 featured: false
-draft: false
+draft: true
 ---
 
 A leishmaniose é uma doença transmitida pela picada do mosquito-palha, um inseto pequeno que costuma se abrigar em locais úmidos, sombreados e com acúmulo de matéria orgânica. A prevenção protege tanto as pessoas quanto os animais de estimação.

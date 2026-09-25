@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getAllArticles, getAllNews, getNews } from "@/lib/cms";
+import { getAllArticles, getAllNews, getArticleSlugs, getNews, getNewsSlugs } from "@/lib/cms";
 
 describe("CMS publico", () => {
   it("nao expoe noticias marcadas como rascunho", () => {
@@ -20,7 +20,7 @@ describe("CMS publico", () => {
   it("mantem metadados necessarios para busca e compartilhamento", () => {
     const documents = [...getAllArticles(), ...getAllNews()];
 
-    expect(documents.length).toBeGreaterThan(0);
+    // O conteudo publicado agora vive no painel; o Markdown que sobrar ainda precisa estar valido.
     for (const document of documents) {
       expect(document.slug).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
       expect(document.title.trim().length).toBeGreaterThan(0);
@@ -29,5 +29,10 @@ describe("CMS publico", () => {
       expect(document.publishedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/);
       expect(document.tags.length).toBeGreaterThan(0);
     }
+  });
+
+  it("mantem ao menos uma rota estatica por colecao, exigencia do export", () => {
+    expect(getArticleSlugs().length).toBeGreaterThan(0);
+    expect(getNewsSlugs().length).toBeGreaterThan(0);
   });
 });

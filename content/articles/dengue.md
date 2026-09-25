@@ -10,7 +10,7 @@ tags:
   - prevenção
   - vetores
 featured: true
-draft: false
+draft: true
 ---
 
 A dengue é uma doença infecciosa transmitida pela picada da fêmea do mosquito _Aedes aegypti_. O cuidado começa com informação e continua na vistoria semanal de cada casa.

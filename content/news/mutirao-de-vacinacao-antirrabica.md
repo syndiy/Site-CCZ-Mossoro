@@ -7,7 +7,7 @@ publishedAt: "2026-07-28"
 tags:
   - vacinação
   - campanhas
-draft: false
+draft: true
 ---
 
 O Centro de Controle de Zoonoses de Mossoró realiza mais um mutirão de vacinação antirrábica para cães e gatos. A ação é gratuita e busca ampliar a cobertura vacinal contra a raiva em todos os bairros da cidade.

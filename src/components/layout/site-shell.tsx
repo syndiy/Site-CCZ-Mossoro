@@ -10,8 +10,8 @@ import { VLibras } from "@/components/widgets/vlibras";
 
 export function SiteShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  // Painel, login e cadastro da equipe têm moldura própria, sem o cabeçalho do portal.
-  const semMoldura = ["/admin", "/login", "/cadastro"].some((rota) => pathname === rota || pathname.startsWith(`${rota}/`));
+  // Painel e login da equipe têm moldura própria, sem o cabeçalho do portal.
+  const semMoldura = ["/admin", "/login"].some((rota) => pathname === rota || pathname.startsWith(`${rota}/`));
   if (semMoldura) return <>{children}</>;
   return <><VLibras /><AccessibilityBar /><Header /><main id="content">{children}</main><Footer /><BackToTop /><CookieBanner /></>;
 }

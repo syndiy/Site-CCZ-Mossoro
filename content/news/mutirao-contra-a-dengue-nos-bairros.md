@@ -7,7 +7,7 @@ publishedAt: "2026-08-12"
 tags:
   - dengue
   - controle de vetores
-draft: false
+draft: true
 ---
 
 As equipes de vigilância em saúde do CCZ Mossoró seguem em mutirão nos bairros da cidade para localizar e eliminar criadouros do mosquito *Aedes aegypti*, transmissor da dengue, da zika e da chikungunya.

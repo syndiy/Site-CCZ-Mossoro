@@ -7,7 +7,7 @@ publishedAt: "2026-08-20"
 tags:
   - castração
   - campanhas
-draft: false
+draft: true
 ---
 
 O Centro de Controle de Zoonoses de Mossoró abre novas vagas para o programa de castração gratuita de cães e gatos. A castração é a forma mais eficaz e humanitária de controlar a população de animais nas ruas e reduzir o abandono na cidade.

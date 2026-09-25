@@ -128,8 +128,10 @@ export function getFeaturedArticles(limit = 3): ArticleMeta[] {
     .slice(0, limit);
 }
 
+// Inclui rascunhos: a rota estática precisa de ao menos uma página no export, e o
+// rascunho responde "não encontrado" (o conteúdo agora vive no painel).
 export function getArticleSlugs(): string[] {
-  return getAllArticles().map(({ slug }) => slug);
+  return readCollection("articles").map(({ slug }) => slug);
 }
 
 export function getArticle(slug: string): Doc<ArticleMeta> | null {
@@ -154,7 +156,7 @@ export function getLatestNews(limit = 3): NewsMeta[] {
 }
 
 export function getNewsSlugs(): string[] {
-  return getAllNews().map(({ slug }) => slug);
+  return readCollection("news").map(({ slug }) => slug);
 }
 
 export function getNews(slug: string): Doc<NewsMeta> | null {
