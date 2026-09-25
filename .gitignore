@@ -42,10 +42,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# editor de conteúdo (app separado em admin/)
-/admin/node_modules
-/admin/.next
-/admin/next-env.d.ts
+# Artefatos locais do editor legado removido
+/admin/
 
 # relatórios, apresentações e arte-fonte solta na raiz (não fazem parte do site)
 /output/

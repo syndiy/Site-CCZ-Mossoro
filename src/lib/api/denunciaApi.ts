@@ -3,9 +3,11 @@ import { fetchWithTimeout } from "../fetch-with-timeout";
 import { PageResponse } from "../types/common";
 import {
   DenunciaResponse,
+  DenunciaProtocolResponse,
   DenunciaPayload,
   DenunciaUpdateRequest,
   StatusDenuncia,
+  TipoDenuncia,
 } from "../types/denuncia";
 
 export function responseToUpdateRequest(
@@ -27,7 +29,7 @@ export function responseToUpdateRequest(
   };
 }
 
-export async function criarDenuncia(payload: DenunciaPayload): Promise<DenunciaResponse> {
+export async function criarDenuncia(payload: DenunciaPayload): Promise<DenunciaProtocolResponse> {
   const form = new FormData();
   form.append("tipoDeDenuncia", payload.tipoDeDenuncia);
   form.append("descricao", payload.descricao);
@@ -58,31 +60,35 @@ export async function criarDenuncia(payload: DenunciaPayload): Promise<DenunciaR
   if (!res.ok) {
     throw new Error(`Falha ao registrar denúncia (HTTP ${res.status}).`);
   }
-  return (await res.json()) as DenunciaResponse;
+  return (await res.json()) as DenunciaProtocolResponse;
 }
 
-export async function buscarDenunciaPorProtocolo(protocolo: string): Promise<DenunciaResponse | null> {
+export async function buscarDenunciaPorProtocolo(protocolo: string): Promise<DenunciaProtocolResponse | null> {
   const res = await fetchWithTimeout(`${API_BASE}/denuncia/protocolo/${encodeURIComponent(protocolo)}`);
   if (res.status === 404) return null;
   if (!res.ok) throw new Error("Erro na busca da denúncia.");
-  return (await res.json()) as DenunciaResponse;
+  return (await res.json()) as DenunciaProtocolResponse;
 }
 
 export const buscarDenuncia = buscarDenunciaPorProtocolo;
 
 export async function listarDenunciasAdmin(
   pagina: number = 0,
-  tamanho: number = 10
+  tamanho: number = 10,
+  filtros: { status?: StatusDenuncia; tipo?: TipoDenuncia } = {},
 ): Promise<PageResponse<DenunciaResponse>> {
   const token = getToken();
-  const res = await requisitar(`${API_BASE}/denuncia?page=${pagina}&size=${tamanho}`, {
+  const query = new URLSearchParams({ page: String(pagina), size: String(tamanho) });
+  if (filtros.status) query.set("status", filtros.status);
+  if (filtros.tipo) query.set("tipo", filtros.tipo);
+  const res = await requisitar(`${API_BASE}/denuncia?${query}`, {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
   });
 
-  if (!res.ok) throw new Error("Sessão expirada ou acesso não autorizado.");
+  if (!res.ok) throw new Error(res.status === 403 ? "Você não tem permissão para consultar ocorrências." : "Não foi possível carregar as ocorrências. Tente novamente.");
   return (await res.json()) as PageResponse<DenunciaResponse>;
 }
 

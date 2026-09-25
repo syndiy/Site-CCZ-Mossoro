@@ -1,130 +1,52 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { AllowedEmployeesManager } from "@/components/admin/allowed-employees-manager"; 
+import { useState } from "react";
+import Link from "next/link";
+import { ArrowUpRight, ClipboardList, FileText, Newspaper, Settings2, Users, UserCheck } from "lucide-react";
+import { AllowedEmployeesManager } from "@/components/admin/allowed-employees-manager";
 import { DenunciasManager } from "@/components/admin/denuncias-manager";
 import { EditorsManager } from "@/components/admin/editors-manager";
-// 1. Importação adicionada
-import { GlobalConfigManager } from "@/components/admin/global-config-manager"; 
+import { GlobalConfigManager } from "@/components/admin/global-config-manager";
 import { useAdminSession } from "@/components/admin/auth-guard";
 
+const sections = [
+  { id: "denuncias", label: "Ocorrências", icon: ClipboardList, admin: false },
+  { id: "servidores", label: "Servidores autorizados", icon: UserCheck, admin: true },
+  { id: "editores", label: "Equipe editorial", icon: Users, admin: true },
+  { id: "configuracoes", label: "Configurações do portal", icon: Settings2, admin: false },
+] as const;
+
 export default function AdminDashboard() {
-  const router = useRouter();
   const session = useAdminSession();
   const isAdministrator = session?.roles.includes("ROLE_ADMINISTRATOR");
-  const [autorizado, setAutorizado] = useState(false);
-  
-  // 2. Estado atualizado para incluir "configuracoes"
-  const [abaAtiva, setAbaAtiva] = useState<"denuncias" | "servidores" | "editores" | "configuracoes">("denuncias");
-
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        router.push("/login");
-      } else {
-        setAutorizado(true);
-      }
-    }, 0);
-    
-    return () => clearTimeout(timeoutId);
-  }, [router]);
-
-  function handleLogout() {
-    localStorage.removeItem("token");
-    router.push("/login");
-  }
-
-  if (!autorizado) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-sm text-muted-foreground">
-        Autenticando permissões de acesso...
-      </div>
-    );
-  }
+  const [abaAtiva, setAbaAtiva] = useState<string>("denuncias");
 
   return (
-    <div className="bg-muted/30 sm:p-6 md:p-10">
-      <div className="max-w-7xl mx-auto flex flex-col gap-6">
-        <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Painel do CCZ</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Centro de Controle de Zoonoses — Sistema de Gestão
-            </p>
-          </div>
-          <Button onClick={handleLogout} variant="destructive" size="sm">
-            Encerrar Sessão
-          </Button>
-        </header>
-
-        <div className="flex border-b gap-6 text-sm font-medium overflow-x-auto whitespace-nowrap">
-          <button
-            onClick={() => setAbaAtiva("denuncias")}
-            className={`pb-3 border-b-2 transition-colors ${
-              abaAtiva === "denuncias" 
-                ? "border-primary text-primary" 
-                : "border-transparent text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Gestão de Ocorrências
-          </button>
-          {isAdministrator && <button
-            onClick={() => setAbaAtiva("servidores")}
-            className={`pb-3 border-b-2 transition-colors ${
-              abaAtiva === "servidores" 
-                ? "border-primary text-primary" 
-                : "border-transparent text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Servidores Autorizados
-          </button>}
-          {isAdministrator && <button
-            onClick={() => setAbaAtiva("editores")}
-            className={`pb-3 border-b-2 transition-colors ${
-              abaAtiva === "editores" 
-                ? "border-primary text-primary" 
-                : "border-transparent text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Editores Cadastrados
-          </button>}
-          
-          {/* 3. Botão do menu adicionado */}
-          <button
-            onClick={() => setAbaAtiva("configuracoes")}
-            className={`pb-3 border-b-2 transition-colors ${
-              abaAtiva === "configuracoes" 
-                ? "border-primary text-primary" 
-                : "border-transparent text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Configurações Globais
-          </button>
+    <div className="space-y-8">
+      <header className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-primary">Centro de Controle de Zoonoses</p>
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Visão geral</h1>
+          <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">Olá, {session?.name?.split(" ")[0] || "equipe"}. Acompanhe as ocorrências e mantenha a população informada.</p>
         </div>
-
-        {abaAtiva === "denuncias" && <DenunciasManager />}
-
-        {isAdministrator && abaAtiva === "servidores" && (
-          <div className="animate-in fade-in duration-300">
-            <AllowedEmployeesManager />
-          </div>
-        )}
-
-        {isAdministrator && abaAtiva === "editores" && (
-          <div className="animate-in fade-in duration-300">
-            <EditorsManager />
-          </div>
-        )}
-
-        {/* 4. Renderização do componente adicionada */}
-        {abaAtiva === "configuracoes" && (
-          <div className="animate-in fade-in duration-300">
-            <GlobalConfigManager />
-          </div>
-        )}
+        <Link href="/" className="inline-flex items-center gap-2 rounded-lg border bg-background px-4 py-2 text-sm font-medium hover:bg-muted">Ver portal<ArrowUpRight className="size-4" /></Link>
+      </header>
+      <div className="grid gap-4 sm:grid-cols-2">
+        {[
+          { title: "Publicar notícia", description: "Informe sobre campanhas, ações e novidades do CCZ.", href: "/admin/noticias/novo", icon: Newspaper },
+          { title: "Escrever artigo", description: "Compartilhe orientações de prevenção e cuidados.", href: "/admin/artigos/novo", icon: FileText },
+        ].map(({ title, description, href, icon: Icon }) => <Link key={href} href={href} className="group flex gap-4 rounded-2xl border bg-background p-5 transition-colors hover:border-primary/40 focus-visible:outline-2 focus-visible:outline-primary"><span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"><Icon className="size-5" /></span><span className="flex-1"><span className="block font-semibold">{title}</span><span className="mt-1 block text-sm leading-relaxed text-muted-foreground">{description}</span></span><ArrowUpRight className="size-4 text-muted-foreground group-hover:text-primary" /></Link>)}
+      </div>
+      <div>
+        <nav aria-label="Gestão do CCZ" className="mb-6 flex gap-2 overflow-x-auto border-b pb-3">
+          {sections.filter((section) => !section.admin || isAdministrator).map(({ id, label, icon: Icon }) => <button key={id} type="button" aria-pressed={abaAtiva === id} aria-controls="gestao-conteudo" onClick={() => setAbaAtiva(id)} className={`flex items-center gap-2 whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-primary ${abaAtiva === id ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}><Icon className="size-4" />{label}</button>)}
+        </nav>
+        <section id="gestao-conteudo" aria-label={sections.find((section) => section.id === abaAtiva)?.label}>
+          {abaAtiva === "denuncias" && <DenunciasManager />}
+          {isAdministrator && abaAtiva === "servidores" && <AllowedEmployeesManager />}
+          {isAdministrator && abaAtiva === "editores" && <EditorsManager />}
+          {abaAtiva === "configuracoes" && <GlobalConfigManager />}
+        </section>
       </div>
     </div>
   );

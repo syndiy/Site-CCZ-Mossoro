@@ -578,7 +578,7 @@ export function ProtocolLookup() {
         {erroConsulta ? <p className="mt-5 text-destructive" role="alert">{erroConsulta}</p> : null}
         {resultado ? (
           <p className="mt-5 inline-flex flex-wrap items-center justify-center gap-2">
-            Denúncia <strong>#{resultado.protocolo ?? resultado.idDenuncia}</strong>
+            Denúncia <strong>#{resultado.protocolo}</strong>
             {(() => {
               const infoStatus = statusDenuncia[resultado.statusDenuncia] ?? {
                 label: resultado.statusDenuncia,

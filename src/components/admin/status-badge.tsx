@@ -1,6 +1,6 @@
 import type { StatusDenuncia, TipoDenuncia } from "@/lib/types/denuncia";
 
-const STATUS_CONFIG: Record<StatusDenuncia, { label: string; className: string }> = {
+export const STATUS_CONFIG: Record<StatusDenuncia, { label: string; className: string }> = {
   EM_ANALISE: {
     label: "Em Análise",
     className: "bg-amber-50 text-amber-700 ring-amber-600/20",
@@ -19,7 +19,7 @@ const STATUS_CONFIG: Record<StatusDenuncia, { label: string; className: string }
   },
 };
 
-const TIPO_LABELS: Record<TipoDenuncia, string> = {
+export const TIPO_LABELS: Record<TipoDenuncia, string> = {
   MAUS_TRATOS: "Maus-tratos a Animais",
   BARATAS: "Infestação de Baratas",
   RATOS: "Infestação de Ratos",

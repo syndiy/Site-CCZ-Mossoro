@@ -38,7 +38,7 @@ services:
 
   backend:
     build:
-      context: ${CCZ_BACKEND_PATH:-../SiteInstitucionalCCZ-BackEnd}
+      context: ${CCZ_BACKEND_PATH:?Defina CCZ_BACKEND_PATH com o repositorio Spring compativel}
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/ccz
       SPRING_DATASOURCE_USERNAME: ccz
@@ -58,18 +58,17 @@ services:
       minio-init:
         condition: service_completed_successfully
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
 
   frontend:
     build:
       context: .
       args:
-        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080}
-        NEXT_PUBLIC_SIMULATE: ${NEXT_PUBLIC_SIMULATE:-0}
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-/api}
     depends_on:
       - backend
     ports:
-      - "4000:80"
+      - "127.0.0.1:4000:80"
 
 volumes:
   db-data:

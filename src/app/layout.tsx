@@ -2,12 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
 import { SiteConfigProvider } from "@/components/layout/site-config-provider";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { AccessibilityBar } from "@/components/widgets/accessibility-bar";
-import { BackToTop } from "@/components/widgets/back-to-top";
-import { CookieBanner } from "@/components/widgets/cookie-banner";
-import { VLibras } from "@/components/widgets/vlibras";
+import { SiteShell } from "@/components/layout/site-shell";
 import { JsonLd } from "@/components/shared/json-ld";
 import { baseMetadata, organizationJsonLd, websiteJsonLd } from "@/lib/seo";
 import { cn } from "@/lib/utils";
@@ -33,24 +28,18 @@ if(f)document.documentElement.style.fontSize=([100,112,125][+f]||100)+"%";
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="pt-BR" className={cn("font-sans", geist.variable)} suppressHydrationWarning>
+    <html lang="pt-BR" className={cn("font-sans", geist.variable)} data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: PREFERENCIAS_ACESSIBILIDADE }} />
       </head>
       <body>
-        <VLibras />
         <a href="#content" className="skip-link">
           Pular para o conteúdo
         </a>
         <JsonLd data={organizationJsonLd()} />
         <JsonLd data={websiteJsonLd()} />
         <SiteConfigProvider>
-        <AccessibilityBar />
-        <Header />
-        <main id="content">{children}</main>
-        <Footer />
-        <BackToTop />
-        <CookieBanner />
+          <SiteShell>{children}</SiteShell>
         </SiteConfigProvider>
       </body>
     </html>

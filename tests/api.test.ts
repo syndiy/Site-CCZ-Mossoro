@@ -21,7 +21,7 @@ function capturarEnvio() {
   const fetchMock = vi.fn(async () => ({
     ok: true,
     status: 200,
-    json: async () => ({ idDenuncia: 1, protocolo: "2026-0001" }),
+    json: async () => ({ protocolo: "2026-0001", dataCriacao: "2026-09-24T10:00:00", tipoDenuncia: "MAUS_TRATOS", statusDenuncia: "EM_ANALISE" }),
   })) as unknown as typeof fetch;
   vi.stubGlobal("fetch", fetchMock);
   return fetchMock as unknown as ReturnType<typeof vi.fn>;

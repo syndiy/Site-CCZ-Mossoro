@@ -11,6 +11,14 @@ export type StatusDenuncia =
   | "CONCLUIDA"
   | "NAO_RESOLVIDA";
 
+// Resposta pública do Spring: não inclui dados pessoais nem endereço.
+export interface DenunciaProtocolResponse {
+  protocolo: string;
+  dataCriacao: string;
+  tipoDenuncia: TipoDenuncia;
+  statusDenuncia: StatusDenuncia;
+}
+
 export interface DenunciaResponse {
   idDenuncia: number;
   protocolo: string;
@@ -64,5 +72,5 @@ export interface DenunciaPayload {
   longitude?: number;
 }
 
-export type Denuncia = DenunciaResponse;
-export type DenunciaDetalhe = DenunciaResponse;
+export type Denuncia = DenunciaProtocolResponse;
+export type DenunciaDetalhe = DenunciaProtocolResponse;
