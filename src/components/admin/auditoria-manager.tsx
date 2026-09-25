@@ -10,7 +10,7 @@ import { descreverAcao, descreverRecurso, ehConsulta, mascararDetalhes } from "@
 
 const dataHora = (valor: string) => new Date(valor).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "medium" });
 const falhou = (status: string) => (status ?? "").toUpperCase().includes("ERRO");
-const quem = (usuario: string) => (usuario === "anonymousUser" ? "Visitante do portal" : usuario);
+const quem = (usuario: string) => (["anonymousUser", "Usuário Anônimo"].includes(usuario) ? "Visitante do portal" : usuario);
 
 export function AuditoriaManager() {
   const [logs, setLogs] = useState<LogAtividade[]>([]);
