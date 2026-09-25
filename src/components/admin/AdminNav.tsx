@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  ArrowUpRight, ClipboardList, FileText, LayoutDashboard, LogOut, Menu, Newspaper,
+  ArrowUpRight, ClipboardList, FileText, History, LayoutDashboard, LogOut, Menu, Newspaper,
   Settings2, Star, UserCheck, Users, X, type LucideIcon,
 } from "lucide-react";
 import { useAdminSession } from "./auth-guard";
@@ -34,6 +34,7 @@ const grupos: { titulo: string; itens: Item[] }[] = [
     itens: [
       { label: "Servidores autorizados", href: "/admin/servidores", icon: UserCheck, admin: true },
       { label: "Equipe editorial", href: "/admin/equipe", icon: Users, admin: true },
+      { label: "Trilha de auditoria", href: "/admin/auditoria", icon: History, admin: true },
     ],
   },
 ];
