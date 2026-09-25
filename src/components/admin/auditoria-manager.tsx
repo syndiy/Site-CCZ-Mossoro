@@ -28,7 +28,7 @@ export function AuditoriaManager() {
     setCarregando(true);
     setErro("");
     try {
-      const res = await listarAuditoriaAdmin(p, 50);
+      const res = await listarAuditoriaAdmin(p, 200);
       if (id !== pedido.current) return;
       setLogs(res.content);
       setPagina(p);
