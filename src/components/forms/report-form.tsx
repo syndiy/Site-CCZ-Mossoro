@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useEffect, useRef, useState } from "react";
 import { tiposDenuncia, statusDenuncia } from "@/lib/content";
 import { criarDenuncia, buscarDenuncia } from "@/lib/api/denunciaApi";
@@ -511,6 +513,15 @@ export function ReportForm() {
               <AlertDescription>{erroEnvio}</AlertDescription>
             </Alert>
           ) : null}
+
+          <p className="text-xs leading-relaxed text-muted-foreground">
+            Seus dados são usados só para o CCZ atender esta denúncia e, se você deixou contato, dar
+            retorno. A consulta pelo protocolo não mostra nome, telefone nem endereço. Veja a{" "}
+            <Link href="/privacy/" className="font-medium text-brand-800 underline underline-offset-2">
+              Política de Privacidade
+            </Link>
+            .
+          </p>
 
           <Button type="submit" size="lg" disabled={enviando} className="w-full">
             {enviando ? "Enviando…" : "Enviar denúncia"}

@@ -19,11 +19,14 @@ export async function loginUsuario(email: string, password: string): Promise<str
   return data.token;
 }
 
+// Só o administrador cria contas: o cadastro público foi fechado no backend.
 export async function criarUsuario(payload: CreateUserDto): Promise<UserResponse> {
+  const token = getToken();
   const res = await requisitar(`${API_BASE}/users`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
     body: JSON.stringify({ ...payload, role: "ROLE_EDITOR" }),
   });

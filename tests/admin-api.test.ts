@@ -52,11 +52,14 @@ describe("integração do painel com Spring", () => {
     const fetchMock = vi.fn().mockResolvedValue({ ok: true, status: 201, json: async () => ({ id: 2 }) });
     vi.stubGlobal("fetch", fetchMock);
     vi.stubGlobal("window", new EventTarget());
+    vi.stubGlobal("localStorage", { getItem: () => "token-do-admin" });
     const { criarUsuario } = await import("@/lib/api/usuarioApi");
     await criarUsuario({ username: "Ana", email: "ana@ccz.test", phone: "84999990000", cpf: "52998224725", password: "segredo1" });
     const body = JSON.parse(fetchMock.mock.calls[0][1].body);
     expect(body).toMatchObject({ cpf: "52998224725", role: "ROLE_EDITOR" });
     expect(body).not.toHaveProperty("CPF");
+    // O cadastro público foi fechado: só o administrador, com o token, cria contas.
+    expect(fetchMock.mock.calls[0][1].headers.Authorization).toBe("Bearer token-do-admin");
   });
 
   it("usa a mesma origem quando o endereço da API não foi configurado", async () => {

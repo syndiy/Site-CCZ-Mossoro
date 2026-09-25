@@ -6,7 +6,7 @@ import {
   atualizarDenunciaAdmin,
   responseToUpdateRequest,
 } from "@/lib/api/denunciaApi";
-import { getImageUrl } from "@/lib/api/apiClient";
+import { FotoProtegida } from "./foto-protegida";
 import { StatusBadge, formatarTipo } from "./status-badge";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -29,7 +29,6 @@ export function DenunciaModal({ denuncia, open, onClose, onUpdateSuccess }: Prop
   const [salvando, setSalvando] = useState(false);
   const [erroLocal, setErroLocal] = useState("");
   // Guarda a URL da imagem que falhou ao carregar
-  const [imagemComErro, setImagemComErro] = useState<string | null>(null);
 
   // Fechar modal ao pressionar a tecla ESC
   useEffect(() => {
@@ -63,10 +62,7 @@ export function DenunciaModal({ denuncia, open, onClose, onUpdateSuccess }: Prop
       }).format(new Date(denuncia.dataCriacao))
     : "Data indisponível";
 
-  const urlImagem = getImageUrl(denuncia.imagem);
   
-  // Estado derivado: se a URL atual for diferente da URL que deu erro, considera sem erro automaticamente
-  const erroImagem = imagemComErro === urlImagem;
 
   return (
     <div
@@ -183,35 +179,13 @@ export function DenunciaModal({ denuncia, open, onClose, onUpdateSuccess }: Prop
         {/* Evidência Fotográfica */}
         <div>
           <span className="font-semibold text-muted-foreground block mb-2 text-sm">Evidência Anexada:</span>
-          {denuncia.imagem && !erroImagem ? (
-            <div className="relative overflow-hidden rounded-lg border bg-black/5 flex flex-col items-center justify-center p-3">
-              <img
-                src={urlImagem}
-                alt={`Evidência da denúncia ${denuncia.protocolo}`}
-                className="object-contain max-h-72 w-full rounded-md"
-                onError={() => setImagemComErro(urlImagem)}
-              />
-              <a
-                href={urlImagem}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-primary hover:underline mt-2.5 font-medium flex items-center gap-1"
-              >
-                Abrir imagem original em nova aba ↗
-              </a>
+          {denuncia.imagem ? (
+            <div className="relative flex flex-col items-center justify-center overflow-hidden rounded-lg border bg-black/5 p-3">
+              <FotoProtegida caminho={denuncia.imagem} alt={`Foto enviada na denúncia ${denuncia.protocolo}`} />
             </div>
           ) : (
-            <div className="border border-dashed rounded-lg p-5 text-center text-xs text-muted-foreground bg-muted/10">
-              {denuncia.imagem && erroImagem ? (
-                <div className="flex flex-col gap-1 text-destructive">
-                  <p className="font-semibold">⚠️ Não foi possível carregar a imagem do servidor.</p>
-                  <p className="text-[11px] text-muted-foreground">
-                    Caminho: <code className="bg-muted px-1 py-0.5 rounded text-foreground">{urlImagem}</code>
-                  </p>
-                </div>
-              ) : (
-                <p className="italic">Nenhuma imagem foi anexada a esta denúncia.</p>
-              )}
+            <div className="rounded-lg border border-dashed bg-muted/10 p-5 text-center text-xs text-muted-foreground">
+              <p className="italic">Nenhuma imagem foi anexada a esta denúncia.</p>
             </div>
           )}
         </div>

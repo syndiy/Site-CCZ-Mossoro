@@ -9,6 +9,7 @@ export interface ConteudoListResponse {
   modificadoPor: string;
   colecao?: ColecaoConteudo;
   imagemCapaUrl?: string | null;
+  resumo?: string | null;
   ordemDestaque?: number | null;
   dataPublicacao?: string | null;
 }
@@ -18,6 +19,7 @@ export interface ConteudoCompletoResponse {
   slug: string;
   corpo: string;
   imagemCapaUrl: string;
+  resumo?: string | null;
   status: StatusConteudo;
   ordemDestaque: number | null;
   dataModificacao: string;
@@ -28,6 +30,7 @@ export interface ConteudoRequest {
   titulo: string;
   corpo: string;
   imagemCapaUrl: string | null;
+  resumo?: string | null;
 }
 
 export interface DestaqueItem {

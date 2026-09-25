@@ -5,7 +5,7 @@
 // um IP direto, por isso a origem é o nome sslip.io.
 const ORIGEM = "https://134-65-250-41.sslip.io";
 
-export default {
+const proxy = {
   async fetch(request) {
     const url = new URL(request.url);
     const destino = new URL(url.pathname + url.search, ORIGEM);
@@ -31,3 +31,5 @@ export default {
     return new Response(resposta.body, { status: resposta.status, statusText: resposta.statusText, headers: saida });
   },
 };
+
+export default proxy;

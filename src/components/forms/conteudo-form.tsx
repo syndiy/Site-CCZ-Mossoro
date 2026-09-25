@@ -29,6 +29,7 @@ export function ConteudoForm({ colecao, dadosIniciais }: ConteudoFormProps) {
     dadosIniciais?.imagemCapaUrl || null
   );
   const [corpo, setCorpo] = useState(dadosIniciais?.corpo || "");
+  const [resumo, setResumo] = useState(dadosIniciais?.resumo || "");
 
   const [enviandoImagem, setEnviandoImagem] = useState(false);
   const [salvando, setSalvando] = useState(false);
@@ -43,10 +44,11 @@ export function ConteudoForm({ colecao, dadosIniciais }: ConteudoFormProps) {
         titulo: dadosIniciais?.titulo || "",
         corpo: dadosIniciais?.corpo || "",
         imagemCapaUrl: dadosIniciais?.imagemCapaUrl || null,
+        resumo: dadosIniciais?.resumo || "",
       }),
     [dadosIniciais],
   );
-  const naoSalvo = JSON.stringify({ titulo, corpo, imagemCapaUrl }) !== estadoInicial;
+  const naoSalvo = JSON.stringify({ titulo, corpo, imagemCapaUrl, resumo }) !== estadoInicial;
 
   useEffect(() => {
     if (!naoSalvo || salvando) return;
@@ -88,6 +90,7 @@ export function ConteudoForm({ colecao, dadosIniciais }: ConteudoFormProps) {
       titulo,
       corpo,
       imagemCapaUrl,
+      resumo: resumo.trim() || null,
     };
 
     try {
@@ -147,6 +150,30 @@ export function ConteudoForm({ colecao, dadosIniciais }: ConteudoFormProps) {
               className="w-full rounded-md border p-2 text-base focus:outline-none focus:ring-2 focus:ring-ring"
               required
             />
+          </div>
+
+          {/* Resumo: cards do portal e descrição no Google e em assistentes de IA */}
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <label htmlFor="conteudo-resumo" className="text-sm font-medium">Resumo</label>
+              <span className={`text-xs ${resumo.length > 160 ? "text-amber-700" : "text-muted-foreground"}`}>{resumo.length}/300</span>
+            </div>
+            <textarea
+              id="conteudo-resumo"
+              value={resumo}
+              onChange={(e) => setResumo(e.target.value.slice(0, 300))}
+              rows={2}
+              placeholder="Uma ou duas frases dizendo do que se trata. Aparece nos cards do portal e no Google."
+              className="w-full rounded-md border p-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+            <p className="text-xs text-muted-foreground">Até 160 caracteres aparecem inteiros no Google. Se ficar vazio, usamos o começo do texto.</p>
+            {titulo.trim() ? (
+              <div aria-label="Prévia no Google" className="rounded-lg border bg-white p-3">
+                <p className="text-[11px] text-muted-foreground">Prévia no Google</p>
+                <p className="mt-1 truncate text-base text-[#1a0dab]">{titulo.trim().slice(0, 60)}{titulo.trim().length > 60 ? "…" : ""} | CCZ Mossoró</p>
+                <p className="line-clamp-2 text-sm text-[#4d5156]">{(resumo.trim() || "Sem resumo: o Google usará o começo do texto.").slice(0, 160)}</p>
+              </div>
+            ) : null}
           </div>
 
           {/* Imagem de Capa */}
