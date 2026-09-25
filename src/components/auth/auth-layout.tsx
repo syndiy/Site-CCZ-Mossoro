@@ -1,20 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, ClipboardList, Newspaper, ShieldCheck } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
-const destaques = [
-  { icon: ClipboardList, texto: "Acompanhe e atualize as ocorrências enviadas pela população." },
-  { icon: Newspaper, texto: "Publique notícias e artigos que aparecem no portal na hora." },
-  { icon: ShieldCheck, texto: "Acesso restrito a servidores autorizados pelo CCZ." },
-];
 
 // Moldura das telas de login e cadastro da equipe: marca à esquerda, formulário à direita.
 export function AuthLayout({ titulo, descricao, children }: { titulo: string; descricao: string; children: React.ReactNode }) {
   return (
     <div className="grid min-h-screen lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
-      <aside className="relative hidden overflow-hidden bg-gradient-to-br from-brand-900 via-brand-800 to-brand-600 p-12 text-white lg:flex lg:flex-col">
-        <div aria-hidden="true" className="absolute -right-24 -top-24 size-96 rounded-full bg-white/5" />
-        <div aria-hidden="true" className="absolute -bottom-32 -left-20 size-[28rem] rounded-full bg-white/5" />
+      <aside className="relative hidden overflow-hidden bg-brand-900 p-12 text-white lg:flex lg:flex-col">
+        <Image src="/img/home2.avif" alt="" fill priority sizes="45vw" className="object-cover" />
+        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-brand-900 via-brand-900/75 to-brand-900/35" />
         <Link href="/" className="relative w-fit rounded-md focus-visible:outline-2 focus-visible:outline-white">
           <Image src="/logo.svg" alt="CCZ Mossoró — página inicial" width={180} height={80} className="h-16 w-auto" priority />
         </Link>
@@ -23,18 +18,11 @@ export function AuthLayout({ titulo, descricao, children }: { titulo: string; de
           <h2 className="mt-3 text-3xl font-bold leading-tight text-white">
             Centro de Controle de Zoonoses de Mossoró
           </h2>
-          <ul className="mt-8 space-y-4">
-            {destaques.map(({ icon: Icon, texto }) => (
-              <li key={texto} className="flex items-start gap-3 text-sm leading-relaxed text-white/85">
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-white/10">
-                  <Icon className="size-4" />
-                </span>
-                <span className="pt-2">{texto}</span>
-              </li>
-            ))}
-          </ul>
+          <p className="mt-3 text-sm leading-relaxed text-white/80">
+            Atendimento às denúncias da população e comunicação do CCZ com a cidade.
+          </p>
         </div>
-        <p className="relative mt-12 text-xs text-white/60">Prefeitura Municipal de Mossoró · Secretaria de Saúde</p>
+        <p className="relative mt-10 text-xs text-white/60">Prefeitura Municipal de Mossoró · Secretaria de Saúde</p>
       </aside>
 
       <main id="content" className="flex flex-col bg-surface">
