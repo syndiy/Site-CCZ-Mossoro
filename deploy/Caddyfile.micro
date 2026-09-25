@@ -1,0 +1,27 @@
+{
+	# Navegadores nao enviam SNI para endereco IP; sem isto o Caddy nao sabe
+	# qual certificado entregar a quem acessa pelo IP.
+	default_sni {$SITE_IP}
+}
+
+(portal) {
+	encode zstd gzip
+	reverse_proxy frontend:80
+}
+
+{$SITE_DOMAIN} {
+	import portal
+}
+
+# O mesmo site no IP da VM. Firewalls que bloqueiam a categoria "Dynamic DNS"
+# (ex.: FortiGate de redes de faculdade) barram o sslip.io, mas liberam o IP.
+# O Let's Encrypt so emite certificado de IP no perfil de curta duracao
+# (cerca de 6 dias); o Caddy renova sozinho.
+{$SITE_IP} {
+	tls {
+		issuer acme {
+			profile shortlived
+		}
+	}
+	import portal
+}
