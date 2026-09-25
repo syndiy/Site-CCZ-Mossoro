@@ -89,6 +89,11 @@ export function Footer() {
                 Privacidade e LGPD
               </Link>
             </li>
+            <li>
+              <Link href="/login/" className="text-brand-300 hover:text-white">
+                Acesso da equipe
+              </Link>
+            </li>
           </ul>
         </div>
       </Container>
