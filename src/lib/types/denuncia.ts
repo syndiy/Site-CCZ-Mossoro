@@ -11,56 +11,43 @@ export type StatusDenuncia =
   | "CONCLUIDA"
   | "NAO_RESOLVIDA";
 
-export interface DenunciaResponse {
+export interface DenunciaProtocoloResponse {
   idDenuncia: number;
   protocolo: string;
   dataCriacao: string;
+  tipoDenuncia: TipoDenuncia;
+  statusDenuncia: StatusDenuncia;
+}
+
+export interface DenunciaDetalhadaResponse {
+  id: number;
+  idDenuncia: number;
+  protocolo: string;
+  descricao: string;
   tipoDeDenuncia: TipoDenuncia;
   statusDenuncia: StatusDenuncia;
-  descricao?: string;
-  nomeDenunciante: string | null;
-  numeroTelefone: string | null;
-  imagem: string | null;
-  idEndereco: number;
+  nomeDenunciante?: string;
+  numeroTelefone?: string;
+  fonte: string;
+  createdAt: string;
+  dataCriacao: string;
+  nomeFoto?: string;
+  imagem?: string;
   rua: string;
-  numero: string;
-  complemento: string | null;
-  bairro: string;
-  cep: string;
+  numero?: string;
+  bairro?: string;
   cidade: string;
   estado: string;
+  cep?: string;
+  complemento?: string | null;
+  endereco?: {
+    id: number;
+    logradouro: string;
+    numero?: string;
+    bairro?: string;
+    localidade: string;
+    uf: string;
+    cep?: string;
+    complemento?: string | null;
+  };
 }
-
-export interface DenunciaUpdateRequest {
-  tipoDeDenuncia: TipoDenuncia;
-  statusDenuncia: StatusDenuncia;
-  numeroTelefone: string | null;
-  nomeDenunciante: string | null;
-  logradouro: string;
-  numero: string;
-  complemento: string | null;
-  bairro: string;
-  cep: string;
-  localidade: string;
-  uf: string;
-}
-
-export interface DenunciaPayload {
-  tipoDeDenuncia: TipoDenuncia;
-  descricao: string;
-  nomeDenunciante: string;
-  numeroTelefone: string;
-  cep: string;
-  logradouro: string;
-  numero: string;
-  complemento: string;
-  bairro: string;
-  localidade: string;
-  uf: string;
-  imagem: File | null;
-  latitude?: number;
-  longitude?: number;
-}
-
-export type Denuncia = DenunciaResponse;
-export type DenunciaDetalhe = DenunciaResponse;
