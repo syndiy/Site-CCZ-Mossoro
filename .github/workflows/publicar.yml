@@ -1,0 +1,50 @@
+name: Publicar site
+
+# Gera o site com as publicações do painel e troca no servidor. Assim, o que a
+# equipe publica vira página pronta para o Google sem depender de um computador
+# ligado. Fica inativo até configurar no GitHub (Settings > Secrets and variables):
+#   secret   SSH_KEY          chave privada que acessa o servidor
+#   variable SERVIDOR         usuário@host, ex.: opc@134.65.250.41
+#   variable CONTENT_API_URL  ex.: https://134.65.250.41/api
+#   variable SITE_URL         endereço público do site
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 */6 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publicar-site
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    if: ${{ vars.SERVIDOR != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - name: Build com as publicações do painel
+        env:
+          CONTENT_API_URL: ${{ vars.CONTENT_API_URL }}
+          NEXT_PUBLIC_SITE_URL: ${{ vars.SITE_URL }}
+        run: npm run build
+      - name: Troca o site no servidor
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+          SERVIDOR: ${{ vars.SERVIDOR }}
+        run: |
+          install -m 600 /dev/null "$RUNNER_TEMP/chave"
+          printf '%s\n' "$SSH_KEY" > "$RUNNER_TEMP/chave"
+          SSH="ssh -i $RUNNER_TEMP/chave -o StrictHostKeyChecking=accept-new"
+          tar -czf site.tar.gz out nginx.conf
+          scp -i "$RUNNER_TEMP/chave" -o StrictHostKeyChecking=accept-new site.tar.gz deploy/atualizar-site.sh "$SERVIDOR":ccz/
+          $SSH "$SERVIDOR" 'bash ccz/atualizar-site.sh'

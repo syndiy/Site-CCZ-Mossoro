@@ -73,6 +73,12 @@ export function ReportForm() {
   const [buscandoEndereco, setBuscandoEndereco] = useState(false);
   const [online, setOnline] = useState(true);
   const cepRequest = useRef(0);
+  // Anti-robô: campo que só robôs preenchem e tempo mínimo de preenchimento.
+  const armadilha = useRef<HTMLInputElement>(null);
+  const abertoEm = useRef(0);
+  useEffect(() => {
+    abertoEm.current = Date.now();
+  }, []);
   const ultimoCepConsultado = useRef("");
 
   useEffect(() => {
@@ -208,6 +214,17 @@ export function ReportForm() {
     e.preventDefault();
     setErroEnvio("");
 
+    // Robô preencheu o campo invisível: finge que enviou e descarta.
+    if (armadilha.current?.value) {
+      setResultado({ protocolo: "RECEBIDO" } as Denuncia);
+      return;
+    }
+    // Ninguém escolhe o tipo e preenche o endereço em menos de 3 segundos.
+    if (Date.now() - abertoEm.current < 3000) {
+      setErroEnvio("Confira os dados e toque em enviar de novo.");
+      return;
+    }
+
     if (!online) {
       setErroEnvio("Você está offline. Conecte-se à internet para enviar a denúncia.");
       return;
@@ -287,6 +304,11 @@ export function ReportForm() {
 
       <CardContent>
         <form onSubmit={onSubmit} noValidate className="flex flex-col gap-8">
+          {/* Campo invisível para pessoas (e para leitores de tela); robôs costumam preencher. */}
+          <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
+            <label htmlFor="site-contato">Site</label>
+            <input ref={armadilha} id="site-contato" name="site" type="text" tabIndex={-1} autoComplete="off" defaultValue="" />
+          </div>
           <section>
             <Step number={1} title="O que você quer denunciar" />
             <div role="radiogroup" aria-label="Tipo de denúncia" className="grid grid-cols-2 gap-3 sm:grid-cols-3">
