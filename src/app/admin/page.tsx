@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { AllowedEmployeesManager } from "@/components/admin/allowed-employees-manager"; 
-import { DenunciasManager } from "@/components/admin/denuncias-manager";
 import { EditorsManager } from "@/components/admin/editors-manager";
 import { GlobalConfigManager } from "@/components/admin/global-config-manager"; 
 import { AuditoriaManager } from "@/components/admin/auditoria-manager";
@@ -13,9 +12,10 @@ export default function AdminDashboard() {
   const router = useRouter();
   const [autorizado, setAutorizado] = useState(false);
   
+  // Alterado para iniciar direto na aba de servidores, já que denúncias foi removido
   const [abaAtiva, setAbaAtiva] = useState<
-    "denuncias" | "servidores" | "editores" | "configuracoes" | "auditoria"
-  >("denuncias");
+    "servidores" | "editores" | "configuracoes" | "auditoria"
+  >("servidores");
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -60,16 +60,6 @@ export default function AdminDashboard() {
 
         <div className="flex border-b gap-6 text-sm font-medium overflow-x-auto whitespace-nowrap">
           <button
-            onClick={() => setAbaAtiva("denuncias")}
-            className={`pb-3 border-b-2 transition-colors ${
-              abaAtiva === "denuncias" 
-                ? "border-primary text-primary" 
-                : "border-transparent text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Gestão de Ocorrências
-          </button>
-          <button
             onClick={() => setAbaAtiva("servidores")}
             className={`pb-3 border-b-2 transition-colors ${
               abaAtiva === "servidores" 
@@ -110,8 +100,6 @@ export default function AdminDashboard() {
             Trilha de Auditoria
           </button>
         </div>
-
-        {abaAtiva === "denuncias" && <DenunciasManager />}
 
         {abaAtiva === "servidores" && (
           <div className="animate-in fade-in duration-300">

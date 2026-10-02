@@ -1,3 +1,6 @@
+
+import axios from "axios";
+
 export const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
 export const getImageUrl = (path: string | null): string => {
@@ -16,3 +19,24 @@ export const getToken = (): string | null => {
   }
   return null;
 };
+
+
+export const apiClient = axios.create({
+  baseURL: API_BASE,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = getToken();
+    if (token && config.headers) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);

@@ -51,3 +51,18 @@ export interface DenunciaDetalhadaResponse {
     complemento?: string | null;
   };
 }
+
+export interface Denuncia {
+  id?: string | number;
+  protocolo: string;
+  statusDenuncia: string;
+  tipoDeDenuncia?: string;
+  descricao?: string;
+  rua?: string;
+  bairro?: string;
+  cidade?: string;
+  estado?: string;
+  createdAt?: string;
+}
+
+export type DenunciaDetalhe = Denuncia;

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { tiposDenuncia, statusDenuncia } from "@/lib/content";
-import { criarDenuncia, buscarDenuncia } from "@/lib/api/denunciaApi";
+import { denunciaApi } from "@/lib/api/denunciaApi";
 import type { Denuncia, DenunciaDetalhe, TipoDenuncia } from "@/lib/types/denuncia";
 import {
   buscarPorCep,
@@ -26,7 +26,7 @@ import { Icon } from "@/components/shared/icon";
 
 const cczCoords: Coords = { lat: site.address.lat, lng: site.address.lng };
 
-type Errors = Partial<Record<"tipo" | "logradouro" | "localidade" | "uf" | "imagem", string>>;
+type Errors = Partial<Record<"tipo" | "descricao" | "logradouro" | "localidade" | "uf" | "imagem", string>>;
 
 function Step({ number, title }: { number: number; title: string }) {
   return (
@@ -49,7 +49,7 @@ function FieldError({ children }: { children: string }) {
 
 export function ReportForm() {
   const [tipo, setTipo] = useState<TipoDenuncia | "">("");
-  const [descricao, setDescricao] = useState(""); // <-- NOVO CAMPO: Descrição
+  const [descricao, setDescricao] = useState("");
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
   const [cep, setCep] = useState("");
@@ -211,33 +211,46 @@ export function ReportForm() {
       return;
     }
 
+    // NOVA VERSÃO: Remove tudo que não for letra, pega os 2 primeiros caracteres e converte para maiúsculo
+    const ufEstrita = uf.replace(/[^a-zA-Z]/g, "").substring(0, 2).toUpperCase();
+
     const next: Errors = {};
     if (!tipo) next.tipo = "Selecione o tipo de denúncia.";
+    if (!descricao.trim()) next.descricao = "A descrição dos fatos é obrigatória.";
     if (!logradouro.trim()) next.logradouro = "Informe a rua.";
     if (!localidade.trim()) next.localidade = "Informe a cidade.";
-    if (!uf.trim()) next.uf = "Informe a UF.";
-    if (!imagem) next.imagem = "Anexe uma foto da ocorrência.";
+    
+    if (!ufEstrita || ufEstrita.length !== 2) {
+      next.uf = "Apenas os 2 caracteres da sigla (ex: RN).";
+    }
+
     setErrors(next);
+
     if (Object.keys(next).length > 0) return;
 
     setEnviando(true);
     try {
-      const res = await criarDenuncia({
-        tipoDeDenuncia: tipo as TipoDenuncia,
-        descricao: descricao.trim(),
-        nomeDenunciante: nome.trim(),
-        numeroTelefone: telefone.trim(),
-        cep: cep.trim(),
-        logradouro: logradouro.trim(),
-        numero: numero.trim(),
-        complemento: complemento.trim(),
-        bairro: bairro.trim(),
-        localidade: localidade.trim(),
-        uf: uf.trim().toUpperCase(),
-        imagem,
-        latitude: ponto?.lat,
-        longitude: ponto?.lng,
-      });
+      const formData = new FormData();
+      formData.append("descricao", descricao.trim());
+      formData.append("tipoDeDenuncia", tipo);
+      formData.append("rua", logradouro.trim());
+      formData.append("cidade", localidade.trim());
+      
+      // Envia a versão estritamente tratada, impossível de mandar aspas ou espaços
+      formData.append("estado", ufEstrita);
+
+      if (bairro.trim()) formData.append("bairro", bairro.trim());
+      if (numero.trim()) formData.append("numero", numero.trim());
+      if (complemento.trim()) formData.append("complemento", complemento.trim());
+      if (cep.trim()) formData.append("cep", cep.trim());
+      if (nome.trim()) formData.append("nomeDenunciante", nome.trim());
+      if (telefone.trim()) formData.append("numeroTelefone", telefone.trim());
+
+      if (imagem) {
+        formData.append("imagem", imagem);
+      }
+
+      const res = await denunciaApi.criar(formData);
       setResultado(res);
     } catch (err) {
       setErroEnvio(
@@ -304,11 +317,10 @@ export function ReportForm() {
             </div>
             {errors.tipo ? <FieldError>{errors.tipo}</FieldError> : null}
 
-            {/* NOVO CAMPO: Descrição da Ocorrência */}
             <div className="mt-5 flex flex-col gap-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="descricao" className="text-sm font-medium">
-                  Descrição dos fatos <span className="text-xs font-normal text-muted-foreground">(opcional)</span>
+                  Descrição dos fatos <span className="text-destructive">*</span>
                 </Label>
                 <span className="text-xs text-muted-foreground">
                   {descricao.length}/500
@@ -321,7 +333,9 @@ export function ReportForm() {
                 onChange={(e) => setDescricao(e.target.value)}
                 placeholder="Descreva brevemente detalhes que ajudem a fiscalização (ex.: quantidade estimada, horários de maior frequência, ponto de referência interno)..."
                 className="min-h-[100px] w-full resize-none rounded-xl border border-border bg-white p-3 text-sm text-foreground shadow-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-600 disabled:cursor-not-allowed disabled:opacity-50"
+                aria-invalid={!!errors.descricao}
               />
+              {errors.descricao ? <FieldError>{errors.descricao}</FieldError> : null}
             </div>
           </section>
 
@@ -432,7 +446,7 @@ export function ReportForm() {
           </section>
 
           <section className="border-t border-border pt-8">
-            <Step number={3} title="Foto da ocorrência" />
+            <Step number={3} title="Foto da ocorrência (Opcional)" />
             <Label
               htmlFor="imagem"
               className={cn(
@@ -457,8 +471,7 @@ export function ReportForm() {
                     className="text-primary transition-transform duration-300 group-hover:scale-110"
                   />
                   <span>
-                    <strong className="text-brand-800">Clique para anexar</strong> uma foto da
-                    ocorrência <span className="text-destructive">*</span>
+                    <strong className="text-brand-800">Clique para anexar</strong> uma foto da ocorrência.
                   </span>
                 </>
               )}
@@ -531,7 +544,7 @@ export function ProtocolLookup() {
     setResultado(null);
     setNaoEncontrado(false);
     try {
-      const res = await buscarDenuncia(protocolo);
+      const res = await denunciaApi.buscarPorProtocolo(protocolo);
       if (res) setResultado(res);
       else setNaoEncontrado(true);
     } catch {
@@ -557,9 +570,9 @@ export function ProtocolLookup() {
             id="id"
             value={id}
             onChange={(e) => setId(e.target.value.toUpperCase())}
-            placeholder="Ex.: 2026-ZYHJ-MQSC"
+            placeholder="Ex.: DEN-20261002-EDDE26"
             maxLength={25}
-            className="max-w-56"
+            className="max-w-64"
           />
           <Button type="submit" variant="outline" disabled={carregando}>
             {carregando ? "Consultando…" : "Consultar"}
@@ -568,7 +581,7 @@ export function ProtocolLookup() {
 
         {resultado ? (
           <p className="mt-5 inline-flex flex-wrap items-center justify-center gap-2">
-            Denúncia <strong>#{resultado.protocolo ?? resultado.idDenuncia}</strong>
+            Denúncia <strong>#{resultado.protocolo ?? resultado.id}</strong>
             {(() => {
               const infoStatus = statusDenuncia[resultado.statusDenuncia] ?? {
                 label: resultado.statusDenuncia,
